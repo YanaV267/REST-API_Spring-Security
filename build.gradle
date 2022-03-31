@@ -1,0 +1,16 @@
+subprojects {
+    apply plugin: 'java'
+
+    group 'com.epam.esm'
+    version '1.0-SNAPSHOT'
+
+    sourceCompatibility = '8'
+    targetCompatibility = '8'
+
+    repositories {
+        mavenCentral()
+    }
+
+    dependencies {
+    }
+}
