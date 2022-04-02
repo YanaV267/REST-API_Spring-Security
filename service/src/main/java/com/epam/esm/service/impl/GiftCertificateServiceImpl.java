@@ -8,6 +8,7 @@ import com.epam.esm.service.GiftCertificateService;
 import com.epam.esm.util.CertificateDateFormatter;
 import com.epam.esm.validator.GiftCertificateValidator;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -21,17 +22,18 @@ import static com.epam.esm.util.ParameterName.*;
 @Service
 public class GiftCertificateServiceImpl implements GiftCertificateService {
     private final GiftCertificateRepository repository;
+    private final CertificateDateFormatter dateFormatter;
     private final GiftCertificateValidator validator;
     private final GiftCertificateMapper mapper;
-    private final CertificateDateFormatter dateFormatter;
 
     @Autowired
-    public GiftCertificateServiceImpl(GiftCertificateRepository repository, GiftCertificateValidator validator,
-                                      GiftCertificateMapper mapper, CertificateDateFormatter dateFormatter) {
+    public GiftCertificateServiceImpl(GiftCertificateRepository repository, CertificateDateFormatter dateFormatter,
+                                      GiftCertificateValidator validator,
+                                      @Qualifier("certificateMapper") GiftCertificateMapper mapper) {
         this.repository = repository;
+        this.dateFormatter = dateFormatter;
         this.validator = validator;
         this.mapper = mapper;
-        this.dateFormatter = dateFormatter;
     }
 
     @Override

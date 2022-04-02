@@ -5,11 +5,14 @@ import com.epam.esm.entity.Tag;
 import com.epam.esm.mapper.impl.TagMapper;
 import com.epam.esm.repository.TagRepository;
 import com.epam.esm.service.TagService;
+import com.epam.esm.util.ParameterName;
 import com.epam.esm.validator.TagValidator;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -20,16 +23,18 @@ public class TagServiceImpl implements TagService {
     private final TagMapper mapper;
 
     @Autowired
-    public TagServiceImpl(TagRepository repository, TagValidator validator, TagMapper mapper) {
+    public TagServiceImpl(TagRepository repository, TagValidator validator,
+                          @Qualifier("tagMapper") TagMapper mapper) {
         this.repository = repository;
         this.validator = validator;
         this.mapper = mapper;
     }
 
     @Override
-    public boolean create(String tagName) {
-        if (validator.checkName(tagName)) {
-            Tag tag = new Tag(tagName);
+    public boolean create(Map<String, String> tagData) {
+        if (validator.checkName(tagData.get(ParameterName.NAME))) {
+            Tag tag = new Tag();
+            tag.setName(tagData.get(ParameterName.NAME));
             return repository.create(tag);
         } else {
             return false;
