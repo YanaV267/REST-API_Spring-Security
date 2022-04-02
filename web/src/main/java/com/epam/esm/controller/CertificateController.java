@@ -1,4 +1,4 @@
-package com.epam.esm.controler;
+package com.epam.esm.controller;
 
 import com.epam.esm.dto.GiftCertificateDto;
 import com.epam.esm.exception.BadRequestException;

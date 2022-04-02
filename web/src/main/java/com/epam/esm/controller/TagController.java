@@ -1,4 +1,4 @@
-package com.epam.esm.controler;
+package com.epam.esm.controller;
 
 import com.epam.esm.dto.TagDto;
 import com.epam.esm.exception.BadRequestException;
@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import static org.springframework.http.HttpStatus.*;
@@ -25,8 +26,8 @@ public class TagController {
 
     @PostMapping(consumes = APPLICATION_JSON_VALUE)
     @ResponseStatus(CREATED)
-    public void create(@RequestBody String tagName) {
-        boolean isCreated = tagService.create(tagName);
+    public void create(@RequestBody Map<String, String> tagData) {
+        boolean isCreated = tagService.create(tagData);
         if (!isCreated) {
             throw new BadRequestException();
         }
