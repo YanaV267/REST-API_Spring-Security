@@ -1,11 +1,10 @@
 package com.epam.esm.repository.impl;
 
+import com.epam.esm.connection.ConnectionPool;
+import com.epam.esm.entity.GiftCertificate;
 import com.epam.esm.repository.GiftCertificateRepository;
-import com.epam.esm.repository.connection.ConnectionPool;
-import com.epam.esm.repository.entity.GiftCertificate;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.sql.*;
@@ -32,8 +31,11 @@ public class GiftCertificateRepositoryImpl implements GiftCertificateRepository 
     private static final String SELECT_CERTIFICATES_BY_DESCRIPTION = "SELECT id, name, description, price, duration, create_date, " +
             "last_update_date FROM gift_certificate WHERE description = ?";
 
-    @Autowired
-    private ConnectionPool connectionPool;
+    private final ConnectionPool connectionPool;
+
+    public GiftCertificateRepositoryImpl(ConnectionPool connectionPool) {
+        this.connectionPool = connectionPool;
+    }
 
     @Override
     public boolean create(GiftCertificate certificate) {
@@ -80,7 +82,7 @@ public class GiftCertificateRepositoryImpl implements GiftCertificateRepository 
             statement.execute();
             return true;
         } catch (SQLException exception) {
-            LOGGER.error("Error has occurred deleting gift certificate: " + exception);
+            LOGGER.error("Error has occurred while deleting gift certificate: " + exception);
             return false;
         }
     }
@@ -93,7 +95,7 @@ public class GiftCertificateRepositoryImpl implements GiftCertificateRepository 
              ResultSet resultSet = statement.executeQuery(SELECT_ALL_CERTIFICATES)) {
             certificates = retrieve(resultSet);
         } catch (SQLException exception) {
-            LOGGER.error("Error has occurred finding all gift certificates: " + exception);
+            LOGGER.error("Error has occurred while finding all gift certificates: " + exception);
         }
         return certificates;
     }
@@ -110,7 +112,7 @@ public class GiftCertificateRepositoryImpl implements GiftCertificateRepository 
                 }
             }
         } catch (SQLException exception) {
-            LOGGER.error("Error has occurred deleting gift certificate: " + exception);
+            LOGGER.error("Error has occurred while finding gift certificate by id: " + exception);
         }
         return Optional.empty();
     }
@@ -125,7 +127,7 @@ public class GiftCertificateRepositoryImpl implements GiftCertificateRepository 
                 certificates = retrieve(resultSet);
             }
         } catch (SQLException exception) {
-            LOGGER.error("Error has occurred deleting gift certificate: " + exception);
+            LOGGER.error("Error has occurred while finding gift certificates by name: " + exception);
         }
         return certificates;
     }
@@ -140,7 +142,7 @@ public class GiftCertificateRepositoryImpl implements GiftCertificateRepository 
                 certificates = retrieve(resultSet);
             }
         } catch (SQLException exception) {
-            LOGGER.error("Error has occurred deleting gift certificate: " + exception);
+            LOGGER.error("Error has occurred while finding gift certificates by description: " + exception);
         }
         return certificates;
     }

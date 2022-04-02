@@ -1,8 +1,8 @@
 package com.epam.esm.repository.impl;
 
+import com.epam.esm.connection.ConnectionPool;
+import com.epam.esm.entity.Tag;
 import com.epam.esm.repository.TagRepository;
-import com.epam.esm.repository.connection.ConnectionPool;
-import com.epam.esm.repository.entity.Tag;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,8 +25,12 @@ public class TagRepositoryImpl implements TagRepository {
     private static final String SELECT_TAG_BY_ID = "SELECT id, name FROM tag WHERE id = ?";
     private static final String SELECT_TAG_BY_NAME = "SELECT id, name FROM tag WHERE name = ?";
 
+    private final ConnectionPool connectionPool;
+
     @Autowired
-    private ConnectionPool connectionPool;
+    public TagRepositoryImpl(ConnectionPool connectionPool) {
+        this.connectionPool = connectionPool;
+    }
 
     @Override
     public boolean create(Tag tag) {
