@@ -1,4 +1,4 @@
-package com.epam.esm.repository.connection;
+package com.epam.esm.connection;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -52,10 +52,6 @@ class ConnectionFactory {
             LOGGER.fatal("Driver {} wasn't found: {}", driver, exception);
             throw new RuntimeException("Driver " + driver + " wasn't found: ", exception);
         }
-    }
-
-    private ConnectionFactory() {
-
     }
 
     static Connection getConnection() throws SQLException {

@@ -1,9 +1,9 @@
-package com.epam.esm.repository.entity;
+package com.epam.esm.dto;
 
 import java.math.BigDecimal;
 import java.util.Date;
 
-public class GiftCertificate {
+public class GiftCertificateDto {
     private long id;
     private String name;
     private String description;
@@ -12,7 +12,7 @@ public class GiftCertificate {
     private Date createDate;
     private Date lastUpdateDate;
 
-    public GiftCertificate() {
+    public GiftCertificateDto() {
 
     }
 
@@ -78,7 +78,7 @@ public class GiftCertificate {
             return true;
         if (o == null || getClass() != o.getClass())
             return false;
-        GiftCertificate certificate = (GiftCertificate) o;
+        GiftCertificateDto certificate = (GiftCertificateDto) o;
         if (name != null ? name.equals(certificate.name) : certificate.name == null) {
             return false;
         }
@@ -121,52 +121,5 @@ public class GiftCertificate {
         sb.append(" , createDate='").append(createDate);
         sb.append("' , lastUpdateDate='").append(lastUpdateDate).append("'}");
         return sb.toString();
-    }
-
-    public static class GiftCertificateBuilder {
-        private GiftCertificate certificate;
-
-        public GiftCertificateBuilder() {
-
-        }
-
-        public GiftCertificateBuilder setId(long id) {
-            certificate.id = id;
-            return this;
-        }
-
-        public GiftCertificateBuilder setName(String name) {
-            certificate.name = name;
-            return this;
-        }
-
-        public GiftCertificateBuilder setDescription(String description) {
-            certificate.description = description;
-            return this;
-        }
-
-        public GiftCertificateBuilder setPrice(BigDecimal price) {
-            certificate.price = price;
-            return this;
-        }
-
-        public GiftCertificateBuilder setDuration(int duration) {
-            certificate.duration = duration;
-            return this;
-        }
-
-        public GiftCertificateBuilder setCreateDate(Date createDate) {
-            certificate.createDate = createDate;
-            return this;
-        }
-
-        public GiftCertificateBuilder setLastUpdateDate(Date lastUpdateDate) {
-            certificate.lastUpdateDate = lastUpdateDate;
-            return this;
-        }
-
-        public GiftCertificate build() {
-            return certificate;
-        }
     }
 }

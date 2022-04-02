@@ -1,17 +1,17 @@
-package com.epam.esm.repository.connection;
+package com.epam.esm.connection;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.springframework.stereotype.Component;
 
 import java.sql.Connection;
+import java.sql.Driver;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.Enumeration;
 import java.util.ResourceBundle;
 import java.util.concurrent.BlockingDeque;
 import java.util.concurrent.LinkedBlockingDeque;
 
-@Component
 public class ConnectionPool {
     private static final Logger LOGGER = LogManager.getLogger();
     private static final String POOL_PROPERTY_FILE = "pool";
@@ -33,7 +33,7 @@ public class ConnectionPool {
         }
     }
 
-    private ConnectionPool() {
+    public ConnectionPool() {
         freeConnections = new LinkedBlockingDeque<>(POOL_SIZE);
         takenConnections = new LinkedBlockingDeque<>(POOL_SIZE);
         for (int i = 0; i < POOL_SIZE; i++) {
@@ -93,14 +93,16 @@ public class ConnectionPool {
     }
 
     private void deregisterDrivers() {
-        DriverManager.getDrivers().asIterator().forEachRemaining(driver -> {
+        Enumeration<Driver> drivers = DriverManager.getDrivers();
+        while (drivers.hasMoreElements()) {
+            Driver driver = drivers.nextElement();
             try {
                 DriverManager.deregisterDriver(driver);
             } catch (SQLException exception) {
                 LOGGER.error("Error has occurred while deregistering drivers: " + exception.getMessage());
                 Thread.currentThread().interrupt();
             }
-        });
+        }
     }
 }
 

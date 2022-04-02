@@ -1,9 +1,12 @@
-package com.epam.esm.service.dto;
+package com.epam.esm.entity;
 
 import java.math.BigDecimal;
+import java.util.Collections;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
-public class GiftCertificateDto {
+public class GiftCertificate {
     private long id;
     private String name;
     private String description;
@@ -11,9 +14,10 @@ public class GiftCertificateDto {
     private int duration;
     private Date createDate;
     private Date lastUpdateDate;
+    private Set<Tag> tags;
 
-    public GiftCertificateDto() {
-
+    public GiftCertificate() {
+        tags = new HashSet<>();
     }
 
     public long getId() {
@@ -72,13 +76,21 @@ public class GiftCertificateDto {
         this.lastUpdateDate = lastUpdateDate;
     }
 
+    public Set<Tag> getTags() {
+        return Collections.unmodifiableSet(tags);
+    }
+
+    public void setTags(Set<Tag> tags) {
+        this.tags = Collections.unmodifiableSet(tags);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o)
             return true;
         if (o == null || getClass() != o.getClass())
             return false;
-        GiftCertificateDto certificate = (GiftCertificateDto) o;
+        GiftCertificate certificate = (GiftCertificate) o;
         if (name != null ? name.equals(certificate.name) : certificate.name == null) {
             return false;
         }
@@ -107,6 +119,7 @@ public class GiftCertificateDto {
         result = result * 31 + Integer.hashCode(duration);
         result = result * 31 + (createDate != null ? createDate.hashCode() : 0);
         result = result * 31 + (lastUpdateDate != null ? lastUpdateDate.hashCode() : 0);
+        result = result * 31 + tags.hashCode();
         return result;
     }
 
@@ -121,5 +134,52 @@ public class GiftCertificateDto {
         sb.append(" , createDate='").append(createDate);
         sb.append("' , lastUpdateDate='").append(lastUpdateDate).append("'}");
         return sb.toString();
+    }
+
+    public static class GiftCertificateBuilder {
+        private GiftCertificate certificate;
+
+        public GiftCertificateBuilder() {
+
+        }
+
+        public GiftCertificateBuilder setId(long id) {
+            certificate.id = id;
+            return this;
+        }
+
+        public GiftCertificateBuilder setName(String name) {
+            certificate.name = name;
+            return this;
+        }
+
+        public GiftCertificateBuilder setDescription(String description) {
+            certificate.description = description;
+            return this;
+        }
+
+        public GiftCertificateBuilder setPrice(BigDecimal price) {
+            certificate.price = price;
+            return this;
+        }
+
+        public GiftCertificateBuilder setDuration(int duration) {
+            certificate.duration = duration;
+            return this;
+        }
+
+        public GiftCertificateBuilder setCreateDate(Date createDate) {
+            certificate.createDate = createDate;
+            return this;
+        }
+
+        public GiftCertificateBuilder setLastUpdateDate(Date lastUpdateDate) {
+            certificate.lastUpdateDate = lastUpdateDate;
+            return this;
+        }
+
+        public GiftCertificate build() {
+            return certificate;
+        }
     }
 }

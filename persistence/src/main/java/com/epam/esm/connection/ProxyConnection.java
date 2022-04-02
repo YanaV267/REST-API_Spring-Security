@@ -1,4 +1,4 @@
-package com.epam.esm.repository.connection;
+package com.epam.esm.connection;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -12,7 +12,6 @@ import java.util.concurrent.Executor;
 class ProxyConnection implements Connection {
     @Autowired
     private ConnectionPool connectionPool;
-
     private final Connection connection;
 
     ProxyConnection(Connection connection) {
@@ -281,36 +280,6 @@ class ProxyConnection implements Connection {
     @Override
     public int getNetworkTimeout() throws SQLException {
         return connection.getNetworkTimeout();
-    }
-
-    @Override
-    public void beginRequest() throws SQLException {
-        connection.beginRequest();
-    }
-
-    @Override
-    public void endRequest() throws SQLException {
-        connection.endRequest();
-    }
-
-    @Override
-    public boolean setShardingKeyIfValid(ShardingKey shardingKey, ShardingKey superShardingKey, int timeout) throws SQLException {
-        return connection.setShardingKeyIfValid(shardingKey, superShardingKey, timeout);
-    }
-
-    @Override
-    public boolean setShardingKeyIfValid(ShardingKey shardingKey, int timeout) throws SQLException {
-        return connection.setShardingKeyIfValid(shardingKey, timeout);
-    }
-
-    @Override
-    public void setShardingKey(ShardingKey shardingKey, ShardingKey superShardingKey) throws SQLException {
-        connection.setShardingKey(shardingKey, superShardingKey);
-    }
-
-    @Override
-    public void setShardingKey(ShardingKey shardingKey) throws SQLException {
-        connection.setShardingKey(shardingKey);
     }
 
     @Override
