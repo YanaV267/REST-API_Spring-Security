@@ -1,16 +1,24 @@
-subprojects {
+allprojects {
     apply plugin: 'java'
+}
 
+subprojects {
     group 'com.epam.esm'
     version '1.0-SNAPSHOT'
 
-    sourceCompatibility = '8'
-    targetCompatibility = '8'
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
 
     repositories {
         mavenCentral()
     }
 
     dependencies {
+        implementation 'org.springframework:spring-core:5.3.18'
+        implementation 'org.springframework:spring-context:5.3.18'
+        implementation 'org.springframework:spring-web:5.3.18'
+        implementation 'org.springframework:spring-beans:5.3.18'
+        implementation 'org.apache.logging.log4j:log4j-core:2.17.2'
+        implementation 'org.apache.logging.log4j:log4j-api:2.17.2'
     }
 }
