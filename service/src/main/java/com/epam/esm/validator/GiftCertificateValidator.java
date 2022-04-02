@@ -1,7 +1,5 @@
 package com.epam.esm.validator;
 
-import com.epam.esm.util.ParameterName;
-
 import java.util.Map;
 
 public interface GiftCertificateValidator {

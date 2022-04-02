@@ -1,11 +1,13 @@
 package com.epam.esm.validator.impl;
 
 import com.epam.esm.validator.GiftCertificateValidator;
+import org.springframework.stereotype.Component;
 
 import java.util.Map;
 
 import static com.epam.esm.util.ParameterName.*;
 
+@Component
 public class GiftCertificateValidatorImpl implements GiftCertificateValidator {
     private static final String NAME_REGEX = "[а-я\\p{Lower} _]+";
     private static final String DESCRIPTION_REGEX = "[\\p{Graph} ]+";

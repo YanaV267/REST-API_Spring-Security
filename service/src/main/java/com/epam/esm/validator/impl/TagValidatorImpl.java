@@ -1,7 +1,9 @@
 package com.epam.esm.validator.impl;
 
 import com.epam.esm.validator.TagValidator;
+import org.springframework.stereotype.Component;
 
+@Component
 public class TagValidatorImpl implements TagValidator {
     private static final String NAME_REGEX = "[а-я\\p{Lower} _]+";
 
