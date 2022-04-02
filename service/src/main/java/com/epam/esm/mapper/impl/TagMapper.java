@@ -9,11 +9,17 @@ import org.springframework.stereotype.Component;
 public class TagMapper implements Mapper<Tag, TagDto> {
     @Override
     public TagDto mapToDto(Tag tag) {
-        return null;
+        TagDto tagDto = new TagDto();
+        tagDto.setId(tag.getId());
+        tagDto.setName(tag.getName());
+        return tagDto;
     }
 
     @Override
     public Tag mapToEntity(TagDto tagDto) {
-        return null;
+        Tag tag = new Tag();
+        tag.setId(tagDto.getId());
+        tag.setName(tagDto.getName());
+        return tag;
     }
 }
