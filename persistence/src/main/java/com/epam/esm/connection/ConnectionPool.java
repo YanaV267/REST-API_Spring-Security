@@ -2,7 +2,9 @@ package com.epam.esm.connection;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 
+import javax.annotation.PostConstruct;
 import java.sql.Connection;
 import java.sql.Driver;
 import java.sql.DriverManager;
@@ -20,6 +22,8 @@ public class ConnectionPool {
     private static final int POOL_SIZE;
     private static BlockingDeque<ProxyConnection> freeConnections;
     private static BlockingDeque<ProxyConnection> takenConnections;
+    @Autowired
+    private ConnectionPool connectionPool;
 
     static {
         ResourceBundle resourceBundle = ResourceBundle.getBundle(POOL_PROPERTY_FILE);
@@ -33,13 +37,14 @@ public class ConnectionPool {
         }
     }
 
-    public ConnectionPool() {
+    @PostConstruct
+    public void initPool() {
         freeConnections = new LinkedBlockingDeque<>(POOL_SIZE);
         takenConnections = new LinkedBlockingDeque<>(POOL_SIZE);
         for (int i = 0; i < POOL_SIZE; i++) {
             try {
                 Connection connection = ConnectionFactory.getConnection();
-                ProxyConnection proxyConnection = new ProxyConnection(connection);
+                ProxyConnection proxyConnection = new ProxyConnection(connectionPool, connection);
                 freeConnections.add(proxyConnection);
             } catch (SQLException exception) {
                 LOGGER.error("Error has occurred while creating connection: " + exception);
@@ -53,6 +58,9 @@ public class ConnectionPool {
     }
 
     public Connection getConnection() {
+        if (freeConnections == null || takenConnections == null) {
+            initPool();
+        }
         ProxyConnection connection = null;
         try {
             connection = freeConnections.take();

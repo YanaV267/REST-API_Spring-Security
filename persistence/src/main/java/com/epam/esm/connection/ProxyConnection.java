@@ -1,20 +1,16 @@
 package com.epam.esm.connection;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
 import java.sql.*;
 import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.Executor;
 
-@Component
 class ProxyConnection implements Connection {
-    @Autowired
-    private ConnectionPool connectionPool;
+    private final ConnectionPool connectionPool;
     private final Connection connection;
 
-    ProxyConnection(Connection connection) {
+    ProxyConnection(ConnectionPool connectionPool, Connection connection) {
+        this.connectionPool = connectionPool;
         this.connection = connection;
     }
 
