@@ -137,10 +137,10 @@ public class GiftCertificate {
     }
 
     public static class GiftCertificateBuilder {
-        private GiftCertificate certificate;
+        private final GiftCertificate certificate;
 
         public GiftCertificateBuilder() {
-
+            certificate = new GiftCertificate();
         }
 
         public GiftCertificateBuilder setId(long id) {
@@ -175,6 +175,11 @@ public class GiftCertificate {
 
         public GiftCertificateBuilder setLastUpdateDate(Date lastUpdateDate) {
             certificate.lastUpdateDate = lastUpdateDate;
+            return this;
+        }
+
+        public GiftCertificateBuilder setTags(Set<Tag> tags) {
+            certificate.tags = tags;
             return this;
         }
 

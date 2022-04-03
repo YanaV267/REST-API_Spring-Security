@@ -1,110 +1,75 @@
 package com.epam.esm.repository.impl;
 
-import com.epam.esm.connection.ConnectionPool;
 import com.epam.esm.entity.Tag;
+import com.epam.esm.mapper.TagMapper;
 import com.epam.esm.repository.TagRepository;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
-import java.sql.*;
-import java.util.ArrayList;
+import javax.sql.DataSource;
+import java.sql.PreparedStatement;
+import java.sql.Statement;
 import java.util.List;
 import java.util.Optional;
 
-import static com.epam.esm.repository.ColumnName.ID;
-import static com.epam.esm.repository.ColumnName.NAME;
-
 @Repository
 public class TagRepositoryImpl implements TagRepository {
-    private static final Logger LOGGER = LogManager.getLogger(GiftCertificateRepositoryImpl.class);
     private static final String INSERT_TAG = "INSERT INTO tag (name) VALUES (?)";
     private static final String DELETE_TAG = "DELETE FROM tag WHERE id = ?";
     private static final String SELECT_ALL_TAGS = "SELECT id, name FROM tag";
     private static final String SELECT_TAG_BY_ID = "SELECT id, name FROM tag WHERE id = ?";
     private static final String SELECT_TAG_BY_NAME = "SELECT id, name FROM tag WHERE name = ?";
 
-    private final ConnectionPool connectionPool;
+    private final JdbcTemplate template;
 
     @Autowired
-    public TagRepositoryImpl(ConnectionPool connectionPool) {
-        this.connectionPool = connectionPool;
+    public TagRepositoryImpl(DataSource dataSource) {
+        this.template = new JdbcTemplate(dataSource);
     }
 
     @Override
-    public boolean create(Tag tag) {
-        try (Connection connection = connectionPool.getConnection();
-             PreparedStatement statement = connection.prepareStatement(INSERT_TAG)) {
+    public long create(Tag tag) {
+        KeyHolder keyHolder = new GeneratedKeyHolder();
+        template.update(connection -> {
+            PreparedStatement statement = connection.prepareStatement(INSERT_TAG, Statement.RETURN_GENERATED_KEYS);
             statement.setString(1, tag.getName());
-            statement.execute();
-            return true;
-        } catch (SQLException exception) {
-            LOGGER.error("Error has occurred while creating gift certificate: " + exception);
-            return false;
-        }
+            return statement;
+        }, keyHolder);
+        return keyHolder.getKey().longValue();
     }
 
     @Override
     public boolean delete(long id) {
-        try (Connection connection = connectionPool.getConnection();
-             PreparedStatement statement = connection.prepareStatement(DELETE_TAG)) {
-            statement.setLong(1, id);
-            statement.execute();
-            return true;
-        } catch (SQLException exception) {
-            LOGGER.error("Error has occurred deleting gift certificate: " + exception);
-            return false;
-        }
+        template.update(DELETE_TAG, id);
+        return true;
     }
 
     @Override
     public List<Tag> findAll() {
-        List<Tag> tags = new ArrayList<>();
-        try (Connection connection = connectionPool.getConnection();
-             Statement statement = connection.createStatement();
-             ResultSet resultSet = statement.executeQuery(SELECT_ALL_TAGS)) {
-            while (resultSet.next()) {
-                Tag tag = new Tag(resultSet.getLong(ID), resultSet.getString(NAME));
-                tags.add(tag);
-            }
-        } catch (SQLException exception) {
-            LOGGER.error("Error has occurred finding all gift certificates: " + exception);
-        }
-        return tags;
+        return template.query(SELECT_ALL_TAGS, new TagMapper());
     }
 
     @Override
     public Optional<Tag> findById(long id) {
-        try (Connection connection = connectionPool.getConnection();
-             PreparedStatement statement = connection.prepareStatement(SELECT_TAG_BY_ID)) {
-            statement.setLong(1, id);
-            try (ResultSet resultSet = statement.executeQuery()) {
-                if (resultSet.next()) {
-                    Tag tag = new Tag(resultSet.getLong(ID), resultSet.getString(NAME));
-                    return Optional.of(tag);
-                }
-            }
-        } catch (SQLException exception) {
-            LOGGER.error("Error has occurred deleting gift certificate: " + exception);
+        try {
+            Tag tag = template.queryForObject(SELECT_TAG_BY_ID, new TagMapper(), id);
+            return Optional.ofNullable(tag);
+        } catch (EmptyResultDataAccessException exception) {
+            return Optional.empty();
         }
-        return Optional.empty();
     }
 
     @Override
     public Optional<Tag> findByName(String name) {
-        try (Connection connection = connectionPool.getConnection();
-             PreparedStatement statement = connection.prepareStatement(SELECT_TAG_BY_NAME)) {
-            statement.setString(1, name);
-            try (ResultSet resultSet = statement.executeQuery()) {
-                if (resultSet.next()) {
-                    Tag tag = new Tag(resultSet.getLong(ID), resultSet.getString(NAME));
-                    return Optional.of(tag);
-                }
-            }
-        } catch (SQLException exception) {
-            LOGGER.error("Error has occurred deleting gift certificate: " + exception);
+        try {
+            Tag tag = template.queryForObject(SELECT_TAG_BY_NAME, new TagMapper(), name);
+            return Optional.ofNullable(tag);
+        } catch (EmptyResultDataAccessException exception) {
+            return Optional.empty();
         }
-        return Optional.empty();
     }
 }

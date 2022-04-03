@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface BaseRepository<T> {
-    boolean create(T t);
+    long create(T t);
 
     boolean delete(long id);
 
