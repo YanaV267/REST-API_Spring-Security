@@ -16,17 +16,17 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @RestController
 @RequestMapping("/certificates")
-public class CertificateController {
+public class GiftCertificateController {
     private final GiftCertificateService certificateService;
 
     @Autowired
-    public CertificateController(GiftCertificateService certificateService) {
+    public GiftCertificateController(GiftCertificateService certificateService) {
         this.certificateService = certificateService;
     }
 
     @PostMapping(consumes = APPLICATION_JSON_VALUE)
     @ResponseStatus(CREATED)
-    public void create(@RequestBody Map<String, String> certificateData) {
+    public void create(@RequestBody Map<String, Object> certificateData) {
         boolean isCreated = certificateService.create(certificateData);
         if (!isCreated) {
             throw new BadRequestException();
@@ -35,7 +35,7 @@ public class CertificateController {
 
     @PutMapping(consumes = APPLICATION_JSON_VALUE)
     @ResponseStatus(OK)
-    public void update(@RequestBody Map<String, String> certificateData) {
+    public void update(@RequestBody Map<String, Object> certificateData) {
         boolean isUpdated = certificateService.update(certificateData);
         if (!isUpdated) {
             throw new BadRequestException();
@@ -68,13 +68,13 @@ public class CertificateController {
         }
     }
 
-    @GetMapping
+    @GetMapping(params = "name")
     @ResponseStatus(FOUND)
     public List<GiftCertificateDto> findByName(@RequestParam String name) {
         return certificateService.findByName(name);
     }
 
-    @GetMapping
+    @GetMapping(params = "description")
     @ResponseStatus(FOUND)
     public List<GiftCertificateDto> findByDescription(@RequestParam String description) {
         return certificateService.findByDescription(description);

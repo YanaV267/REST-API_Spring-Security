@@ -5,7 +5,7 @@ import java.util.Map;
 import java.util.Optional;
 
 public interface BaseService<T> {
-    boolean create(Map<String, String> data);
+    boolean create(Map<String, Object> data);
 
     boolean delete(long id);
 

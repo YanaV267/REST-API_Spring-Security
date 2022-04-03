@@ -31,11 +31,12 @@ public class TagServiceImpl implements TagService {
     }
 
     @Override
-    public boolean create(Map<String, String> tagData) {
-        if (validator.checkName(tagData.get(ParameterName.NAME))) {
+    public boolean create(Map<String, Object> tagData) {
+        if (validator.checkName(String.valueOf(tagData.get(ParameterName.NAME)))) {
             Tag tag = new Tag();
-            tag.setName(tagData.get(ParameterName.NAME));
-            return repository.create(tag);
+            tag.setName(String.valueOf(tagData.get(ParameterName.NAME)));
+            repository.create(tag);
+            return true;
         } else {
             return false;
         }

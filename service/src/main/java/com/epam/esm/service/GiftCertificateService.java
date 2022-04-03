@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 public interface GiftCertificateService extends BaseService<GiftCertificateDto> {
-    boolean update(Map<String, String> certificateData);
+    boolean update(Map<String, Object> certificateData);
 
     List<GiftCertificateDto> findByName(String name);
 

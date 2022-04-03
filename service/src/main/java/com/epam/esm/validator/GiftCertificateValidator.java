@@ -11,9 +11,5 @@ public interface GiftCertificateValidator {
 
     boolean checkDuration(String duration);
 
-    boolean checkCreateDate(String createDate);
-
-    boolean checkLastUpdateDate(String lastUpdateDate);
-
-    boolean checkCertificate(Map<String, String> certificateData);
+    boolean checkCertificate(Map<String, ?> certificateData);
 }

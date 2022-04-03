@@ -1,7 +1,10 @@
 package com.epam.esm.dto;
 
 import java.math.BigDecimal;
+import java.util.Collections;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 public class GiftCertificateDto {
     private long id;
@@ -11,9 +14,10 @@ public class GiftCertificateDto {
     private int duration;
     private Date createDate;
     private Date lastUpdateDate;
+    private Set<TagDto> tags;
 
     public GiftCertificateDto() {
-
+        tags = new HashSet<>();
     }
 
     public long getId() {
@@ -70,6 +74,14 @@ public class GiftCertificateDto {
 
     public void setLastUpdateDate(Date lastUpdateDate) {
         this.lastUpdateDate = lastUpdateDate;
+    }
+
+    public Set<TagDto> getTags() {
+        return Collections.unmodifiableSet(tags);
+    }
+
+    public void setTags(Set<TagDto> tags) {
+        this.tags = Collections.unmodifiableSet(tags);
     }
 
     @Override

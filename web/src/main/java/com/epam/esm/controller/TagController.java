@@ -26,7 +26,7 @@ public class TagController {
 
     @PostMapping(consumes = APPLICATION_JSON_VALUE)
     @ResponseStatus(CREATED)
-    public void create(@RequestBody Map<String, String> tagData) {
+    public void create(@RequestBody Map<String, Object> tagData) {
         boolean isCreated = tagService.create(tagData);
         if (!isCreated) {
             throw new BadRequestException();
@@ -52,6 +52,17 @@ public class TagController {
     @ResponseStatus(FOUND)
     public TagDto findById(@PathVariable long id) {
         Optional<TagDto> tag = tagService.findById(id);
+        if (tag.isPresent()) {
+            return tag.get();
+        } else {
+            throw new NotFoundException();
+        }
+    }
+
+    @GetMapping(params = "name")
+    @ResponseStatus(FOUND)
+    public TagDto findByName(@RequestParam String name) {
+        Optional<TagDto> tag = tagService.findByName(name);
         if (tag.isPresent()) {
             return tag.get();
         } else {
