@@ -13,9 +13,9 @@ import static com.epam.esm.util.ParameterName.*;
 
 @Component
 public class GiftCertificateValidatorImpl implements GiftCertificateValidator {
-    private static final String NAME_REGEX = "[а-я\\p{Lower}\\p{Digit} _]+";
+    private static final String NAME_REGEX = "[а-я\\p{Alnum} _]+";
     private static final String DESCRIPTION_REGEX = "[\\p{Graph} ]+";
-    private static final String PRICE_REGEX = "(\\d\\d?\\.)?\\d{1,2}";
+    private static final String PRICE_REGEX = "((\\d{2,4}\\.\\d{1,2})|(\\d{2,4}))";
     private static final String DURATION_REGEX = "\\d+";
 
     private final TagValidator tagValidator;

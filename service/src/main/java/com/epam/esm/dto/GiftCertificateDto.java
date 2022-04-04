@@ -1,7 +1,7 @@
 package com.epam.esm.dto;
 
 import java.math.BigDecimal;
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -11,8 +11,8 @@ public class GiftCertificateDto {
     private String description;
     private BigDecimal price;
     private int duration;
-    private Date createDate;
-    private Date lastUpdateDate;
+    private LocalDateTime createDate;
+    private LocalDateTime lastUpdateDate;
     private Set<TagDto> tags;
 
     public GiftCertificateDto() {
@@ -59,19 +59,19 @@ public class GiftCertificateDto {
         this.duration = duration;
     }
 
-    public Date getCreateDate() {
-        return createDate;
+    public String getCreateDate() {
+        return String.valueOf(createDate);
     }
 
-    public void setCreateDate(Date createDate) {
+    public void setCreateDate(LocalDateTime createDate) {
         this.createDate = createDate;
     }
 
-    public Date getLastUpdateDate() {
-        return lastUpdateDate;
+    public String getLastUpdateDate() {
+        return String.valueOf(lastUpdateDate);
     }
 
-    public void setLastUpdateDate(Date lastUpdateDate) {
+    public void setLastUpdateDate(LocalDateTime lastUpdateDate) {
         this.lastUpdateDate = lastUpdateDate;
     }
 

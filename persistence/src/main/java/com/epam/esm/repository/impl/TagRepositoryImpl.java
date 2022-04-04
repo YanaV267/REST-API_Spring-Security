@@ -11,6 +11,8 @@ import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
+import java.sql.PreparedStatement;
+import java.sql.Statement;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
@@ -32,7 +34,11 @@ public class TagRepositoryImpl implements TagRepository {
     @Override
     public long create(Tag tag) {
         KeyHolder keyHolder = new GeneratedKeyHolder();
-        template.update(INSERT_TAG, tag.getName(), keyHolder);
+        template.update(connection -> {
+            PreparedStatement statement = connection.prepareStatement(INSERT_TAG, Statement.RETURN_GENERATED_KEYS);
+            statement.setString(1, tag.getName());
+            return statement;
+        }, keyHolder);
         return keyHolder.getKey().longValue();
     }
 

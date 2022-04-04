@@ -12,6 +12,8 @@ import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
+import java.sql.PreparedStatement;
+import java.sql.Statement;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -20,9 +22,9 @@ import java.util.Set;
 @Repository
 public class GiftCertificateRepositoryImpl implements GiftCertificateRepository {
     private static final String INSERT_CERTIFICATE = "INSERT INTO gift_certificate " +
-            "(name, description, price, duration, create_date, last_update_date) VALUES (?, ?, ?, ?, now(), now())";
+            "(name, description, price, duration, create_date, last_update_date) VALUES (?, ?, ?, ?, now(3), now(3))";
     private static final String UPDATE_CERTIFICATE = "UPDATE gift_certificate " +
-            "SET name = ?, description = ?, price = ?, duration = ?, create_date = ?, last_update_date = now() WHERE id = ?";
+            "SET name = ?, description = ?, price = ?, duration = ?, create_date = ?, last_update_date = now(3) WHERE id = ?";
     private static final String DELETE_CERTIFICATE = "DELETE FROM gift_certificate WHERE id = ?";
     private static final String SELECT_ALL_CERTIFICATES = "SELECT gift_certificate.id, gift_certificate.name, description, " +
             "price, duration, create_date, last_update_date, tag.id, tag.name FROM gift_certificate " +
@@ -44,8 +46,14 @@ public class GiftCertificateRepositoryImpl implements GiftCertificateRepository 
     @Override
     public long create(GiftCertificate certificate) {
         KeyHolder keyHolder = new GeneratedKeyHolder();
-        template.update(INSERT_CERTIFICATE, certificate.getName(), certificate.getDescription(), certificate.getPrice(),
-                certificate.getDuration(), keyHolder);
+        template.update(connection -> {
+            PreparedStatement statement = connection.prepareStatement(INSERT_CERTIFICATE, Statement.RETURN_GENERATED_KEYS);
+            statement.setString(1, certificate.getName());
+            statement.setString(2, certificate.getDescription());
+            statement.setBigDecimal(3, certificate.getPrice());
+            statement.setInt(4, certificate.getDuration());
+            return statement;
+        }, keyHolder);
         return keyHolder.getKey().longValue();
     }
 

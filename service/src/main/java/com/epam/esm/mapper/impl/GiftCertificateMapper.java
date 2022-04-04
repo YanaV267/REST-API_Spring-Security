@@ -5,20 +5,24 @@ import com.epam.esm.dto.TagDto;
 import com.epam.esm.entity.GiftCertificate;
 import com.epam.esm.entity.Tag;
 import com.epam.esm.mapper.Mapper;
+import com.epam.esm.util.CertificateDateFormatter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 @Component("certificateMapper")
 public class GiftCertificateMapper implements Mapper<GiftCertificate, GiftCertificateDto> {
     private final TagMapper tagMapper;
+    private final CertificateDateFormatter dateFormatter;
 
     @Autowired
-    public GiftCertificateMapper(@Qualifier("tagMapper") TagMapper tagMapper) {
+    public GiftCertificateMapper(@Qualifier("tagMapper") TagMapper tagMapper, CertificateDateFormatter dateFormatter) {
         this.tagMapper = tagMapper;
+        this.dateFormatter = dateFormatter;
     }
 
     @Override
@@ -46,8 +50,10 @@ public class GiftCertificateMapper implements Mapper<GiftCertificate, GiftCertif
         giftCertificate.setDescription(certificateDto.getDescription());
         giftCertificate.setDuration(certificateDto.getDuration());
         giftCertificate.setPrice(certificateDto.getPrice());
-        giftCertificate.setCreateDate(certificateDto.getCreateDate());
-        giftCertificate.setLastUpdateDate(certificateDto.getLastUpdateDate());
+        LocalDateTime formattedDate = dateFormatter.format(certificateDto.getCreateDate());
+        giftCertificate.setCreateDate(formattedDate);
+        formattedDate = dateFormatter.format(certificateDto.getLastUpdateDate());
+        giftCertificate.setLastUpdateDate(formattedDate);
         Set<Tag> tags = certificateDto.getTags().stream()
                 .map(tagMapper::mapToEntity)
                 .collect(Collectors.toSet());

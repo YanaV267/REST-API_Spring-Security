@@ -1,7 +1,7 @@
 package com.epam.esm.entity;
 
 import java.math.BigDecimal;
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -11,8 +11,8 @@ public class GiftCertificate {
     private String description;
     private BigDecimal price;
     private int duration;
-    private Date createDate;
-    private Date lastUpdateDate;
+    private LocalDateTime createDate;
+    private LocalDateTime lastUpdateDate;
     private Set<Tag> tags;
 
     public GiftCertificate() {
@@ -59,19 +59,19 @@ public class GiftCertificate {
         this.duration = duration;
     }
 
-    public Date getCreateDate() {
+    public LocalDateTime getCreateDate() {
         return createDate;
     }
 
-    public void setCreateDate(Date createDate) {
+    public void setCreateDate(LocalDateTime createDate) {
         this.createDate = createDate;
     }
 
-    public Date getLastUpdateDate() {
+    public LocalDateTime getLastUpdateDate() {
         return lastUpdateDate;
     }
 
-    public void setLastUpdateDate(Date lastUpdateDate) {
+    public void setLastUpdateDate(LocalDateTime lastUpdateDate) {
         this.lastUpdateDate = lastUpdateDate;
     }
 
@@ -149,37 +149,51 @@ public class GiftCertificate {
         }
 
         public GiftCertificateBuilder setName(String name) {
-            certificate.name = name;
+            if (name != null) {
+                certificate.name = name;
+            }
             return this;
         }
 
         public GiftCertificateBuilder setDescription(String description) {
-            certificate.description = description;
+            if (description != null) {
+                certificate.description = description;
+            }
             return this;
         }
 
         public GiftCertificateBuilder setPrice(BigDecimal price) {
-            certificate.price = price;
+            if (price != null) {
+                certificate.price = price;
+            }
             return this;
         }
 
         public GiftCertificateBuilder setDuration(int duration) {
-            certificate.duration = duration;
+            if (duration != 0) {
+                certificate.duration = duration;
+            }
             return this;
         }
 
-        public GiftCertificateBuilder setCreateDate(Date createDate) {
-            certificate.createDate = createDate;
+        public GiftCertificateBuilder setCreateDate(LocalDateTime createDate) {
+            if (createDate != null) {
+                certificate.createDate = createDate;
+            }
             return this;
         }
 
-        public GiftCertificateBuilder setLastUpdateDate(Date lastUpdateDate) {
-            certificate.lastUpdateDate = lastUpdateDate;
+        public GiftCertificateBuilder setLastUpdateDate(LocalDateTime lastUpdateDate) {
+            if (lastUpdateDate != null) {
+                certificate.lastUpdateDate = lastUpdateDate;
+            }
             return this;
         }
 
         public GiftCertificateBuilder setTags(Set<Tag> tags) {
-            certificate.tags = tags;
+            if (tags != null && !tags.isEmpty()) {
+                certificate.tags = tags;
+            }
             return this;
         }
 

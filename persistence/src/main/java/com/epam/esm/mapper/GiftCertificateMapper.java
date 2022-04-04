@@ -17,8 +17,8 @@ public class GiftCertificateMapper implements RowMapper<GiftCertificate> {
                 .setDescription(resultSet.getString(DESCRIPTION))
                 .setPrice(resultSet.getBigDecimal(PRICE))
                 .setDuration(resultSet.getInt(DURATION))
-                .setCreateDate(resultSet.getDate(CREATE_DATE))
-                .setLastUpdateDate(resultSet.getDate(LAST_UPDATE_DATE))
+                .setCreateDate(resultSet.getTimestamp(CREATE_DATE).toLocalDateTime())
+                .setLastUpdateDate(resultSet.getTimestamp(LAST_UPDATE_DATE).toLocalDateTime())
                 .build();
     }
 
