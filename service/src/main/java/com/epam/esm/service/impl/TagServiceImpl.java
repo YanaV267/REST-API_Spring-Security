@@ -44,7 +44,12 @@ public class TagServiceImpl implements TagService {
 
     @Override
     public boolean delete(long id) {
-        return repository.delete(id);
+        if (repository.findById(id).isPresent()) {
+            repository.delete(id);
+            return true;
+        } else {
+            return false;
+        }
     }
 
     @Override

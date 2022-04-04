@@ -1,5 +1,6 @@
 package com.epam.esm.repository.impl;
 
+import com.epam.esm.builder.GiftCertificateQueryBuilder;
 import com.epam.esm.entity.GiftCertificate;
 import com.epam.esm.mapper.GiftCertificateExtractor;
 import com.epam.esm.mapper.GiftCertificateMapper;
@@ -14,28 +15,18 @@ import org.springframework.stereotype.Repository;
 import javax.sql.DataSource;
 import java.sql.PreparedStatement;
 import java.sql.Statement;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 @Repository
 public class GiftCertificateRepositoryImpl implements GiftCertificateRepository {
     private static final String INSERT_CERTIFICATE = "INSERT INTO gift_certificate " +
             "(name, description, price, duration, create_date, last_update_date) VALUES (?, ?, ?, ?, now(3), now(3))";
-    private static final String UPDATE_CERTIFICATE = "UPDATE gift_certificate " +
-            "SET name = ?, description = ?, price = ?, duration = ?, create_date = ?, last_update_date = now(3) WHERE id = ?";
+    private static final String UPDATE_CERTIFICATE = "UPDATE gift_certificate SET ";
     private static final String DELETE_CERTIFICATE = "DELETE FROM gift_certificate WHERE id = ?";
-    private static final String SELECT_ALL_CERTIFICATES = "SELECT gift_certificate.id, gift_certificate.name, description, " +
+    private static final String SELECT_CERTIFICATES = "SELECT gift_certificate.id, gift_certificate.name, description, " +
             "price, duration, create_date, last_update_date, tag.id, tag.name FROM gift_certificate " +
             "JOIN certificate_purchase ON certificate_purchase.id_certificate = gift_certificate.id " +
             "JOIN tag ON certificate_purchase.id_tag = tag.id";
-    private static final String SELECT_CERTIFICATE_BY_ID = "SELECT id, name, description, price, duration, create_date, " +
-            "last_update_date FROM gift_certificate WHERE id = ?";
-    private static final String SELECT_CERTIFICATES_BY_NAME = "SELECT id, name, description, price, duration, create_date, " +
-            "last_update_date FROM gift_certificate WHERE name = ?";
-    private static final String SELECT_CERTIFICATES_BY_DESCRIPTION = "SELECT id, name, description, price, duration, create_date, " +
-            "last_update_date FROM gift_certificate WHERE description = ?";
     private final JdbcTemplate template;
 
     @Autowired
@@ -58,32 +49,41 @@ public class GiftCertificateRepositoryImpl implements GiftCertificateRepository 
     }
 
     @Override
-    public boolean update(GiftCertificate certificate) {
-        template.update(UPDATE_CERTIFICATE, certificate.getName(), certificate.getDescription(), certificate.getPrice(),
-                certificate.getDuration(), certificate.getId());
-        return true;
+    public void update(GiftCertificate certificate) {
+        template.update(new GiftCertificateQueryBuilder(UPDATE_CERTIFICATE)
+                .addNameParameter(certificate.getName())
+                .addDescriptionParameter(certificate.getDescription())
+                .addPriceParameter(certificate.getPrice())
+                .addDurationParameter(certificate.getDuration())
+                .addLastUpdateDateNowParameter()
+                .addWhereClause()
+                .addIdParameter(certificate.getId())
+                .build());
     }
 
     @Override
-    public boolean delete(long id) {
+    public void delete(long id) {
         template.update(DELETE_CERTIFICATE, id);
-        return true;
     }
 
     @Override
     public Set<GiftCertificate> findAll() {
-        List<GiftCertificate> certificates = template.query(SELECT_ALL_CERTIFICATES, new GiftCertificateExtractor());
+        List<GiftCertificate> certificates = template.query(SELECT_CERTIFICATES, new GiftCertificateExtractor());
         if (certificates != null) {
-            return new HashSet<>(certificates);
+            return new LinkedHashSet<>(certificates);
         } else {
-            return new HashSet<>();
+            return new LinkedHashSet<>();
         }
     }
 
     @Override
     public Optional<GiftCertificate> findById(long id) {
         try {
-            GiftCertificate certificate = template.queryForObject(SELECT_CERTIFICATE_BY_ID, new GiftCertificateMapper(), id);
+            GiftCertificate certificate = template.queryForObject(
+                    new GiftCertificateQueryBuilder(SELECT_CERTIFICATES)
+                            .addWhereClause()
+                            .addIdParameter(id)
+                            .build(), new GiftCertificateMapper());
             return Optional.ofNullable(certificate);
         } catch (EmptyResultDataAccessException exception) {
             return Optional.empty();
@@ -91,22 +91,24 @@ public class GiftCertificateRepositoryImpl implements GiftCertificateRepository 
     }
 
     @Override
-    public Set<GiftCertificate> findByName(String name) {
-        List<GiftCertificate> certificates = template.query(SELECT_CERTIFICATES_BY_NAME, new GiftCertificateExtractor(), name);
+    public Set<GiftCertificate> findBySeveralParameters(GiftCertificate certificate, String tagName,
+                                                        List<String> sortTypes) {
+        List<GiftCertificate> certificates = template.query(
+                new GiftCertificateQueryBuilder(SELECT_CERTIFICATES)
+                        .addWhereClause()
+                        .addNameLikeParameter(certificate.getName())
+                        .addDescriptionLikeParameter(certificate.getDescription())
+                        .addPriceParameter(certificate.getPrice())
+                        .addDurationParameter(certificate.getDuration())
+                        .addCreateDateParameter(certificate.getCreateDate())
+                        .addLastUpdateDateParameter(certificate.getLastUpdateDate())
+                        .addTagName(tagName)
+                        .addSorting(sortTypes)
+                        .build(), new GiftCertificateExtractor());
         if (certificates != null) {
-            return new HashSet<>(certificates);
+            return new LinkedHashSet<>(certificates);
         } else {
-            return new HashSet<>();
-        }
-    }
-
-    @Override
-    public Set<GiftCertificate> findByDescription(String description) {
-        List<GiftCertificate> certificates = template.query(SELECT_CERTIFICATES_BY_DESCRIPTION, new GiftCertificateExtractor(), description);
-        if (certificates != null) {
-            return new HashSet<>(certificates);
-        } else {
-            return new HashSet<>();
+            return new LinkedHashSet<>();
         }
     }
 }

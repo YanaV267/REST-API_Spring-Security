@@ -14,6 +14,7 @@ import javax.sql.DataSource;
 import java.sql.PreparedStatement;
 import java.sql.Statement;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Optional;
 import java.util.Set;
 
@@ -43,9 +44,8 @@ public class TagRepositoryImpl implements TagRepository {
     }
 
     @Override
-    public boolean delete(long id) {
+    public void delete(long id) {
         template.update(DELETE_TAG, id);
-        return true;
     }
 
     @Override

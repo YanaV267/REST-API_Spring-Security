@@ -66,6 +66,9 @@ public class GiftCertificateValidatorImpl implements GiftCertificateValidator {
                     .map(tagValidator::checkName)
                     .noneMatch(r -> r.equals(Boolean.FALSE));
         }
+        if (certificateData.containsKey(TAG)) {
+            return tagValidator.checkName(String.valueOf(certificateData.get(TAG)));
+        }
         return true;
     }
 }

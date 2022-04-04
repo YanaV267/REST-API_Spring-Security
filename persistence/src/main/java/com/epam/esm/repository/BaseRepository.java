@@ -6,7 +6,7 @@ import java.util.Set;
 public interface BaseRepository<T> {
     long create(T t);
 
-    boolean delete(long id);
+    void delete(long id);
 
     Set<T> findAll();
 

@@ -7,6 +7,7 @@ import com.epam.esm.service.GiftCertificateService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -68,15 +69,10 @@ public class GiftCertificateController {
         }
     }
 
-    @GetMapping(params = "name", produces = APPLICATION_JSON_VALUE)
+    @GetMapping
     @ResponseStatus(FOUND)
-    public Set<GiftCertificateDto> findByName(@RequestParam String name) {
-        return certificateService.findByName(name);
-    }
-
-    @GetMapping(params = "description", produces = APPLICATION_JSON_VALUE)
-    @ResponseStatus(FOUND)
-    public Set<GiftCertificateDto> findByDescription(@RequestParam String description) {
-        return certificateService.findByDescription(description);
+    public Set<GiftCertificateDto> findByName(@RequestParam Map<String, Object> certificateData,
+                                              @RequestParam(value = "sort", required = false) List<String> sortTypes) {
+        return certificateService.findBySeveralParameters(certificateData, sortTypes);
     }
 }

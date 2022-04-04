@@ -14,7 +14,7 @@ import static com.epam.esm.repository.ColumnName.GIFT_CERTIFICATE_ID;
 public class GiftCertificateExtractor implements ResultSetExtractor<List<GiftCertificate>> {
     @Override
     public List<GiftCertificate> extractData(ResultSet resultSet) throws SQLException, DataAccessException {
-        Map<Long, GiftCertificate> certificates = new HashMap<>();
+        Map<Long, GiftCertificate> certificates = new LinkedHashMap<>();
         GiftCertificateMapper certificateMapper = new GiftCertificateMapper();
         TagMapper tagMapper = new TagMapper();
         while (resultSet.next()) {
@@ -31,6 +31,6 @@ public class GiftCertificateExtractor implements ResultSetExtractor<List<GiftCer
             tags.add(tag);
             giftCertificate.setTags(tags);
         }
-        return new ArrayList<>(certificates.values());
+        return new LinkedList<>(certificates.values());
     }
 }
