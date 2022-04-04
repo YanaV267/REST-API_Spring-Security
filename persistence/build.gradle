@@ -12,6 +12,7 @@ repositories {
 dependencies {
     implementation 'mysql:mysql-connector-java:8.0.28'
     implementation 'org.springframework:spring-jdbc:5.3.18'
+    implementation 'commons-dbcp:commons-dbcp:1.4'
 }
 
 test {

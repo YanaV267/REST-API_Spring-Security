@@ -1,8 +1,12 @@
 package com.epam.esm.validator.impl;
 
 import com.epam.esm.validator.GiftCertificateValidator;
+import com.epam.esm.validator.TagValidator;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import static com.epam.esm.util.ParameterName.*;
@@ -13,6 +17,13 @@ public class GiftCertificateValidatorImpl implements GiftCertificateValidator {
     private static final String DESCRIPTION_REGEX = "[\\p{Graph} ]+";
     private static final String PRICE_REGEX = "(\\d\\d?\\.)?\\d{1,2}";
     private static final String DURATION_REGEX = "\\d+";
+
+    private final TagValidator tagValidator;
+
+    @Autowired
+    public GiftCertificateValidatorImpl(TagValidator tagValidator) {
+        this.tagValidator = tagValidator;
+    }
 
     @Override
     public boolean checkName(String name) {
@@ -36,9 +47,25 @@ public class GiftCertificateValidatorImpl implements GiftCertificateValidator {
 
     @Override
     public boolean checkCertificate(Map<String, ?> certificateData) {
-        return checkName(String.valueOf(certificateData.get(NAME)))
-                && checkDescription(String.valueOf(certificateData.get(DESCRIPTION)))
-                && checkPrice(String.valueOf(certificateData.get(PRICE)))
-                && checkDuration(String.valueOf(certificateData.get(DURATION)));
+        if (certificateData.containsKey(NAME) && !checkName(String.valueOf(certificateData.get(NAME)))) {
+            return false;
+        }
+        if (certificateData.containsKey(DESCRIPTION) && !checkDescription(String.valueOf(certificateData.get(DESCRIPTION)))) {
+            return false;
+        }
+        if (certificateData.containsKey(PRICE) && !checkPrice(String.valueOf(certificateData.get(PRICE)))) {
+            return false;
+        }
+        if (certificateData.containsKey(DURATION) && !checkDuration(String.valueOf(certificateData.get(DURATION)))) {
+            return false;
+        }
+        if (certificateData.containsKey(TAGS)) {
+            List<Map<String, String>> tags = (ArrayList<Map<String, String>>) certificateData.get(TAGS);
+            return tags.stream()
+                    .map(t -> t.get(NAME))
+                    .map(tagValidator::checkName)
+                    .noneMatch(r -> r.equals(Boolean.FALSE));
+        }
+        return true;
     }
 }

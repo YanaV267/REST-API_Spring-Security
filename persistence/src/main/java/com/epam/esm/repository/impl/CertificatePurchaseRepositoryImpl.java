@@ -8,11 +8,13 @@ import com.epam.esm.repository.TagRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.sql.DataSource;
 import java.util.Optional;
 
 @Repository
+@Transactional
 public class CertificatePurchaseRepositoryImpl implements CertificatePurchaseRepository {
     private static final String INSERT_PURCHASE = "INSERT INTO certificate_purchase (id_certificate, id_tag) VALUES (?, ?)";
 

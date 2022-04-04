@@ -7,9 +7,9 @@ import com.epam.esm.service.GiftCertificateService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 import static org.springframework.http.HttpStatus.*;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
@@ -51,13 +51,13 @@ public class GiftCertificateController {
         }
     }
 
-    @GetMapping
+    @GetMapping(produces = APPLICATION_JSON_VALUE)
     @ResponseStatus(FOUND)
-    public List<GiftCertificateDto> retrieveAll() {
+    public Set<GiftCertificateDto> retrieveAll() {
         return certificateService.findAll();
     }
 
-    @GetMapping("/{id}")
+    @GetMapping(value = "/{id}", produces = APPLICATION_JSON_VALUE)
     @ResponseStatus(FOUND)
     public GiftCertificateDto findById(@PathVariable long id) {
         Optional<GiftCertificateDto> giftCertificate = certificateService.findById(id);
@@ -68,15 +68,15 @@ public class GiftCertificateController {
         }
     }
 
-    @GetMapping(params = "name")
+    @GetMapping(params = "name", produces = APPLICATION_JSON_VALUE)
     @ResponseStatus(FOUND)
-    public List<GiftCertificateDto> findByName(@RequestParam String name) {
+    public Set<GiftCertificateDto> findByName(@RequestParam String name) {
         return certificateService.findByName(name);
     }
 
-    @GetMapping(params = "description")
+    @GetMapping(params = "description", produces = APPLICATION_JSON_VALUE)
     @ResponseStatus(FOUND)
-    public List<GiftCertificateDto> findByDescription(@RequestParam String description) {
+    public Set<GiftCertificateDto> findByDescription(@RequestParam String description) {
         return certificateService.findByDescription(description);
     }
 }

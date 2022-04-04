@@ -13,7 +13,10 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static com.epam.esm.util.ParameterName.*;
@@ -58,19 +61,28 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
 
     @Override
     public boolean update(Map<String, Object> certificateData) {
-        if (validator.checkCertificate(certificateData)) {
-            Set<Tag> tags = ((ArrayList<Map<String, String>>) certificateData.get(TAGS)).stream()
-                    .map(t -> t.get(NAME))
-                    .map(Tag::new)
-                    .collect(Collectors.toSet());
-            GiftCertificate giftCertificate = new GiftCertificate.GiftCertificateBuilder()
-                    .setId(Long.parseLong(String.valueOf(certificateData.get(ID))))
-                    .setName(String.valueOf(certificateData.get(NAME)))
-                    .setDescription(String.valueOf(certificateData.get(DESCRIPTION)))
-                    .setPrice(new BigDecimal(String.valueOf(certificateData.get(PRICE))))
-                    .setDuration(Integer.parseInt(String.valueOf(certificateData.get(DURATION))))
-                    .setTags(tags)
-                    .build();
+        if (certificateData.containsKey(ID) && validator.checkCertificate(certificateData)) {
+            GiftCertificate giftCertificate = new GiftCertificate();
+            giftCertificate.setId(Long.parseLong(String.valueOf(certificateData.get(ID))));
+            if (certificateData.containsKey(NAME)) {
+                giftCertificate.setName(String.valueOf(certificateData.get(NAME)));
+            }
+            if (certificateData.containsKey(DESCRIPTION)) {
+                giftCertificate.setDescription(String.valueOf(certificateData.get(DESCRIPTION)));
+            }
+            if (certificateData.containsKey(PRICE)) {
+                giftCertificate.setPrice(new BigDecimal(String.valueOf(certificateData.get(PRICE))));
+            }
+            if (certificateData.containsKey(DURATION)) {
+                giftCertificate.setDuration(Integer.parseInt(String.valueOf(certificateData.get(DURATION))));
+            }
+            if (certificateData.containsKey(TAGS)) {
+                Set<Tag> tags = ((ArrayList<Map<String, String>>) certificateData.get(TAGS)).stream()
+                        .map(t -> t.get(NAME))
+                        .map(Tag::new)
+                        .collect(Collectors.toSet());
+                giftCertificate.setTags(tags);
+            }
             return purchaseRepository.update(giftCertificate);
         } else {
             return false;
@@ -83,11 +95,11 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
     }
 
     @Override
-    public List<GiftCertificateDto> findAll() {
-        List<GiftCertificate> certificates = repository.findAll();
+    public Set<GiftCertificateDto> findAll() {
+        Set<GiftCertificate> certificates = repository.findAll();
         return certificates.stream()
                 .map(mapper::mapToDto)
-                .collect(Collectors.toList());
+                .collect(Collectors.toSet());
     }
 
     @Override
@@ -102,18 +114,18 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
     }
 
     @Override
-    public List<GiftCertificateDto> findByName(String name) {
-        List<GiftCertificate> certificates = repository.findByName(name);
+    public Set<GiftCertificateDto> findByName(String name) {
+        Set<GiftCertificate> certificates = repository.findByName(name);
         return certificates.stream()
                 .map(mapper::mapToDto)
-                .collect(Collectors.toList());
+                .collect(Collectors.toSet());
     }
 
     @Override
-    public List<GiftCertificateDto> findByDescription(String description) {
-        List<GiftCertificate> certificates = repository.findByDescription(description);
+    public Set<GiftCertificateDto> findByDescription(String description) {
+        Set<GiftCertificate> certificates = repository.findByDescription(description);
         return certificates.stream()
                 .map(mapper::mapToDto)
-                .collect(Collectors.toList());
+                .collect(Collectors.toSet());
     }
 }

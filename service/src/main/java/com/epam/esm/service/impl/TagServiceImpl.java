@@ -11,9 +11,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -48,11 +48,11 @@ public class TagServiceImpl implements TagService {
     }
 
     @Override
-    public List<TagDto> findAll() {
-        List<Tag> tags = repository.findAll();
+    public Set<TagDto> findAll() {
+        Set<Tag> tags = repository.findAll();
         return tags.stream()
                 .map(mapper::mapToDto)
-                .collect(Collectors.toList());
+                .collect(Collectors.toSet());
     }
 
     @Override

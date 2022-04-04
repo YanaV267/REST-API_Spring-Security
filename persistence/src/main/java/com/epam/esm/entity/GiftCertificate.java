@@ -1,7 +1,6 @@
 package com.epam.esm.entity;
 
 import java.math.BigDecimal;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
@@ -77,11 +76,11 @@ public class GiftCertificate {
     }
 
     public Set<Tag> getTags() {
-        return Collections.unmodifiableSet(tags);
+        return new HashSet<>(tags);
     }
 
     public void setTags(Set<Tag> tags) {
-        this.tags = Collections.unmodifiableSet(tags);
+        this.tags = new HashSet<>(tags);
     }
 
     @Override
@@ -133,6 +132,7 @@ public class GiftCertificate {
         sb.append(" , duration=").append(duration);
         sb.append(" , createDate='").append(createDate);
         sb.append("' , lastUpdateDate='").append(lastUpdateDate).append("'}");
+        sb.append("' , tags=").append(tags.toString()).append("}");
         return sb.toString();
     }
 

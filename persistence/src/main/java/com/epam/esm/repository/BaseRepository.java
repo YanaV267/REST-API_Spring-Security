@@ -1,14 +1,14 @@
 package com.epam.esm.repository;
 
-import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 public interface BaseRepository<T> {
     long create(T t);
 
     boolean delete(long id);
 
-    List<T> findAll();
+    Set<T> findAll();
 
     Optional<T> findById(long id);
 }

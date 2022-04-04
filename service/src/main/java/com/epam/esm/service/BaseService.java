@@ -1,15 +1,15 @@
 package com.epam.esm.service;
 
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 public interface BaseService<T> {
     boolean create(Map<String, Object> data);
 
     boolean delete(long id);
 
-    List<T> findAll();
+    Set<T> findAll();
 
     Optional<T> findById(long id);
 }

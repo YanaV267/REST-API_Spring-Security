@@ -11,10 +11,9 @@ import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
-import java.sql.PreparedStatement;
-import java.sql.Statement;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Optional;
+import java.util.Set;
 
 @Repository
 public class TagRepositoryImpl implements TagRepository {
@@ -23,7 +22,6 @@ public class TagRepositoryImpl implements TagRepository {
     private static final String SELECT_ALL_TAGS = "SELECT id, name FROM tag";
     private static final String SELECT_TAG_BY_ID = "SELECT id, name FROM tag WHERE id = ?";
     private static final String SELECT_TAG_BY_NAME = "SELECT id, name FROM tag WHERE name = ?";
-
     private final JdbcTemplate template;
 
     @Autowired
@@ -34,11 +32,7 @@ public class TagRepositoryImpl implements TagRepository {
     @Override
     public long create(Tag tag) {
         KeyHolder keyHolder = new GeneratedKeyHolder();
-        template.update(connection -> {
-            PreparedStatement statement = connection.prepareStatement(INSERT_TAG, Statement.RETURN_GENERATED_KEYS);
-            statement.setString(1, tag.getName());
-            return statement;
-        }, keyHolder);
+        template.update(INSERT_TAG, tag.getName(), keyHolder);
         return keyHolder.getKey().longValue();
     }
 
@@ -49,8 +43,8 @@ public class TagRepositoryImpl implements TagRepository {
     }
 
     @Override
-    public List<Tag> findAll() {
-        return template.query(SELECT_ALL_TAGS, new TagMapper());
+    public Set<Tag> findAll() {
+        return new HashSet<>(template.query(SELECT_ALL_TAGS, new TagMapper()));
     }
 
     @Override

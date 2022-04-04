@@ -2,12 +2,12 @@ package com.epam.esm.repository;
 
 import com.epam.esm.entity.GiftCertificate;
 
-import java.util.List;
+import java.util.Set;
 
 public interface GiftCertificateRepository extends BaseRepository<GiftCertificate> {
     boolean update(GiftCertificate giftCertificate);
 
-    List<GiftCertificate> findByName(String name);
+    Set<GiftCertificate> findByName(String name);
 
-    List<GiftCertificate> findByDescription(String description);
+    Set<GiftCertificate> findByDescription(String description);
 }
