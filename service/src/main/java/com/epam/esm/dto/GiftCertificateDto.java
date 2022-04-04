@@ -1,7 +1,6 @@
 package com.epam.esm.dto;
 
 import java.math.BigDecimal;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
@@ -77,11 +76,11 @@ public class GiftCertificateDto {
     }
 
     public Set<TagDto> getTags() {
-        return Collections.unmodifiableSet(tags);
+        return new HashSet<>(tags);
     }
 
     public void setTags(Set<TagDto> tags) {
-        this.tags = Collections.unmodifiableSet(tags);
+        this.tags = new HashSet<>(tags);
     }
 
     @Override
@@ -131,7 +130,8 @@ public class GiftCertificateDto {
         sb.append("' , price=").append(price);
         sb.append(" , duration=").append(duration);
         sb.append(" , createDate='").append(createDate);
-        sb.append("' , lastUpdateDate='").append(lastUpdateDate).append("'}");
+        sb.append("' , lastUpdateDate='").append(lastUpdateDate);
+        sb.append("' , tags=").append(tags.toString()).append("}");
         return sb.toString();
     }
 }

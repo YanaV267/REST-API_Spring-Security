@@ -6,13 +6,11 @@ import org.springframework.jdbc.core.RowMapper;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import static com.epam.esm.repository.ColumnName.ID;
-import static com.epam.esm.repository.ColumnName.NAME;
+import static com.epam.esm.repository.ColumnName.*;
 
 public class TagMapper implements RowMapper<Tag> {
     @Override
     public Tag mapRow(ResultSet resultSet, int rowNum) throws SQLException {
-        return new Tag(resultSet.getLong(ID), resultSet.getString(NAME));
+        return new Tag(resultSet.getLong(TAG_ID), resultSet.getString(TAG_NAME));
     }
-
 }
