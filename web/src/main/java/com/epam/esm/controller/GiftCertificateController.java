@@ -2,7 +2,7 @@ package com.epam.esm.controller;
 
 import com.epam.esm.dto.GiftCertificateDto;
 import com.epam.esm.exception.BadRequestException;
-import com.epam.esm.exception.NotFoundException;
+import com.epam.esm.exception.NoDataFoundException;
 import com.epam.esm.service.GiftCertificateService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -12,6 +12,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
+import static com.epam.esm.util.ParameterName.CERTIFICATES;
+import static com.epam.esm.util.ParameterName.ID;
 import static org.springframework.http.HttpStatus.*;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
@@ -30,7 +32,7 @@ public class GiftCertificateController {
     public void create(@RequestBody Map<String, Object> certificateData) {
         boolean isCreated = certificateService.create(certificateData);
         if (!isCreated) {
-            throw new BadRequestException();
+            throw new BadRequestException(GiftCertificateDto.class);
         }
     }
 
@@ -39,7 +41,7 @@ public class GiftCertificateController {
     public void update(@RequestBody Map<String, Object> certificateData) {
         boolean isUpdated = certificateService.update(certificateData);
         if (!isUpdated) {
-            throw new BadRequestException();
+            throw new BadRequestException(GiftCertificateDto.class);
         }
     }
 
@@ -48,31 +50,41 @@ public class GiftCertificateController {
     public void delete(@PathVariable long id) {
         boolean isDeleted = certificateService.delete(id);
         if (!isDeleted) {
-            throw new NotFoundException();
+            throw new NoDataFoundException(ID, id, GiftCertificateDto.class);
         }
     }
 
     @GetMapping(produces = APPLICATION_JSON_VALUE)
     @ResponseStatus(FOUND)
     public Set<GiftCertificateDto> retrieveAll() {
-        return certificateService.findAll();
+        Set<GiftCertificateDto> certificates = certificateService.findAll();
+        if (!certificates.isEmpty()) {
+            return certificates;
+        } else {
+            throw new NoDataFoundException(CERTIFICATES, GiftCertificateDto.class);
+        }
     }
 
-    @GetMapping(value = "/{id}", produces = APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/{id}")
     @ResponseStatus(FOUND)
     public GiftCertificateDto findById(@PathVariable long id) {
         Optional<GiftCertificateDto> giftCertificate = certificateService.findById(id);
         if (giftCertificate.isPresent()) {
             return giftCertificate.get();
         } else {
-            throw new NotFoundException();
+            throw new NoDataFoundException(ID, id, GiftCertificateDto.class);
         }
     }
 
     @GetMapping
     @ResponseStatus(FOUND)
-    public Set<GiftCertificateDto> findByName(@RequestParam Map<String, Object> certificateData,
-                                              @RequestParam(value = "sort", required = false) List<String> sortTypes) {
-        return certificateService.findBySeveralParameters(certificateData, sortTypes);
+    public Set<GiftCertificateDto> findBySeveralParameters(@RequestParam Map<String, Object> certificateData,
+                                                           @RequestParam(value = "sort", required = false) List<String> sortTypes) {
+        Set<GiftCertificateDto> certificates = certificateService.findBySeveralParameters(certificateData, sortTypes);
+        if (!certificates.isEmpty()) {
+            return certificates;
+        } else {
+            throw new NoDataFoundException(certificateData.toString(), GiftCertificateDto.class);
+        }
     }
 }

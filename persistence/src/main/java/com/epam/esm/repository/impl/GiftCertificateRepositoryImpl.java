@@ -3,7 +3,6 @@ package com.epam.esm.repository.impl;
 import com.epam.esm.builder.GiftCertificateQueryBuilder;
 import com.epam.esm.entity.GiftCertificate;
 import com.epam.esm.mapper.GiftCertificateExtractor;
-import com.epam.esm.mapper.GiftCertificateMapper;
 import com.epam.esm.repository.GiftCertificateRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -15,7 +14,10 @@ import org.springframework.stereotype.Repository;
 import javax.sql.DataSource;
 import java.sql.PreparedStatement;
 import java.sql.Statement;
-import java.util.*;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 @Repository
 public class GiftCertificateRepositoryImpl implements GiftCertificateRepository {
@@ -79,12 +81,12 @@ public class GiftCertificateRepositoryImpl implements GiftCertificateRepository 
     @Override
     public Optional<GiftCertificate> findById(long id) {
         try {
-            GiftCertificate certificate = template.queryForObject(
-                    new GiftCertificateQueryBuilder(SELECT_CERTIFICATES)
+            return template.query(new GiftCertificateQueryBuilder(SELECT_CERTIFICATES)
                             .addWhereClause()
                             .addIdParameter(id)
-                            .build(), new GiftCertificateMapper());
-            return Optional.ofNullable(certificate);
+                            .build(), new GiftCertificateExtractor())
+                    .stream()
+                    .findFirst();
         } catch (EmptyResultDataAccessException exception) {
             return Optional.empty();
         }
