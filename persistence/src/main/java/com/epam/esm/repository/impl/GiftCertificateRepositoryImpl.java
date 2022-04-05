@@ -68,6 +68,7 @@ public class GiftCertificateRepositoryImpl implements GiftCertificateRepository 
                 .addDescriptionParameter(certificate.getDescription())
                 .addPriceParameter(certificate.getPrice())
                 .addDurationParameter(certificate.getDuration())
+                .checkQueryEnding()
                 .addLastUpdateDateNowParameter()
                 .addWhereClause()
                 .addIdParameter(certificate.getId())
@@ -108,7 +109,7 @@ public class GiftCertificateRepositoryImpl implements GiftCertificateRepository 
                                                         List<String> sortTypes) {
         List<GiftCertificate> certificates = template.query(
                 new GiftCertificateQueryBuilder(SELECT_CERTIFICATES)
-                        .addWhereClause()
+                        .addWhereClause(certificate.getId())
                         .addNameLikeParameter(certificate.getName())
                         .addDescriptionLikeParameter(certificate.getDescription())
                         .addPriceParameter(certificate.getPrice())

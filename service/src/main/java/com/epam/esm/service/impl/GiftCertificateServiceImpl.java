@@ -148,6 +148,7 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
      */
     public GiftCertificate retrieveCertificateData(Map<String, Object> certificateData) {
         GiftCertificate giftCertificate = new GiftCertificate();
+        giftCertificate.setId(certificateData.size());
         if (certificateData.containsKey(NAME)) {
             giftCertificate.setName(String.valueOf(certificateData.get(NAME)));
         }

@@ -260,6 +260,19 @@ public class GiftCertificateQueryBuilder {
     /**
      * Add where clause gift certificate query builder.
      *
+     * @param id the id
+     * @return the gift certificate query builder
+     */
+    public GiftCertificateQueryBuilder addWhereClause(long id) {
+        if (id != 0) {
+            query.append(WHERE_CLAUSE);
+        }
+        return this;
+    }
+
+    /**
+     * Add where clause gift certificate query builder.
+     *
      * @return the gift certificate query builder
      */
     public GiftCertificateQueryBuilder addWhereClause() {
@@ -269,14 +282,17 @@ public class GiftCertificateQueryBuilder {
 
     /**
      * Check query ending.
+     *
+     * @return the gift certificate query builder
      */
-    public void checkQueryEnding() {
+    public GiftCertificateQueryBuilder checkQueryEnding() {
         if (query.toString().contains(WHERE_CLAUSE) && !query.toString().endsWith(WHERE_CLAUSE)) {
             query.append(AND_OPERATOR);
         }
         if (query.toString().contains(SET_OPERATOR) && !query.toString().endsWith(SET_OPERATOR)) {
             query.append(COMMA);
         }
+        return this;
     }
 
     /**
