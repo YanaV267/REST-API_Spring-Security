@@ -20,6 +20,10 @@ public final class ParameterName {
      */
     public static final String TAG = "tag";
     /**
+     * The constant SORT.
+     */
+    public static final String SORT = "sort";
+    /**
      * The constant ID.
      */
     public static final String ID = "id";

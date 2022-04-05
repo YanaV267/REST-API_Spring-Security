@@ -57,14 +57,19 @@ public class CertificatePurchaseRepositoryImpl implements CertificatePurchaseRep
 
     @Override
     public boolean update(GiftCertificate certificate) {
-        certificateRepository.update(certificate);
-        certificate.getTags().forEach(tag -> {
-            Optional<Tag> foundTag = tagRepository.findByName(tag.getName());
-            if (!foundTag.isPresent()) {
-                long tagId = tagRepository.create(tag);
-                template.update(INSERT_PURCHASE, certificate.getId(), tagId);
-            }
-        });
-        return true;
+        Optional<GiftCertificate> foundCertificate = certificateRepository.findById(certificate.getId());
+        if (foundCertificate.isPresent()) {
+            certificateRepository.update(certificate);
+            certificate.getTags().forEach(tag -> {
+                Optional<Tag> foundTag = tagRepository.findByName(tag.getName());
+                if (!foundTag.isPresent()) {
+                    long tagId = tagRepository.create(tag);
+                    template.update(INSERT_PURCHASE, certificate.getId(), tagId);
+                }
+            });
+            return true;
+        } else {
+            return false;
+        }
     }
 }

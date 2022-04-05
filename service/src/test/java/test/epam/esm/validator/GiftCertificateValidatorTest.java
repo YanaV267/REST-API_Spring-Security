@@ -69,7 +69,7 @@ public class GiftCertificateValidatorTest {
     @ParameterizedTest
     @MethodSource("provideCertificateData")
     public void checkCertificate(Map<String, ?> certificateData) {
-        boolean actual = validator.checkCertificate(certificateData);
+        boolean actual = validator.checkAllCertificateData(certificateData);
         Assertions.assertFalse(actual);
     }
 

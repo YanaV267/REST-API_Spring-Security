@@ -58,7 +58,7 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
 
     @Override
     public boolean create(Map<String, Object> certificateData) {
-        if (validator.checkCertificate(certificateData)) {
+        if (validator.checkAllCertificateData(certificateData)) {
             Set<Tag> tags = ((ArrayList<Map<String, String>>) certificateData.get(TAGS)).stream()
                     .map(t -> t.get(NAME))
                     .map(Tag::new)
@@ -79,7 +79,8 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
     @Override
     public boolean update(Map<String, Object> certificateData) {
         if (!certificateData.isEmpty() && certificateData.containsKey(ID)
-                && validator.checkCertificate(certificateData)) {
+                && validator.checkId((String) certificateData.get(ID))
+                && validator.checkCertificateData(certificateData)) {
             GiftCertificate giftCertificate = retrieveCertificateData(certificateData);
             giftCertificate.setId(Long.parseLong(String.valueOf(certificateData.get(ID))));
             if (certificateData.containsKey(TAGS)) {
@@ -126,8 +127,10 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
 
     @Override
     public Set<GiftCertificateDto> findBySeveralParameters(Map<String, Object> certificateData, List<String> sortTypes) {
-        if (!certificateData.isEmpty() && validator.checkCertificate(certificateData)) {
+        if (!certificateData.isEmpty() && validator.checkCertificateData(certificateData)) {
             GiftCertificate giftCertificate = retrieveCertificateData(certificateData);
+            int id = certificateData.size() == 1 && certificateData.containsKey(SORT) ? 0 : 1;
+            giftCertificate.setId(id);
             String tagName = null;
             if (certificateData.containsKey(TAG)) {
                 tagName = String.valueOf(certificateData.get(TAG));
@@ -148,7 +151,6 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
      */
     public GiftCertificate retrieveCertificateData(Map<String, Object> certificateData) {
         GiftCertificate giftCertificate = new GiftCertificate();
-        giftCertificate.setId(certificateData.size());
         if (certificateData.containsKey(NAME)) {
             giftCertificate.setName(String.valueOf(certificateData.get(NAME)));
         }

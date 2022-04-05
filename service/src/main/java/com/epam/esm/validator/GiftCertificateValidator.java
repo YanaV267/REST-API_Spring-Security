@@ -12,6 +12,14 @@ public interface GiftCertificateValidator {
     /**
      * Check name boolean.
      *
+     * @param id the id
+     * @return the boolean
+     */
+    boolean checkId(String id);
+
+    /**
+     * Check name boolean.
+     *
      * @param name the name
      * @return the boolean
      */
@@ -63,5 +71,13 @@ public interface GiftCertificateValidator {
      * @param certificateData the certificate data
      * @return the boolean
      */
-    boolean checkCertificate(Map<String, ?> certificateData);
+    boolean checkAllCertificateData(Map<String, ?> certificateData);
+
+    /**
+     * Check certificate boolean.
+     *
+     * @param certificateData the certificate data
+     * @return the boolean
+     */
+    boolean checkCertificateData(Map<String, ?> certificateData);
 }

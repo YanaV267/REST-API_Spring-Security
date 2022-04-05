@@ -19,6 +19,7 @@ import static com.epam.esm.util.ParameterName.*;
  */
 @Component
 public class GiftCertificateValidatorImpl implements GiftCertificateValidator {
+    private static final String ID_REGEX = "\\d+";
     private static final String NAME_REGEX = "[а-я\\p{Alnum} _]+";
     private static final String DESCRIPTION_REGEX = "[\\p{Graph} ]+";
     private static final String PRICE_REGEX = "((\\d{2,4}\\.\\d{1,2})|(\\d{2,4}))";
@@ -35,6 +36,11 @@ public class GiftCertificateValidatorImpl implements GiftCertificateValidator {
     @Autowired
     public GiftCertificateValidatorImpl(TagValidator tagValidator) {
         this.tagValidator = tagValidator;
+    }
+
+    @Override
+    public boolean checkId(String id) {
+        return id != null && id.matches(ID_REGEX);
     }
 
     @Override
@@ -68,26 +74,38 @@ public class GiftCertificateValidatorImpl implements GiftCertificateValidator {
     }
 
     @Override
-    public boolean checkCertificate(Map<String, ?> certificateData) {
-        if (certificateData.containsKey(NAME) && !checkName(String.valueOf(certificateData.get(NAME)))) {
+    public boolean checkAllCertificateData(Map<String, ?> certificateData) {
+        return checkName((String) certificateData.get(NAME))
+                && checkDescription((String) certificateData.get(DESCRIPTION))
+                && checkPrice((String) certificateData.get(PRICE))
+                && checkDuration((String) certificateData.get(DURATION))
+                && ((ArrayList<Map<String, String>>) certificateData.get(TAGS)).stream()
+                .map(t -> t.get(NAME))
+                .map(tagValidator::checkName)
+                .noneMatch(r -> r.equals(Boolean.FALSE));
+    }
+
+    @Override
+    public boolean checkCertificateData(Map<String, ?> certificateData) {
+        if (certificateData.containsKey(NAME) && !checkName((String) certificateData.get(NAME))) {
             return false;
         }
-        if (certificateData.containsKey(DESCRIPTION) && !checkDescription(String.valueOf(certificateData.get(DESCRIPTION)))) {
+        if (certificateData.containsKey(DESCRIPTION) && !checkDescription((String) certificateData.get(DESCRIPTION))) {
             return false;
         }
-        if (certificateData.containsKey(PRICE) && !checkPrice(String.valueOf(certificateData.get(PRICE)))) {
+        if (certificateData.containsKey(PRICE) && !checkPrice((String) certificateData.get(PRICE))) {
             return false;
         }
         if (certificateData.containsKey(DURATION)
-                && !checkDuration(String.valueOf(certificateData.get(DURATION)))) {
+                && !checkDuration((String) certificateData.get(DURATION))) {
             return false;
         }
         if (certificateData.containsKey(CREATE_DATE)
-                && !checkCreateDate(String.valueOf(certificateData.get(CREATE_DATE)))) {
+                && !checkCreateDate((String) certificateData.get(CREATE_DATE))) {
             return false;
         }
         if (certificateData.containsKey(LAST_UPDATE_DATE)
-                && !checkLastUpdateDate(String.valueOf(certificateData.get(LAST_UPDATE_DATE)))) {
+                && !checkLastUpdateDate((String) certificateData.get(LAST_UPDATE_DATE))) {
             return false;
         }
         if (certificateData.containsKey(TAGS)) {
@@ -98,7 +116,7 @@ public class GiftCertificateValidatorImpl implements GiftCertificateValidator {
                     .noneMatch(r -> r.equals(Boolean.FALSE));
         }
         if (certificateData.containsKey(TAG)) {
-            return tagValidator.checkName(String.valueOf(certificateData.get(TAG)));
+            return tagValidator.checkName((String) certificateData.get(TAG));
         }
         return true;
     }

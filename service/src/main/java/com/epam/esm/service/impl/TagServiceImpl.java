@@ -45,7 +45,7 @@ public class TagServiceImpl implements TagService {
 
     @Override
     public boolean create(Map<String, Object> tagData) {
-        if (validator.checkName(String.valueOf(tagData.get(ParameterName.NAME)))) {
+        if (validator.checkName((String) tagData.get(ParameterName.NAME))) {
             Tag tag = new Tag();
             tag.setName(String.valueOf(tagData.get(ParameterName.NAME)));
             repository.create(tag);

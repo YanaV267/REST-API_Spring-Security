@@ -56,7 +56,7 @@ public class GiftCertificateServiceTest {
     @ParameterizedTest
     @MethodSource("provideCertificateData")
     public void create(Map<String, Object> certificateData) {
-        when(validator.checkCertificate(anyMap())).thenReturn(false);
+        when(validator.checkAllCertificateData(anyMap())).thenReturn(false);
         when(dateFormatter.format(anyString())).thenReturn(LocalDateTime.now());
         when(purchaseRepository.create(any(GiftCertificate.class))).thenReturn(true);
 
@@ -67,7 +67,7 @@ public class GiftCertificateServiceTest {
     @ParameterizedTest
     @MethodSource("provideCertificateData")
     public void update(Map<String, Object> certificateData) {
-        when(validator.checkCertificate(anyMap())).thenReturn(false);
+        when(validator.checkAllCertificateData(anyMap())).thenReturn(false);
         when(dateFormatter.format(anyString())).thenReturn(LocalDateTime.now());
         when(purchaseRepository.update(any(GiftCertificate.class))).thenReturn(true);
 
@@ -109,13 +109,13 @@ public class GiftCertificateServiceTest {
     @ParameterizedTest
     @MethodSource("provideSearchParameters")
     public void findBySeveralParameters(Map<String, Object> certificateData, List<String> sortTypes) {
-        when(validator.checkCertificate(anyMap())).thenReturn(true);
+        when(validator.checkAllCertificateData(anyMap())).thenReturn(true);
         when(dateFormatter.format(anyString())).thenReturn(LocalDateTime.now());
         when(repository.findBySeveralParameters(any(GiftCertificate.class), anyString(), anyList()))
                 .thenReturn(new LinkedHashSet<>());
         when(mapper.mapToDto(any(GiftCertificate.class))).thenReturn(new GiftCertificateDto());
 
-        int expected = 12;
+        int expected = 1;
         Set<GiftCertificateDto> certificates = service.findBySeveralParameters(certificateData, sortTypes);
         int actual = certificates.size();
         Assertions.assertEquals(expected, actual);
@@ -148,7 +148,28 @@ public class GiftCertificateServiceTest {
 
     public static Object[][] provideSearchParameters() {
         return new Object[][]{
-
+                {new HashMap<String, Object>() {
+                    {
+                        put(PRICE, "100");
+                        put(LAST_UPDATE_DATE, "2022-03-31T19:04:55");
+                    }
+                }, new ArrayList<String>() {
+                    {
+                        add("name_asc");
+                        add("price_desc");
+                    }
+                }},
+                {new HashMap<String, Object>() {
+                    {
+                        put(NAME, "european countries tours");
+                        put(PRICE, "70");
+                        put(DURATION, "15");
+                    }
+                }, new ArrayList<String>() {
+                    {
+                        add("name_asc");
+                    }
+                }}
         };
     }
 }
