@@ -1,15 +1,27 @@
 package com.epam.esm.builder;
 
+import com.epam.esm.repository.ColumnName;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import static com.epam.esm.repository.ColumnName.*;
+
 public class GiftCertificateQueryBuilder {
     private static final String WHERE_CLAUSE = " WHERE ";
     private static final String SET_OPERATOR = " SET ";
+    private static final String SPACE = " ";
+    private static final String QUOTE = "'";
     private static final String COMMA = ", ";
+    private static final String UNDERSCORE = "_";
+    private static final String EQUALS = " = ";
     private static final String AND_OPERATOR = " AND ";
+    private static final String LIKE_OPERATOR = " LIKE ";
+    private static final String LIKE_WILDCARD = "%";
     private static final String ORDER_BY_OPERATOR = " ORDER BY ";
+    private static final String DESC_OPERATOR = "DESC";
+    private static final String NOW_TIME = "now(3)";
     private final StringBuilder query;
 
     public GiftCertificateQueryBuilder(String query) {
@@ -18,21 +30,33 @@ public class GiftCertificateQueryBuilder {
 
     public GiftCertificateQueryBuilder addIdParameter(long id) {
         if (id != 0) {
-            query.append("gift_certificate.id = ").append(id);
+            query.append(GIFT_CERTIFICATE_ID)
+                    .append(EQUALS)
+                    .append(id);
         }
         return this;
     }
 
     public GiftCertificateQueryBuilder addNameParameter(String name) {
         if (name != null) {
-            query.append("gift_certificate.name = '").append(name).append("'");
+            query.append(GIFT_CERTIFICATE_NAME)
+                    .append(EQUALS)
+                    .append(QUOTE)
+                    .append(name)
+                    .append(QUOTE);
         }
         return this;
     }
 
     public GiftCertificateQueryBuilder addNameLikeParameter(String name) {
         if (name != null) {
-            query.append("gift_certificate.name LIKE '%").append(name).append("%'");
+            query.append(GIFT_CERTIFICATE_NAME)
+                    .append(LIKE_OPERATOR)
+                    .append(QUOTE)
+                    .append(LIKE_WILDCARD)
+                    .append(name)
+                    .append(LIKE_WILDCARD)
+                    .append(QUOTE);
         }
         return this;
     }
@@ -40,7 +64,11 @@ public class GiftCertificateQueryBuilder {
     public GiftCertificateQueryBuilder addDescriptionParameter(String description) {
         if (description != null) {
             checkQueryEnding();
-            query.append("description = '").append(description).append("'");
+            query.append(DESCRIPTION)
+                    .append(EQUALS)
+                    .append(QUOTE)
+                    .append(description)
+                    .append(QUOTE);
         }
         return this;
     }
@@ -51,7 +79,13 @@ public class GiftCertificateQueryBuilder {
             if (!query.toString().endsWith(WHERE_CLAUSE)) {
                 query.append(AND_OPERATOR);
             }
-            query.append("description LIKE '%").append(description).append("%'");
+            query.append(DESCRIPTION)
+                    .append(LIKE_OPERATOR)
+                    .append(QUOTE)
+                    .append(LIKE_WILDCARD)
+                    .append(description)
+                    .append(LIKE_WILDCARD)
+                    .append(QUOTE);
         }
         return this;
     }
@@ -59,7 +93,9 @@ public class GiftCertificateQueryBuilder {
     public GiftCertificateQueryBuilder addPriceParameter(BigDecimal price) {
         if (price != null) {
             checkQueryEnding();
-            query.append("price = ").append(price.doubleValue());
+            query.append(PRICE)
+                    .append(EQUALS)
+                    .append(price.doubleValue());
         }
         return this;
     }
@@ -67,7 +103,9 @@ public class GiftCertificateQueryBuilder {
     public GiftCertificateQueryBuilder addDurationParameter(int duration) {
         if (duration != 0) {
             checkQueryEnding();
-            query.append("duration = ").append(duration);
+            query.append(DURATION)
+                    .append(EQUALS)
+                    .append(duration);
         }
         return this;
     }
@@ -75,7 +113,11 @@ public class GiftCertificateQueryBuilder {
     public GiftCertificateQueryBuilder addCreateDateParameter(LocalDateTime createDate) {
         if (createDate != null) {
             checkQueryEnding();
-            query.append("create_date = '").append(createDate).append("'");
+            query.append(CREATE_DATE)
+                    .append(EQUALS)
+                    .append(QUOTE)
+                    .append(createDate)
+                    .append(QUOTE);
         }
         return this;
     }
@@ -83,13 +125,19 @@ public class GiftCertificateQueryBuilder {
     public GiftCertificateQueryBuilder addLastUpdateDateParameter(LocalDateTime lastUpdateDate) {
         if (lastUpdateDate != null) {
             checkQueryEnding();
-            query.append("last_update_date = '").append(lastUpdateDate).append("'");
+            query.append(LAST_UPDATE_DATE)
+                    .append(EQUALS)
+                    .append(QUOTE)
+                    .append(lastUpdateDate)
+                    .append(QUOTE);
         }
         return this;
     }
 
     public GiftCertificateQueryBuilder addLastUpdateDateNowParameter() {
-        query.append("last_update_date = now(3)");
+        query.append(LAST_UPDATE_DATE)
+                .append(EQUALS)
+                .append(NOW_TIME);
         return this;
     }
 
@@ -98,7 +146,11 @@ public class GiftCertificateQueryBuilder {
             if (!query.toString().endsWith(WHERE_CLAUSE)) {
                 query.append(AND_OPERATOR);
             }
-            query.append("tag.name = '").append(tagName).append("'");
+            query.append(TAG_NAME)
+                    .append(EQUALS)
+                    .append(QUOTE)
+                    .append(tagName)
+                    .append(QUOTE);
         }
         return this;
     }
@@ -110,9 +162,13 @@ public class GiftCertificateQueryBuilder {
                 if (!query.toString().endsWith(ORDER_BY_OPERATOR)) {
                     query.append(COMMA);
                 }
-                query.append(sortType, 0, sortType.indexOf("_"));
-                if (sortType.endsWith("desc")) {
-                    query.append(" DESC");
+                if (!sortType.substring(0, sortType.indexOf(UNDERSCORE)).equals(ColumnName.NAME)) {
+                    query.append(sortType, 0, sortType.indexOf(UNDERSCORE));
+                } else {
+                    query.append(ColumnName.GIFT_CERTIFICATE_NAME);
+                }
+                if (sortType.endsWith(DESC_OPERATOR.toLowerCase())) {
+                    query.append(SPACE).append(DESC_OPERATOR);
                 }
             }
         }
