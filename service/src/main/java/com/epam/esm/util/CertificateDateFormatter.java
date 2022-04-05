@@ -25,4 +25,15 @@ public class CertificateDateFormatter {
         DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern(DATE_FORMAT);
         return LocalDateTime.parse(date, dateFormatter);
     }
+
+    /**
+     * Format local date time.
+     *
+     * @param date the date
+     * @return the local date time
+     */
+    public LocalDateTime format(LocalDateTime date) {
+        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern(DATE_FORMAT);
+        return LocalDateTime.parse(dateFormatter.format(date));
+    }
 }

@@ -23,6 +23,7 @@ public class GiftCertificateValidatorImpl implements GiftCertificateValidator {
     private static final String DESCRIPTION_REGEX = "[\\p{Graph} ]+";
     private static final String PRICE_REGEX = "((\\d{2,4}\\.\\d{1,2})|(\\d{2,4}))";
     private static final String DURATION_REGEX = "\\d+";
+    private static final String DATE_REGEX = "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}";
 
     private final TagValidator tagValidator;
 
@@ -57,6 +58,16 @@ public class GiftCertificateValidatorImpl implements GiftCertificateValidator {
     }
 
     @Override
+    public boolean checkCreateDate(String createDate) {
+        return createDate != null && createDate.matches(DATE_REGEX);
+    }
+
+    @Override
+    public boolean checkLastUpdateDate(String lastUpdateDate) {
+        return lastUpdateDate != null && lastUpdateDate.matches(DATE_REGEX);
+    }
+
+    @Override
     public boolean checkCertificate(Map<String, ?> certificateData) {
         if (certificateData.containsKey(NAME) && !checkName(String.valueOf(certificateData.get(NAME)))) {
             return false;
@@ -67,7 +78,16 @@ public class GiftCertificateValidatorImpl implements GiftCertificateValidator {
         if (certificateData.containsKey(PRICE) && !checkPrice(String.valueOf(certificateData.get(PRICE)))) {
             return false;
         }
-        if (certificateData.containsKey(DURATION) && !checkDuration(String.valueOf(certificateData.get(DURATION)))) {
+        if (certificateData.containsKey(DURATION)
+                && !checkDuration(String.valueOf(certificateData.get(DURATION)))) {
+            return false;
+        }
+        if (certificateData.containsKey(CREATE_DATE)
+                && !checkCreateDate(String.valueOf(certificateData.get(CREATE_DATE)))) {
+            return false;
+        }
+        if (certificateData.containsKey(LAST_UPDATE_DATE)
+                && !checkLastUpdateDate(String.valueOf(certificateData.get(LAST_UPDATE_DATE)))) {
             return false;
         }
         if (certificateData.containsKey(TAGS)) {

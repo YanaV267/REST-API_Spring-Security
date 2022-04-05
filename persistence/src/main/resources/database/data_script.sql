@@ -1,4 +1,4 @@
-INSERT INTO gift_certificate (name, description, price, create_date, duration, last_update_date)
+INSERT INTO gift_certificate (name, description, price, duration, create_date, last_update_date)
 VALUES ('5 element', '15% discount', 30, 100, now(3), now(3)),
        ('european countries tours', 'provides 17% discount for any 1 chosen tour', 72, 200, now(3), now(3));
 

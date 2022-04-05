@@ -42,6 +42,22 @@ public interface GiftCertificateValidator {
     boolean checkDuration(String duration);
 
     /**
+     * Check start date boolean.
+     *
+     * @param createDate the create date
+     * @return the boolean
+     */
+    boolean checkCreateDate(String createDate);
+
+    /**
+     * Check last update date boolean.
+     *
+     * @param lastUpdateDate the last update date
+     * @return the boolean
+     */
+    boolean checkLastUpdateDate(String lastUpdateDate);
+
+    /**
      * Check certificate boolean.
      *
      * @param certificateData the certificate data
