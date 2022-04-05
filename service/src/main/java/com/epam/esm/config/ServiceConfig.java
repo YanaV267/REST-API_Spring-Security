@@ -1,5 +1,6 @@
 package com.epam.esm.config;
 
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 
 /**
@@ -9,5 +10,6 @@ import org.springframework.context.annotation.Configuration;
  * @project GiftCertificate
  */
 @Configuration
+@ComponentScan("com.epam.esm")
 public class ServiceConfig {
 }
