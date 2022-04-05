@@ -14,10 +14,15 @@ import javax.sql.DataSource;
 import java.sql.PreparedStatement;
 import java.sql.Statement;
 import java.util.HashSet;
-import java.util.LinkedHashSet;
 import java.util.Optional;
 import java.util.Set;
 
+/**
+ * The type Tag repository.
+ *
+ * @author YanaV
+ * @project GiftCertificate
+ */
 @Repository
 public class TagRepositoryImpl implements TagRepository {
     private static final String INSERT_TAG = "INSERT INTO tag (name) VALUES (?)";
@@ -27,6 +32,11 @@ public class TagRepositoryImpl implements TagRepository {
     private static final String SELECT_TAG_BY_NAME = "SELECT id, name FROM tag WHERE name = ?";
     private final JdbcTemplate template;
 
+    /**
+     * Instantiates a new Tag repository.
+     *
+     * @param dataSource the data source
+     */
     @Autowired
     public TagRepositoryImpl(DataSource dataSource) {
         this.template = new JdbcTemplate(dataSource);

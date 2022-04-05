@@ -20,6 +20,12 @@ import java.util.stream.Collectors;
 
 import static com.epam.esm.util.ParameterName.*;
 
+/**
+ * The type Gift certificate service.
+ *
+ * @author YanaV
+ * @project GiftCertificate
+ */
 @Service
 public class GiftCertificateServiceImpl implements GiftCertificateService {
     private final GiftCertificateRepository repository;
@@ -28,6 +34,15 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
     private final GiftCertificateMapper mapper;
     private final CertificateDateFormatter dateFormatter;
 
+    /**
+     * Instantiates a new Gift certificate service.
+     *
+     * @param repository         the repository
+     * @param purchaseRepository the purchase repository
+     * @param validator          the validator
+     * @param mapper             the mapper
+     * @param dateFormatter      the date formatter
+     */
     @Autowired
     public GiftCertificateServiceImpl(GiftCertificateRepository repository,
                                       CertificatePurchaseRepository purchaseRepository,
@@ -125,6 +140,12 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
         return new LinkedHashSet<>();
     }
 
+    /**
+     * Retrieve certificate data gift certificate.
+     *
+     * @param certificateData the certificate data
+     * @return the gift certificate
+     */
     public GiftCertificate retrieveCertificateData(Map<String, Object> certificateData) {
         GiftCertificate giftCertificate = new GiftCertificate();
         if (certificateData.containsKey(NAME)) {

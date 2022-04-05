@@ -8,6 +8,12 @@ import java.sql.SQLException;
 
 import static com.epam.esm.repository.ColumnName.*;
 
+/**
+ * The type Gift certificate mapper.
+ *
+ * @author YanaV
+ * @project GiftCertificate
+ */
 public class GiftCertificateMapper implements RowMapper<GiftCertificate> {
     @Override
     public GiftCertificate mapRow(ResultSet resultSet, int rowNum) throws SQLException {

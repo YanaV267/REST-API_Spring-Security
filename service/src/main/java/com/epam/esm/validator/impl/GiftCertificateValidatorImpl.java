@@ -11,6 +11,12 @@ import java.util.Map;
 
 import static com.epam.esm.util.ParameterName.*;
 
+/**
+ * The type Gift certificate validator.
+ *
+ * @author YanaV
+ * @project GiftCertificate
+ */
 @Component
 public class GiftCertificateValidatorImpl implements GiftCertificateValidator {
     private static final String NAME_REGEX = "[а-я\\p{Alnum} _]+";
@@ -20,6 +26,11 @@ public class GiftCertificateValidatorImpl implements GiftCertificateValidator {
 
     private final TagValidator tagValidator;
 
+    /**
+     * Instantiates a new Gift certificate validator.
+     *
+     * @param tagValidator the tag validator
+     */
     @Autowired
     public GiftCertificateValidatorImpl(TagValidator tagValidator) {
         this.tagValidator = tagValidator;

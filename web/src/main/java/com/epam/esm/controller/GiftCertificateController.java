@@ -17,16 +17,32 @@ import static com.epam.esm.util.ParameterName.ID;
 import static org.springframework.http.HttpStatus.*;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
+/**
+ * The type Gift certificate controller.
+ *
+ * @author YanaV
+ * @project GiftCertificate
+ */
 @RestController
 @RequestMapping("/certificates")
 public class GiftCertificateController {
     private final GiftCertificateService certificateService;
 
+    /**
+     * Instantiates a new Gift certificate controller.
+     *
+     * @param certificateService the certificate service
+     */
     @Autowired
     public GiftCertificateController(GiftCertificateService certificateService) {
         this.certificateService = certificateService;
     }
 
+    /**
+     * Create.
+     *
+     * @param certificateData the certificate data
+     */
     @PostMapping(consumes = APPLICATION_JSON_VALUE)
     @ResponseStatus(CREATED)
     public void create(@RequestBody Map<String, Object> certificateData) {
@@ -36,6 +52,11 @@ public class GiftCertificateController {
         }
     }
 
+    /**
+     * Update.
+     *
+     * @param certificateData the certificate data
+     */
     @PutMapping(consumes = APPLICATION_JSON_VALUE)
     @ResponseStatus(OK)
     public void update(@RequestBody Map<String, Object> certificateData) {
@@ -45,6 +66,11 @@ public class GiftCertificateController {
         }
     }
 
+    /**
+     * Delete.
+     *
+     * @param id the id
+     */
     @DeleteMapping("/{id}")
     @ResponseStatus(OK)
     public void delete(@PathVariable long id) {
@@ -54,7 +80,12 @@ public class GiftCertificateController {
         }
     }
 
-    @GetMapping(produces = APPLICATION_JSON_VALUE)
+    /**
+     * Retrieve all set.
+     *
+     * @return the set
+     */
+    @GetMapping(value = "/all", produces = APPLICATION_JSON_VALUE)
     @ResponseStatus(FOUND)
     public Set<GiftCertificateDto> retrieveAll() {
         Set<GiftCertificateDto> certificates = certificateService.findAll();
@@ -65,6 +96,12 @@ public class GiftCertificateController {
         }
     }
 
+    /**
+     * Find by id gift certificate dto.
+     *
+     * @param id the id
+     * @return the gift certificate dto
+     */
     @GetMapping(value = "/{id}")
     @ResponseStatus(FOUND)
     public GiftCertificateDto findById(@PathVariable long id) {
@@ -76,6 +113,13 @@ public class GiftCertificateController {
         }
     }
 
+    /**
+     * Find by several parameters set.
+     *
+     * @param certificateData the certificate data
+     * @param sortTypes       the sort types
+     * @return the set
+     */
     @GetMapping
     @ResponseStatus(FOUND)
     public Set<GiftCertificateDto> findBySeveralParameters(@RequestParam Map<String, Object> certificateData,

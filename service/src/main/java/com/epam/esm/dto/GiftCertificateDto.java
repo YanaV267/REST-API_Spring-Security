@@ -5,6 +5,12 @@ import java.time.LocalDateTime;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
+/**
+ * The type Gift certificate dto.
+ *
+ * @author YanaV
+ * @project GiftCertificate
+ */
 public class GiftCertificateDto {
     private long id;
     private String name;
@@ -15,70 +21,153 @@ public class GiftCertificateDto {
     private LocalDateTime lastUpdateDate;
     private Set<TagDto> tags;
 
+    /**
+     * Instantiates a new Gift certificate dto.
+     */
     public GiftCertificateDto() {
         tags = new LinkedHashSet<>();
     }
 
+    /**
+     * Gets id.
+     *
+     * @return the id
+     */
     public long getId() {
         return id;
     }
 
+    /**
+     * Sets id.
+     *
+     * @param id the id
+     */
     public void setId(long id) {
         this.id = id;
     }
 
+    /**
+     * Gets name.
+     *
+     * @return the name
+     */
     public String getName() {
         return name;
     }
 
+    /**
+     * Sets name.
+     *
+     * @param name the name
+     */
     public void setName(String name) {
         this.name = name;
     }
 
+    /**
+     * Gets description.
+     *
+     * @return the description
+     */
     public String getDescription() {
         return description;
     }
 
+    /**
+     * Sets description.
+     *
+     * @param description the description
+     */
     public void setDescription(String description) {
         this.description = description;
     }
 
+    /**
+     * Gets price.
+     *
+     * @return the price
+     */
     public BigDecimal getPrice() {
         return price;
     }
 
+    /**
+     * Sets price.
+     *
+     * @param price the price
+     */
     public void setPrice(BigDecimal price) {
         this.price = price;
     }
 
+    /**
+     * Gets duration.
+     *
+     * @return the duration
+     */
     public int getDuration() {
         return duration;
     }
 
+    /**
+     * Sets duration.
+     *
+     * @param duration the duration
+     */
     public void setDuration(int duration) {
         this.duration = duration;
     }
 
+    /**
+     * Gets create date.
+     *
+     * @return the create date
+     */
     public String getCreateDate() {
         return String.valueOf(createDate);
     }
 
+    /**
+     * Sets create date.
+     *
+     * @param createDate the create date
+     */
     public void setCreateDate(LocalDateTime createDate) {
         this.createDate = createDate;
     }
 
+    /**
+     * Gets last update date.
+     *
+     * @return the last update date
+     */
     public String getLastUpdateDate() {
         return String.valueOf(lastUpdateDate);
     }
 
+    /**
+     * Sets last update date.
+     *
+     * @param lastUpdateDate the last update date
+     */
     public void setLastUpdateDate(LocalDateTime lastUpdateDate) {
         this.lastUpdateDate = lastUpdateDate;
     }
 
+    /**
+     * Gets tags.
+     *
+     * @return the tags
+     */
     public Set<TagDto> getTags() {
         return new LinkedHashSet<>(tags);
     }
 
+    /**
+     * Sets tags.
+     *
+     * @param tags the tags
+     */
     public void setTags(Set<TagDto> tags) {
         this.tags = new LinkedHashSet<>(tags);
     }

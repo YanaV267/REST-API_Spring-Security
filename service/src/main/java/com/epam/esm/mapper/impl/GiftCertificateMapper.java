@@ -14,11 +14,23 @@ import java.time.LocalDateTime;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+/**
+ * The type Gift certificate mapper.
+ *
+ * @author YanaV
+ * @project GiftCertificate
+ */
 @Component("certificateMapper")
 public class GiftCertificateMapper implements Mapper<GiftCertificate, GiftCertificateDto> {
     private final TagMapper tagMapper;
     private final CertificateDateFormatter dateFormatter;
 
+    /**
+     * Instantiates a new Gift certificate mapper.
+     *
+     * @param tagMapper     the tag mapper
+     * @param dateFormatter the date formatter
+     */
     @Autowired
     public GiftCertificateMapper(@Qualifier("tagMapper") TagMapper tagMapper, CertificateDateFormatter dateFormatter) {
         this.tagMapper = tagMapper;

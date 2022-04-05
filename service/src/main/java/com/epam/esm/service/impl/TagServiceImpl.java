@@ -16,12 +16,25 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+/**
+ * The type Tag service.
+ *
+ * @author YanaV
+ * @project GiftCertificate
+ */
 @Service
 public class TagServiceImpl implements TagService {
     private final TagRepository repository;
     private final TagValidator validator;
     private final TagMapper mapper;
 
+    /**
+     * Instantiates a new Tag service.
+     *
+     * @param repository the repository
+     * @param validator  the validator
+     * @param mapper     the mapper
+     */
     @Autowired
     public TagServiceImpl(TagRepository repository, TagValidator validator,
                           @Qualifier("tagMapper") TagMapper mapper) {

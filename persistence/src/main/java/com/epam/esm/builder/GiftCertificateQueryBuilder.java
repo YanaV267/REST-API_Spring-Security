@@ -8,6 +8,12 @@ import java.util.List;
 
 import static com.epam.esm.repository.ColumnName.*;
 
+/**
+ * The type Gift certificate query builder.
+ *
+ * @author YanaV
+ * @project GiftCertificate
+ */
 public class GiftCertificateQueryBuilder {
     private static final String WHERE_CLAUSE = " WHERE ";
     private static final String SET_OPERATOR = " SET ";
@@ -24,10 +30,21 @@ public class GiftCertificateQueryBuilder {
     private static final String NOW_TIME = "now(3)";
     private final StringBuilder query;
 
+    /**
+     * Instantiates a new Gift certificate query builder.
+     *
+     * @param query the query
+     */
     public GiftCertificateQueryBuilder(String query) {
         this.query = new StringBuilder(query);
     }
 
+    /**
+     * Add id parameter gift certificate query builder.
+     *
+     * @param id the id
+     * @return the gift certificate query builder
+     */
     public GiftCertificateQueryBuilder addIdParameter(long id) {
         if (id != 0) {
             query.append(GIFT_CERTIFICATE_ID)
@@ -37,6 +54,12 @@ public class GiftCertificateQueryBuilder {
         return this;
     }
 
+    /**
+     * Add name parameter gift certificate query builder.
+     *
+     * @param name the name
+     * @return the gift certificate query builder
+     */
     public GiftCertificateQueryBuilder addNameParameter(String name) {
         if (name != null) {
             query.append(GIFT_CERTIFICATE_NAME)
@@ -48,6 +71,12 @@ public class GiftCertificateQueryBuilder {
         return this;
     }
 
+    /**
+     * Add name like parameter gift certificate query builder.
+     *
+     * @param name the name
+     * @return the gift certificate query builder
+     */
     public GiftCertificateQueryBuilder addNameLikeParameter(String name) {
         if (name != null) {
             query.append(GIFT_CERTIFICATE_NAME)
@@ -61,6 +90,12 @@ public class GiftCertificateQueryBuilder {
         return this;
     }
 
+    /**
+     * Add description parameter gift certificate query builder.
+     *
+     * @param description the description
+     * @return the gift certificate query builder
+     */
     public GiftCertificateQueryBuilder addDescriptionParameter(String description) {
         if (description != null) {
             checkQueryEnding();
@@ -74,6 +109,12 @@ public class GiftCertificateQueryBuilder {
     }
 
 
+    /**
+     * Add description like parameter gift certificate query builder.
+     *
+     * @param description the description
+     * @return the gift certificate query builder
+     */
     public GiftCertificateQueryBuilder addDescriptionLikeParameter(String description) {
         if (description != null) {
             if (!query.toString().endsWith(WHERE_CLAUSE)) {
@@ -90,6 +131,12 @@ public class GiftCertificateQueryBuilder {
         return this;
     }
 
+    /**
+     * Add price parameter gift certificate query builder.
+     *
+     * @param price the price
+     * @return the gift certificate query builder
+     */
     public GiftCertificateQueryBuilder addPriceParameter(BigDecimal price) {
         if (price != null) {
             checkQueryEnding();
@@ -100,6 +147,12 @@ public class GiftCertificateQueryBuilder {
         return this;
     }
 
+    /**
+     * Add duration parameter gift certificate query builder.
+     *
+     * @param duration the duration
+     * @return the gift certificate query builder
+     */
     public GiftCertificateQueryBuilder addDurationParameter(int duration) {
         if (duration != 0) {
             checkQueryEnding();
@@ -110,6 +163,12 @@ public class GiftCertificateQueryBuilder {
         return this;
     }
 
+    /**
+     * Add create date parameter gift certificate query builder.
+     *
+     * @param createDate the create date
+     * @return the gift certificate query builder
+     */
     public GiftCertificateQueryBuilder addCreateDateParameter(LocalDateTime createDate) {
         if (createDate != null) {
             checkQueryEnding();
@@ -122,6 +181,12 @@ public class GiftCertificateQueryBuilder {
         return this;
     }
 
+    /**
+     * Add last update date parameter gift certificate query builder.
+     *
+     * @param lastUpdateDate the last update date
+     * @return the gift certificate query builder
+     */
     public GiftCertificateQueryBuilder addLastUpdateDateParameter(LocalDateTime lastUpdateDate) {
         if (lastUpdateDate != null) {
             checkQueryEnding();
@@ -134,6 +199,11 @@ public class GiftCertificateQueryBuilder {
         return this;
     }
 
+    /**
+     * Add last update date now parameter gift certificate query builder.
+     *
+     * @return the gift certificate query builder
+     */
     public GiftCertificateQueryBuilder addLastUpdateDateNowParameter() {
         query.append(LAST_UPDATE_DATE)
                 .append(EQUALS)
@@ -141,6 +211,12 @@ public class GiftCertificateQueryBuilder {
         return this;
     }
 
+    /**
+     * Add tag name gift certificate query builder.
+     *
+     * @param tagName the tag name
+     * @return the gift certificate query builder
+     */
     public GiftCertificateQueryBuilder addTagName(String tagName) {
         if (tagName != null) {
             if (!query.toString().endsWith(WHERE_CLAUSE)) {
@@ -155,6 +231,12 @@ public class GiftCertificateQueryBuilder {
         return this;
     }
 
+    /**
+     * Add sorting gift certificate query builder.
+     *
+     * @param sortTypes the sort types
+     * @return the gift certificate query builder
+     */
     public GiftCertificateQueryBuilder addSorting(List<String> sortTypes) {
         if (sortTypes != null) {
             query.append(ORDER_BY_OPERATOR);
@@ -175,11 +257,19 @@ public class GiftCertificateQueryBuilder {
         return this;
     }
 
+    /**
+     * Add where clause gift certificate query builder.
+     *
+     * @return the gift certificate query builder
+     */
     public GiftCertificateQueryBuilder addWhereClause() {
         query.append(WHERE_CLAUSE);
         return this;
     }
 
+    /**
+     * Check query ending.
+     */
     public void checkQueryEnding() {
         if (!query.toString().endsWith(WHERE_CLAUSE)) {
             query.append(AND_OPERATOR);
@@ -189,6 +279,11 @@ public class GiftCertificateQueryBuilder {
         }
     }
 
+    /**
+     * Build string.
+     *
+     * @return the string
+     */
     public String build() {
         return query.toString();
     }

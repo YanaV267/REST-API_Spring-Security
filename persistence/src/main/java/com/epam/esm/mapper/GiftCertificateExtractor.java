@@ -11,6 +11,12 @@ import java.util.*;
 
 import static com.epam.esm.repository.ColumnName.GIFT_CERTIFICATE_ID;
 
+/**
+ * The type Gift certificate extractor.
+ *
+ * @author YanaV
+ * @project GiftCertificate
+ */
 public class GiftCertificateExtractor implements ResultSetExtractor<List<GiftCertificate>> {
     @Override
     public List<GiftCertificate> extractData(ResultSet resultSet) throws SQLException, DataAccessException {

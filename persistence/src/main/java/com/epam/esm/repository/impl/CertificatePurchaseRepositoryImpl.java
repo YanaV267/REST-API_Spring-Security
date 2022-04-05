@@ -13,6 +13,12 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.sql.DataSource;
 import java.util.Optional;
 
+/**
+ * The type Certificate purchase repository.
+ *
+ * @author YanaV
+ * @project GiftCertificate
+ */
 @Repository
 @Transactional
 public class CertificatePurchaseRepositoryImpl implements CertificatePurchaseRepository {
@@ -22,6 +28,13 @@ public class CertificatePurchaseRepositoryImpl implements CertificatePurchaseRep
     private final GiftCertificateRepository certificateRepository;
     private final TagRepository tagRepository;
 
+    /**
+     * Instantiates a new Certificate purchase repository.
+     *
+     * @param dataSource            the data source
+     * @param certificateRepository the certificate repository
+     * @param tagRepository         the tag repository
+     */
     @Autowired
     public CertificatePurchaseRepositoryImpl(DataSource dataSource, GiftCertificateRepository certificateRepository,
                                              TagRepository tagRepository) {

@@ -19,6 +19,12 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+/**
+ * The type Gift certificate repository.
+ *
+ * @author YanaV
+ * @project GiftCertificate
+ */
 @Repository
 public class GiftCertificateRepositoryImpl implements GiftCertificateRepository {
     private static final String INSERT_CERTIFICATE = "INSERT INTO gift_certificate " +
@@ -31,6 +37,11 @@ public class GiftCertificateRepositoryImpl implements GiftCertificateRepository 
             "JOIN tag ON certificate_purchase.id_tag = tag.id";
     private final JdbcTemplate template;
 
+    /**
+     * Instantiates a new Gift certificate repository.
+     *
+     * @param dataSource the data source
+     */
     @Autowired
     public GiftCertificateRepositoryImpl(DataSource dataSource) {
         this.template = new JdbcTemplate(dataSource);

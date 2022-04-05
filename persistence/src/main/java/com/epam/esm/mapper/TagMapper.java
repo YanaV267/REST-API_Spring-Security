@@ -8,6 +8,12 @@ import java.sql.SQLException;
 
 import static com.epam.esm.repository.ColumnName.*;
 
+/**
+ * The type Tag mapper.
+ *
+ * @author YanaV
+ * @project GiftCertificate
+ */
 public class TagMapper implements RowMapper<Tag> {
     @Override
     public Tag mapRow(ResultSet resultSet, int rowNum) throws SQLException {

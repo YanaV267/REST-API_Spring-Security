@@ -13,6 +13,9 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 import javax.sql.DataSource;
 import java.util.ResourceBundle;
 
+/**
+ * The type Repository config.
+ */
 @Configuration
 @EnableTransactionManagement
 public class RepositoryConfig {
@@ -25,6 +28,11 @@ public class RepositoryConfig {
     private static final String DATABASE_DATA_SCRIPT = "database/data_script.sql";
     private static final String DATABASE_CREATION_SCRIPT = "database/creation_script.sql";
 
+    /**
+     * Prod data source data source.
+     *
+     * @return the data source
+     */
     @Bean
     @Profile("prod")
     public DataSource prodDataSource() {
@@ -38,6 +46,11 @@ public class RepositoryConfig {
         return dataSource;
     }
 
+    /**
+     * Dev data source data source.
+     *
+     * @return the data source
+     */
     @Bean
     @Profile("dev")
     public DataSource devDataSource() {
@@ -49,12 +62,22 @@ public class RepositoryConfig {
                 .build();
     }
 
+    /**
+     * Prod transaction manager transaction manager.
+     *
+     * @return the transaction manager
+     */
     @Bean
     @Profile("prod")
     public TransactionManager prodTransactionManager() {
         return new DataSourceTransactionManager(prodDataSource());
     }
 
+    /**
+     * Dev transaction manager transaction manager.
+     *
+     * @return the transaction manager
+     */
     @Bean
     @Profile("dev")
     public TransactionManager devTransactionManager() {

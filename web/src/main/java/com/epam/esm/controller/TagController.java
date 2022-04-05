@@ -15,16 +15,32 @@ import static com.epam.esm.util.ParameterName.*;
 import static org.springframework.http.HttpStatus.*;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
+/**
+ * The type Tag controller.
+ *
+ * @author YanaV
+ * @project GiftCertificate
+ */
 @RestController
 @RequestMapping("/tags")
 public class TagController {
     private final TagService tagService;
 
+    /**
+     * Instantiates a new Tag controller.
+     *
+     * @param tagService the tag service
+     */
     @Autowired
     public TagController(TagService tagService) {
         this.tagService = tagService;
     }
 
+    /**
+     * Create.
+     *
+     * @param tagData the tag data
+     */
     @PostMapping(consumes = APPLICATION_JSON_VALUE)
     @ResponseStatus(CREATED)
     public void create(@RequestBody Map<String, Object> tagData) {
@@ -34,6 +50,11 @@ public class TagController {
         }
     }
 
+    /**
+     * Delete.
+     *
+     * @param id the id
+     */
     @DeleteMapping("/{id}")
     @ResponseStatus(OK)
     public void delete(@PathVariable long id) {
@@ -43,6 +64,11 @@ public class TagController {
         }
     }
 
+    /**
+     * Retrieve all set.
+     *
+     * @return the set
+     */
     @GetMapping
     @ResponseStatus(FOUND)
     public Set<TagDto> retrieveAll() {
@@ -54,6 +80,12 @@ public class TagController {
         }
     }
 
+    /**
+     * Find by id tag dto.
+     *
+     * @param id the id
+     * @return the tag dto
+     */
     @GetMapping("/{id}")
     @ResponseStatus(FOUND)
     public TagDto findById(@PathVariable long id) {
@@ -65,6 +97,12 @@ public class TagController {
         }
     }
 
+    /**
+     * Find by name tag dto.
+     *
+     * @param name the name
+     * @return the tag dto
+     */
     @GetMapping(params = "name")
     @ResponseStatus(FOUND)
     public TagDto findByName(@RequestParam String name) {
