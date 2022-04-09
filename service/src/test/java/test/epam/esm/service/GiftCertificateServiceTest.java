@@ -1,12 +1,12 @@
 package test.epam.esm.service;
 
-import com.epam.esm.config.ServiceConfig;
 import com.epam.esm.dto.GiftCertificateDto;
 import com.epam.esm.entity.GiftCertificate;
 import com.epam.esm.mapper.impl.GiftCertificateMapper;
 import com.epam.esm.repository.CertificatePurchaseRepository;
 import com.epam.esm.repository.GiftCertificateRepository;
 import com.epam.esm.service.GiftCertificateService;
+import com.epam.esm.service.impl.GiftCertificateServiceImpl;
 import com.epam.esm.util.CertificateDateFormatter;
 import com.epam.esm.validator.GiftCertificateValidator;
 import org.junit.jupiter.api.Assertions;
@@ -19,8 +19,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.ContextConfiguration;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.time.LocalDateTime;
@@ -31,9 +30,9 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
+        classes = GiftCertificateServiceImpl.class)
 @ExtendWith(SpringExtension.class)
-@ActiveProfiles("dev")
-@ContextConfiguration(classes = {ServiceConfig.class})
 class GiftCertificateServiceTest {
     @Autowired
     private GiftCertificateService service;

@@ -1,11 +1,11 @@
 package test.epam.esm.service;
 
-import com.epam.esm.config.ServiceConfig;
 import com.epam.esm.dto.TagDto;
 import com.epam.esm.entity.Tag;
 import com.epam.esm.mapper.impl.TagMapper;
 import com.epam.esm.repository.TagRepository;
 import com.epam.esm.service.TagService;
+import com.epam.esm.service.impl.TagServiceImpl;
 import com.epam.esm.validator.TagValidator;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -17,8 +17,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.ContextConfiguration;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.*;
@@ -28,9 +27,8 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = TagServiceImpl.class)
 @ExtendWith(SpringExtension.class)
-@ActiveProfiles("dev")
-@ContextConfiguration(classes = {ServiceConfig.class})
 class TagServiceTest {
     @Autowired
     private TagService service;

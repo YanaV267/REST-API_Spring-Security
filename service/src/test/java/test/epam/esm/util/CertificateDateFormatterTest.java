@@ -1,6 +1,5 @@
 package test.epam.esm.util;
 
-import com.epam.esm.config.ServiceConfig;
 import com.epam.esm.util.CertificateDateFormatter;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -8,8 +7,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.ContextConfiguration;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.time.LocalDate;
@@ -17,9 +15,9 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
+        classes = CertificateDateFormatter.class)
 @ExtendWith(SpringExtension.class)
-@ActiveProfiles("dev")
-@ContextConfiguration(classes = {ServiceConfig.class})
 class CertificateDateFormatterTest {
     @Autowired
     private CertificateDateFormatter dateFormatter;

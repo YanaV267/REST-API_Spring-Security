@@ -1,22 +1,21 @@
 package test.epam.esm.validator;
 
-import com.epam.esm.config.ServiceConfig;
-import com.epam.esm.validator.GiftCertificateValidator;
+import com.epam.esm.validator.TagValidator;
+import com.epam.esm.validator.impl.TagValidatorImpl;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.ContextConfiguration;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
+        classes = TagValidatorImpl.class)
 @ExtendWith(SpringExtension.class)
-@ActiveProfiles("dev")
-@ContextConfiguration(classes = {ServiceConfig.class})
 class TagValidatorTest {
     @Autowired
-    private GiftCertificateValidator validator;
+    private TagValidator validator;
 
     @ParameterizedTest
     @ValueSource(strings = {"travelling", "tour17", "918&@*82"})

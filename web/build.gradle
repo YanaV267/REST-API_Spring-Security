@@ -11,8 +11,7 @@ repositories {
 }
 
 dependencies {
-    compileOnly 'javax.servlet:javax.servlet-api:4.0.1'
-    implementation 'org.springframework:spring-webmvc:5.3.18'
     implementation 'com.fasterxml.jackson.core:jackson-databind:2.13.2.2'
+    implementation 'commons-dbcp:commons-dbcp:1.4'
     implementation project(":service")
 }
