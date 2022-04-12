@@ -34,7 +34,7 @@ import static org.mockito.Mockito.when;
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles("dev")
 @ContextConfiguration(classes = {ServiceConfig.class})
-public class GiftCertificateServiceTest {
+class GiftCertificateServiceTest {
     @Autowired
     private GiftCertificateService service;
     @Mock
@@ -49,13 +49,13 @@ public class GiftCertificateServiceTest {
     private CertificateDateFormatter dateFormatter;
 
     @BeforeEach
-    public void init() {
+    void init() {
         MockitoAnnotations.openMocks(this);
     }
 
     @ParameterizedTest
     @MethodSource("provideCertificateData")
-    public void create(Map<String, Object> certificateData) {
+    void create(Map<String, Object> certificateData) {
         when(validator.checkAllCertificateData(anyMap())).thenReturn(false);
         when(dateFormatter.format(anyString())).thenReturn(LocalDateTime.now());
         when(purchaseRepository.create(any(GiftCertificate.class))).thenReturn(true);
@@ -66,7 +66,7 @@ public class GiftCertificateServiceTest {
 
     @ParameterizedTest
     @MethodSource("provideCertificateData")
-    public void update(Map<String, Object> certificateData) {
+    void update(Map<String, Object> certificateData) {
         when(validator.checkAllCertificateData(anyMap())).thenReturn(false);
         when(dateFormatter.format(anyString())).thenReturn(LocalDateTime.now());
         when(purchaseRepository.update(any(GiftCertificate.class))).thenReturn(true);
@@ -77,7 +77,7 @@ public class GiftCertificateServiceTest {
 
     @ParameterizedTest
     @ValueSource(longs = {1, 4, 14, 5})
-    public void delete(long id) {
+    void delete(long id) {
         when(repository.findById(anyLong())).thenReturn(Optional.empty());
         doNothing().when(repository).delete(anyLong());
 
@@ -86,7 +86,7 @@ public class GiftCertificateServiceTest {
     }
 
     @Test
-    public void findAll() {
+    void findAll() {
         when(repository.findAll()).thenReturn(new LinkedHashSet<>());
         when(mapper.mapToDto(any(GiftCertificate.class))).thenReturn(new GiftCertificateDto());
 
@@ -98,7 +98,7 @@ public class GiftCertificateServiceTest {
 
     @ParameterizedTest
     @ValueSource(longs = {1, 4, 14, 5})
-    public void findById(long id) {
+    void findById(long id) {
         when(repository.findById(anyLong())).thenReturn(Optional.of(new GiftCertificate()));
         when(mapper.mapToDto(any(GiftCertificate.class))).thenReturn(new GiftCertificateDto());
 
@@ -108,7 +108,7 @@ public class GiftCertificateServiceTest {
 
     @ParameterizedTest
     @MethodSource("provideSearchParameters")
-    public void findBySeveralParameters(Map<String, Object> certificateData, List<String> sortTypes) {
+    void findBySeveralParameters(Map<String, Object> certificateData, List<String> sortTypes) {
         when(validator.checkAllCertificateData(anyMap())).thenReturn(true);
         when(dateFormatter.format(anyString())).thenReturn(LocalDateTime.now());
         when(repository.findBySeveralParameters(any(GiftCertificate.class), anyString(), anyList()))
@@ -121,7 +121,7 @@ public class GiftCertificateServiceTest {
         Assertions.assertEquals(expected, actual);
     }
 
-    public static Object[][] provideCertificateData() {
+    private static Object[][] provideCertificateData() {
         return new Object[][]{
                 {new HashMap<String, Object>() {
                     {
@@ -146,7 +146,7 @@ public class GiftCertificateServiceTest {
         };
     }
 
-    public static Object[][] provideSearchParameters() {
+    private static Object[][] provideSearchParameters() {
         return new Object[][]{
                 {new HashMap<String, Object>() {
                     {

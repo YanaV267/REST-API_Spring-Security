@@ -1,15 +1,10 @@
 package com.epam.esm.mapper;
 
-import org.springframework.stereotype.Component;
-
 /**
  * The interface Mapper.
  *
  * @param <T> the type parameter
  * @param <D> the type parameter
- */
-@Component
-/**
  * @author YanaV
  * @project GiftCertificate
  */

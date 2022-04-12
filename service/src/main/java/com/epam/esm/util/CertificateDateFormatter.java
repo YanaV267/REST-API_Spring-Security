@@ -1,6 +1,6 @@
 package com.epam.esm.util;
 
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -11,7 +11,7 @@ import java.time.format.DateTimeFormatter;
  * @author YanaV
  * @project GiftCertificate
  */
-@Component
+@Service
 public class CertificateDateFormatter {
     private static final String DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSS";
 

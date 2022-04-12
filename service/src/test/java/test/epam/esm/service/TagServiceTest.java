@@ -31,7 +31,7 @@ import static org.mockito.Mockito.when;
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles("dev")
 @ContextConfiguration(classes = {ServiceConfig.class})
-public class TagServiceTest {
+class TagServiceTest {
     @Autowired
     private TagService service;
     @Mock
@@ -42,13 +42,13 @@ public class TagServiceTest {
     private TagMapper mapper;
 
     @BeforeEach
-    public void init() {
+    void init() {
         MockitoAnnotations.openMocks(this);
     }
 
     @ParameterizedTest
     @MethodSource("provideTagData")
-    public void create(Map<String, Object> tagData) {
+    void create(Map<String, Object> tagData) {
         when(validator.checkName(anyString())).thenReturn(true);
         when(repository.create(any(Tag.class))).thenReturn(Long.valueOf(7));
 
@@ -58,7 +58,7 @@ public class TagServiceTest {
 
     @ParameterizedTest
     @ValueSource(longs = {3, 7, 2})
-    public void delete(long id) {
+    void delete(long id) {
         when(repository.findById(anyLong())).thenReturn(Optional.empty());
         doNothing().when(repository).delete(anyLong());
 
@@ -67,7 +67,7 @@ public class TagServiceTest {
     }
 
     @Test
-    public void findAll() {
+    void findAll() {
         when(repository.findAll()).thenReturn(new LinkedHashSet<>());
         when(mapper.mapToDto(any(Tag.class))).thenReturn(new TagDto());
 
@@ -79,7 +79,7 @@ public class TagServiceTest {
 
     @ParameterizedTest
     @ValueSource(longs = {2, 3, 9})
-    public void findById(long id) {
+    void findById(long id) {
         when(repository.findById(anyLong())).thenReturn(Optional.of(new Tag()));
         when(mapper.mapToDto(any(Tag.class))).thenReturn(new TagDto());
 
@@ -89,7 +89,7 @@ public class TagServiceTest {
 
     @ParameterizedTest
     @ValueSource(strings = {"food", "travelling"})
-    public void findByName(String name) {
+    void findByName(String name) {
         when(repository.findByName(anyString())).thenReturn(Optional.of(new Tag()));
         when(mapper.mapToDto(any(Tag.class))).thenReturn(new TagDto());
 
@@ -97,7 +97,7 @@ public class TagServiceTest {
         Assertions.assertFalse(tag.isPresent());
     }
 
-    public static Object[][] provideTagData() {
+    private static Object[][] provideTagData() {
         return new Object[][]{
                 {new HashMap<String, String>() {
                     {

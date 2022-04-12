@@ -19,25 +19,25 @@ import java.util.HashSet;
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles("dev")
 @ContextConfiguration(classes = {RepositoryConfig.class})
-public class CertificatePurchaseRepositoryTest {
+class CertificatePurchaseRepositoryTest {
     @Autowired
     private CertificatePurchaseRepository repository;
 
     @ParameterizedTest
     @MethodSource("provideCertificateData")
-    public void create(GiftCertificate certificate) {
+    void create(GiftCertificate certificate) {
         boolean actual = repository.create(certificate);
         Assertions.assertTrue(actual);
     }
 
     @ParameterizedTest
     @MethodSource("provideCertificateData")
-    public void update(GiftCertificate certificate) {
+    void update(GiftCertificate certificate) {
         boolean actual = repository.update(certificate);
         Assertions.assertTrue(actual);
     }
 
-    public static Object[][] provideCertificateData() {
+    private static Object[][] provideCertificateData() {
         return new Object[][]{
                 {new GiftCertificate.GiftCertificateBuilder()
                         .setId(1)

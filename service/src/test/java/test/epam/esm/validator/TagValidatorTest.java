@@ -14,13 +14,13 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles("dev")
 @ContextConfiguration(classes = {ServiceConfig.class})
-public class TagValidatorTest {
+class TagValidatorTest {
     @Autowired
     private GiftCertificateValidator validator;
 
     @ParameterizedTest
     @ValueSource(strings = {"travelling", "tour17", "918&@*82"})
-    public void checkName(String name) {
+    void checkName(String name) {
         boolean actual = validator.checkName(name);
         Assertions.assertTrue(actual);
     }

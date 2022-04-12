@@ -20,25 +20,25 @@ import java.time.format.DateTimeParseException;
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles("dev")
 @ContextConfiguration(classes = {ServiceConfig.class})
-public class CertificateDateFormatterTest {
+class CertificateDateFormatterTest {
     @Autowired
     private CertificateDateFormatter dateFormatter;
 
     @ParameterizedTest
     @ValueSource(strings = {"2022-02-18T19:12:27", "2022-03-03 10:25:10"})
-    public void format(String date) {
+    void format(String date) {
         Assertions.assertThrows(DateTimeParseException.class, () -> dateFormatter.format(date));
     }
 
     @ParameterizedTest
     @MethodSource("provideDateValues")
-    public void format(LocalDateTime date) {
+    void format(LocalDateTime date) {
         Assertions.assertDoesNotThrow(() -> {
             dateFormatter.format(date);
         });
     }
 
-    public static Object[][] provideDateValues() {
+    private static Object[][] provideDateValues() {
         return new Object[][]{
                 {LocalDate.parse("2022-02-18", DateTimeFormatter.ISO_DATE).atStartOfDay()},
                 {LocalDateTime.parse("2022-04-02T23:14:23", DateTimeFormatter.ISO_DATE_TIME)},

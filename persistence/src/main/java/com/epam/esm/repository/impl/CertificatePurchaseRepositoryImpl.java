@@ -46,13 +46,18 @@ public class CertificatePurchaseRepositoryImpl implements CertificatePurchaseRep
     @Override
     public boolean create(GiftCertificate certificate) {
         long certificateId = certificateRepository.create(certificate);
+        if (certificateId == 0) {
+            return false;
+        }
         certificate.getTags().forEach(tag -> {
             Optional<Tag> foundTag = tagRepository.findByName(tag.getName());
-            long tagId;
-            tagId = foundTag.map(Tag::getId).orElseGet(() -> tagRepository.create(tag));
+            long tagId = foundTag.map(Tag::getId).orElseGet(() -> tagRepository.create(tag));
             template.update(INSERT_PURCHASE, certificateId, tagId);
+            tag.setId(tagId);
         });
-        return true;
+        return certificate.getTags()
+                .stream()
+                .allMatch(t -> t.getId() != 0);
     }
 
     @Override
@@ -65,9 +70,12 @@ public class CertificatePurchaseRepositoryImpl implements CertificatePurchaseRep
                 if (!foundTag.isPresent()) {
                     long tagId = tagRepository.create(tag);
                     template.update(INSERT_PURCHASE, certificate.getId(), tagId);
+                    tag.setId(tagId);
                 }
             });
-            return true;
+            return certificate.getTags()
+                    .stream()
+                    .allMatch(t -> t.getId() != 0);
         } else {
             return false;
         }

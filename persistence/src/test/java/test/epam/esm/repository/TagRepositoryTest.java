@@ -20,13 +20,13 @@ import java.util.Set;
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles("dev")
 @ContextConfiguration(classes = {RepositoryConfig.class})
-public class TagRepositoryTest {
+class TagRepositoryTest {
     @Autowired
     private TagRepository repository;
 
     @ParameterizedTest
     @MethodSource("provideTagData")
-    public void create(Tag tag) {
+    void create(Tag tag) {
         long expected = 5;
         long actual = repository.create(tag);
         Assertions.assertEquals(expected, actual);
@@ -34,7 +34,7 @@ public class TagRepositoryTest {
 
     @ParameterizedTest
     @ValueSource(longs = {4, 1, 7})
-    public void delete(long id) {
+    void delete(long id) {
         int expected = 2;
         repository.delete(id);
         Set<Tag> tags = repository.findAll();
@@ -43,7 +43,7 @@ public class TagRepositoryTest {
     }
 
     @Test
-    public void findAll() {
+    void findAll() {
         long expected = 4;
         Set<Tag> tags = repository.findAll();
         int actual = tags.size();
@@ -52,19 +52,19 @@ public class TagRepositoryTest {
 
     @ParameterizedTest
     @ValueSource(longs = {2, 1, 7})
-    public void findById(long id) {
+    void findById(long id) {
         Optional<Tag> tag = repository.findById(id);
         Assertions.assertTrue(tag.isPresent());
     }
 
     @ParameterizedTest
     @ValueSource(strings = {"travelling", "cars"})
-    public void findByName(String name) {
+    void findByName(String name) {
         Optional<Tag> tag = repository.findByName(name);
         Assertions.assertTrue(tag.isPresent());
     }
 
-    public static Object[][] provideTagData() {
+    private static Object[][] provideTagData() {
         return new Object[][]{
                 {new Tag("clock")},
                 {new Tag("glass")}

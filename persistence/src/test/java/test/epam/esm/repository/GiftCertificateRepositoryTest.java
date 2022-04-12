@@ -23,13 +23,13 @@ import java.util.Set;
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles("dev")
 @ContextConfiguration(classes = {RepositoryConfig.class})
-public class GiftCertificateRepositoryTest {
+class GiftCertificateRepositoryTest {
     @Autowired
     private GiftCertificateRepository repository;
 
     @ParameterizedTest
     @MethodSource("provideCreateCertificateData")
-    public void create(GiftCertificate certificate) {
+    void create(GiftCertificate certificate) {
         long expected = 3;
         long actual = repository.create(certificate);
         Assertions.assertEquals(expected, actual);
@@ -37,17 +37,21 @@ public class GiftCertificateRepositoryTest {
 
     @ParameterizedTest
     @MethodSource("provideUpdateCertificateData")
-    public void update(GiftCertificate certificate) {
+    void update(GiftCertificate certificate) {
         BigDecimal expected = certificate.getPrice();
         repository.update(certificate);
         Optional<GiftCertificate> foundCertificate = repository.findById(certificate.getId());
-        BigDecimal actual = foundCertificate.get().getPrice();
-        Assertions.assertEquals(expected, actual);
+        if (foundCertificate.isPresent()) {
+            BigDecimal actual = foundCertificate.get().getPrice();
+            Assertions.assertEquals(expected, actual);
+        } else {
+            Assertions.fail();
+        }
     }
 
     @ParameterizedTest
     @ValueSource(longs = {2, 7})
-    public void delete(long id) {
+    void delete(long id) {
         long expected = 1;
         repository.delete(id);
         Set<GiftCertificate> certificates = repository.findAll();
@@ -56,7 +60,7 @@ public class GiftCertificateRepositoryTest {
     }
 
     @Test
-    public void findAll() {
+    void findAll() {
         long expected = 2;
         Set<GiftCertificate> certificates = repository.findAll();
         int actual = certificates.size();
@@ -65,22 +69,22 @@ public class GiftCertificateRepositoryTest {
 
     @ParameterizedTest
     @ValueSource(longs = {1, 2, 6})
-    public void findById(long id) {
+    void findById(long id) {
         Optional<GiftCertificate> certificate = repository.findById(id);
         Assertions.assertTrue(certificate.isPresent());
     }
 
     @ParameterizedTest
     @MethodSource("provideSearchParameters")
-    public void findBySeveralParameters(GiftCertificate certificate, String tagName,
-                                        List<String> sortTypes) {
+    void findBySeveralParameters(GiftCertificate certificate, String tagName,
+                                 List<String> sortTypes) {
         long expected = 2;
         Set<GiftCertificate> certificates = repository.findBySeveralParameters(certificate, tagName, sortTypes);
         int actual = certificates.size();
         Assertions.assertEquals(expected, actual);
     }
 
-    public static Object[][] provideCreateCertificateData() {
+    private static Object[][] provideCreateCertificateData() {
         return new Object[][]{
                 {new GiftCertificate.GiftCertificateBuilder()
                         .setName("12% discount")
@@ -91,7 +95,7 @@ public class GiftCertificateRepositoryTest {
         };
     }
 
-    public static Object[][] provideUpdateCertificateData() {
+    private static Object[][] provideUpdateCertificateData() {
         return new Object[][]{
                 {new GiftCertificate.GiftCertificateBuilder()
                         .setId(1)
@@ -105,7 +109,7 @@ public class GiftCertificateRepositoryTest {
         };
     }
 
-    public static Object[][] provideSearchParameters() {
+    private static Object[][] provideSearchParameters() {
         return new Object[][]{
                 {new GiftCertificate.GiftCertificateBuilder()
                         .setId(2)

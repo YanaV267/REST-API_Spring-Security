@@ -51,4 +51,8 @@ public final class ParameterName {
      * The constant LAST_UPDATE_DATE.
      */
     public static final String LAST_UPDATE_DATE = "last_update_date";
+
+    private ParameterName() {
+
+    }
 }

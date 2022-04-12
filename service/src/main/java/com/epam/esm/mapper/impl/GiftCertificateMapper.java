@@ -8,7 +8,7 @@ import com.epam.esm.mapper.Mapper;
 import com.epam.esm.util.CertificateDateFormatter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.Set;
@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
  * @author YanaV
  * @project GiftCertificate
  */
-@Component("certificateMapper")
+@Service("certificateMapper")
 public class GiftCertificateMapper implements Mapper<GiftCertificate, GiftCertificateDto> {
     private final TagMapper tagMapper;
     private final CertificateDateFormatter dateFormatter;

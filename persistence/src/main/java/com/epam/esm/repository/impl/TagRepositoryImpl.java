@@ -50,7 +50,12 @@ public class TagRepositoryImpl implements TagRepository {
             statement.setString(1, tag.getName());
             return statement;
         }, keyHolder);
-        return keyHolder.getKey().longValue();
+        Number key = keyHolder.getKey();
+        if (key != null) {
+            return key.longValue();
+        } else {
+            return 0;
+        }
     }
 
     @Override

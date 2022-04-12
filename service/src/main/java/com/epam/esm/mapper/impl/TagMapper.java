@@ -3,7 +3,7 @@ package com.epam.esm.mapper.impl;
 import com.epam.esm.dto.TagDto;
 import com.epam.esm.entity.Tag;
 import com.epam.esm.mapper.Mapper;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 /**
  * The type Tag mapper.
@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
  * @author YanaV
  * @project GiftCertificate
  */
-@Component("tagMapper")
+@Service("tagMapper")
 public class TagMapper implements Mapper<Tag, TagDto> {
     @Override
     public TagDto mapToDto(Tag tag) {

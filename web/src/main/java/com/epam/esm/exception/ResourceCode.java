@@ -26,11 +26,11 @@ public enum ResourceCode {
     TAG(TagDto.class, "02");
 
     private final Class<?> resourceClass;
-    private final String resourceCode;
+    private final String code;
 
-    ResourceCode(Class<?> resourceClass, String resourceCode) {
+    ResourceCode(Class<?> resourceClass, String code) {
         this.resourceClass = resourceClass;
-        this.resourceCode = resourceCode;
+        this.code = code;
     }
 
     /**
@@ -42,9 +42,9 @@ public enum ResourceCode {
     public static String findResourceCode(Class<?> currentClass) {
         return Arrays.stream(values())
                 .filter(r -> r.resourceClass.equals(currentClass))
-                .map(ResourceCode::getResourceCode)
+                .map(ResourceCode::getCode)
                 .findFirst()
-                .orElseGet(DEFAULT::getResourceCode);
+                .orElseGet(DEFAULT::getCode);
     }
 
     /**
@@ -52,7 +52,7 @@ public enum ResourceCode {
      *
      * @return the resource code
      */
-    public String getResourceCode() {
-        return resourceCode;
+    public String getCode() {
+        return code;
     }
 }

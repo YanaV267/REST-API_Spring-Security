@@ -3,7 +3,7 @@ package com.epam.esm.validator.impl;
 import com.epam.esm.validator.GiftCertificateValidator;
 import com.epam.esm.validator.TagValidator;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,11 +17,11 @@ import static com.epam.esm.util.ParameterName.*;
  * @author YanaV
  * @project GiftCertificate
  */
-@Component
+@Service
 public class GiftCertificateValidatorImpl implements GiftCertificateValidator {
     private static final String ID_REGEX = "\\d+";
-    private static final String NAME_REGEX = "[а-я\\p{Alnum} _]+";
-    private static final String DESCRIPTION_REGEX = "[\\p{Graph} ]+";
+    private static final String NAME_REGEX = "[а-я\\p{Alnum} _]{1,25}";
+    private static final String DESCRIPTION_REGEX = "[\\p{Graph} ]{3,200}";
     private static final String PRICE_REGEX = "((\\d{2,4}\\.\\d{1,2})|(\\d{2,4}))";
     private static final String DURATION_REGEX = "\\d+";
     private static final String DATE_REGEX = "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}";

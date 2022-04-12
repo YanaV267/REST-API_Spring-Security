@@ -20,67 +20,67 @@ import static com.epam.esm.util.ParameterName.*;
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles("dev")
 @ContextConfiguration(classes = {ServiceConfig.class})
-public class GiftCertificateValidatorTest {
+class GiftCertificateValidatorTest {
     @Autowired
     private GiftCertificateValidator validator;
 
     @ParameterizedTest
     @ValueSource(strings = {"travelling", "tour17", "918&@*82"})
-    public void checkName(String name) {
+    void checkName(String name) {
         boolean actual = validator.checkName(name);
         Assertions.assertTrue(actual);
     }
 
     @ParameterizedTest
     @MethodSource("provideDescription")
-    public void checkDescription(String description) {
+    void checkDescription(String description) {
         boolean actual = validator.checkDescription(description);
         Assertions.assertFalse(actual);
     }
 
     @ParameterizedTest
     @ValueSource(strings = {"18.21", "40", "72k2", "182727.19"})
-    public void checkPrice(String price) {
+    void checkPrice(String price) {
         boolean actual = validator.checkPrice(price);
         Assertions.assertTrue(actual);
     }
 
     @ParameterizedTest
     @ValueSource(strings = {"20", "qwe7", "192"})
-    public void checkDuration(String duration) {
+    void checkDuration(String duration) {
         boolean actual = validator.checkDuration(duration);
         Assertions.assertTrue(actual);
     }
 
     @ParameterizedTest
     @MethodSource("provideDateValues")
-    public void checkCreateDate(String createDate) {
+    void checkCreateDate(String createDate) {
         boolean actual = validator.checkCreateDate(createDate);
         Assertions.assertFalse(actual);
     }
 
     @ParameterizedTest
     @MethodSource("provideDateValues")
-    public void checkLastUpdateDate(String lastUpdateDate) {
+    void checkLastUpdateDate(String lastUpdateDate) {
         boolean actual = validator.checkLastUpdateDate(lastUpdateDate);
         Assertions.assertTrue(actual);
     }
 
     @ParameterizedTest
     @MethodSource("provideCertificateData")
-    public void checkCertificate(Map<String, ?> certificateData) {
+    void checkCertificate(Map<String, ?> certificateData) {
         boolean actual = validator.checkAllCertificateData(certificateData);
         Assertions.assertFalse(actual);
     }
 
-    public static Object[][] provideDescription() {
+    private static Object[][] provideDescription() {
         return new Object[][]{
                 {"provides various sales on all of products"},
                 {"20% discount every saturday"}
         };
     }
 
-    public static Object[][] provideDateValues() {
+    private static Object[][] provideDateValues() {
         return new Object[][]{
                 {"2022-02-18"},
                 {"2022-04-02T23:14:23"},
@@ -90,7 +90,7 @@ public class GiftCertificateValidatorTest {
         };
     }
 
-    public static Object[][] provideCertificateData() {
+    private static Object[][] provideCertificateData() {
         return new Object[][]{
                 {new HashMap<String, String>() {
                     {

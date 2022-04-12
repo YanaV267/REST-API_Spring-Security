@@ -5,7 +5,6 @@ import com.epam.esm.entity.GiftCertificate;
 import com.epam.esm.mapper.GiftCertificateExtractor;
 import com.epam.esm.repository.GiftCertificateRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
@@ -58,7 +57,12 @@ public class GiftCertificateRepositoryImpl implements GiftCertificateRepository 
             statement.setInt(4, certificate.getDuration());
             return statement;
         }, keyHolder);
-        return keyHolder.getKey().longValue();
+        Number key = keyHolder.getKey();
+        if (key != null) {
+            return key.longValue();
+        } else {
+            return 0;
+        }
     }
 
     @Override
@@ -92,14 +96,13 @@ public class GiftCertificateRepositoryImpl implements GiftCertificateRepository 
 
     @Override
     public Optional<GiftCertificate> findById(long id) {
-        try {
-            return template.query(new GiftCertificateQueryBuilder(SELECT_CERTIFICATES)
-                            .addWhereClause()
-                            .addIdParameter(id)
-                            .build(), new GiftCertificateExtractor())
-                    .stream()
-                    .findFirst();
-        } catch (EmptyResultDataAccessException exception) {
+        List<GiftCertificate> certificates = template.query(new GiftCertificateQueryBuilder(SELECT_CERTIFICATES)
+                .addWhereClause()
+                .addIdParameter(id)
+                .build(), new GiftCertificateExtractor());
+        if (certificates != null) {
+            return certificates.stream().findFirst();
+        } else {
             return Optional.empty();
         }
     }

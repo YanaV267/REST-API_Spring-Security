@@ -28,8 +28,6 @@ public class RepositoryConfig {
     private static final String DATABASE_POOL_SIZE = "pool.size";
     private static final String DATABASE_DATA_SCRIPT = "database/data_script.sql";
     private static final String DATABASE_CREATION_SCRIPT = "database/creation_script.sql";
-    @Autowired
-    private Environment environment;
 
     /**
      * Prod data source data source.
@@ -38,7 +36,8 @@ public class RepositoryConfig {
      */
     @Bean
     @Profile("prod")
-    public DataSource prodDataSource() {
+    @Autowired
+    public DataSource prodDataSource(Environment environment) {
         BasicDataSource dataSource = new BasicDataSource();
         dataSource.setDriverClassName(environment.getProperty(DATABASE_DRIVER_PROPERTY));
         dataSource.setUrl(environment.getProperty(DATABASE_URL_PROPERTY));
@@ -71,8 +70,9 @@ public class RepositoryConfig {
      */
     @Bean
     @Profile("prod")
-    public TransactionManager prodTransactionManager() {
-        return new DataSourceTransactionManager(prodDataSource());
+    @Autowired
+    public TransactionManager prodTransactionManager(Environment environment) {
+        return new DataSourceTransactionManager(prodDataSource(environment));
     }
 
     /**
