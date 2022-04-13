@@ -29,6 +29,16 @@ public class GiftCertificate {
     }
 
     /**
+     * Instantiates a new Gift certificate.
+     *
+     * @param id the id
+     */
+    public GiftCertificate(long id) {
+        this.id = id;
+        tags = new LinkedHashSet<>();
+    }
+
+    /**
      * Gets id.
      *
      * @return the id

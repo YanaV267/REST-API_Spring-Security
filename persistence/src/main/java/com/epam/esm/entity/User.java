@@ -26,6 +26,16 @@ public class User {
     }
 
     /**
+     * Instantiates a new User.
+     *
+     * @param id the id
+     */
+    public User(long id) {
+        this.id = id;
+        orders = new LinkedHashSet<>();
+    }
+
+    /**
      * Gets id.
      *
      * @return the id

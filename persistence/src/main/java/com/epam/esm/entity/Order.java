@@ -20,6 +20,7 @@ public class Order {
      * Instantiates a new Order.
      */
     public Order() {
+        user = new User();
         certificate = new GiftCertificate();
     }
 
@@ -153,5 +154,72 @@ public class Order {
         sb.append(" , createDate=").append(createDate);
         sb.append(" , certificate=").append(certificate.toString()).append("}");
         return sb.toString();
+    }
+
+    /**
+     * The type Order builder.
+     */
+    public static class OrderBuilder {
+        private final Order order;
+
+        /**
+         * Instantiates a new Order builder.
+         */
+        public OrderBuilder() {
+            order = new Order();
+        }
+
+        /**
+         * Sets user.
+         *
+         * @param user the user
+         * @return the user
+         */
+        public OrderBuilder setUser(User user) {
+            order.user = user;
+            return this;
+        }
+
+        /**
+         * Sets cost.
+         *
+         * @param cost the cost
+         * @return the cost
+         */
+        public OrderBuilder setCost(BigDecimal cost) {
+            order.cost = cost;
+            return this;
+        }
+
+        /**
+         * Sets create date.
+         *
+         * @param createDate the create date
+         * @return the create date
+         */
+        public OrderBuilder setCreateDate(LocalDateTime createDate) {
+            order.createDate = createDate;
+            return this;
+        }
+
+        /**
+         * Sets certificate.
+         *
+         * @param certificate the certificate
+         * @return the certificate
+         */
+        public OrderBuilder setCertificate(GiftCertificate certificate) {
+            order.certificate = certificate;
+            return this;
+        }
+
+        /**
+         * Build order.
+         *
+         * @return the order
+         */
+        public Order build() {
+            return order;
+        }
     }
 }

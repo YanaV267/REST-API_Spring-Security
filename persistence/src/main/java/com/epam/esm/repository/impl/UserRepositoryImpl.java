@@ -3,6 +3,7 @@ package com.epam.esm.repository.impl;
 import com.epam.esm.entity.User;
 import com.epam.esm.mapper.UserExtractor;
 import com.epam.esm.repository.BaseRepository;
+import com.epam.esm.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
@@ -20,7 +21,7 @@ import java.util.Set;
  * @project GiftCertificate
  */
 @Repository
-public class UserRepositoryImpl implements BaseRepository<User> {
+public class UserRepositoryImpl implements UserRepository {
     private static final String DELETE_USER = "DELETE FROM users WHERE id = ?";
     private static final String SELECT_USERS = "SELECT users.id, login, users.name, surname, balance " +
             "FROM users";
