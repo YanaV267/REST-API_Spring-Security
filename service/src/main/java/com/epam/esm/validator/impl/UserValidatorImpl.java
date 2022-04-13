@@ -8,6 +8,8 @@ import java.util.Map;
 import static com.epam.esm.util.ParameterName.*;
 
 /**
+ * The type User validator.
+ *
  * @author YanaV
  * @project GiftCertificate
  */

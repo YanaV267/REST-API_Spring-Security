@@ -25,6 +25,8 @@ import static com.epam.esm.repository.ColumnName.*;
 import static com.epam.esm.util.ParameterName.*;
 
 /**
+ * The type Order service.
+ *
  * @author YanaV
  * @project GiftCertificate
  */
@@ -35,6 +37,14 @@ public class OrderServiceImpl implements OrderService {
     private final OrderMapper mapper;
     private final CertificateDateFormatter dateFormatter;
 
+    /**
+     * Instantiates a new Order service.
+     *
+     * @param repository    the repository
+     * @param validator     the validator
+     * @param mapper        the mapper
+     * @param dateFormatter the date formatter
+     */
     @Autowired
     public OrderServiceImpl(OrderRepository repository, OrderValidator validator,
                             @Qualifier("orderMapper") OrderMapper mapper,

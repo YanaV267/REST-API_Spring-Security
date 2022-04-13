@@ -5,6 +5,7 @@ import com.epam.esm.validator.TagValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -20,7 +21,7 @@ import static com.epam.esm.util.ParameterName.*;
 @Service
 public class GiftCertificateValidatorImpl implements GiftCertificateValidator {
     private static final String ID_REGEX = "\\d+";
-    private static final String NAME_REGEX = "[а-я\\p{Alnum} _]{1,25}";
+    private static final String NAME_REGEX = "[А-Яа-я\\p{Alnum} _]{1,25}";
     private static final String DESCRIPTION_REGEX = "[\\p{Graph} ]{3,200}";
     private static final String PRICE_REGEX = "((\\d{2,4}\\.\\d{1,2})|(\\d{2,4}))";
     private static final String DURATION_REGEX = "\\d+";
@@ -40,7 +41,7 @@ public class GiftCertificateValidatorImpl implements GiftCertificateValidator {
 
     @Override
     public boolean checkId(String id) {
-        return id != null && id.matches(ID_REGEX);
+        return id != null && id.matches(ID_REGEX) && Long.parseLong(id) > 0;
     }
 
     @Override
@@ -55,12 +56,14 @@ public class GiftCertificateValidatorImpl implements GiftCertificateValidator {
 
     @Override
     public boolean checkPrice(String price) {
-        return price != null && price.matches(PRICE_REGEX);
+        return price != null && price.matches(PRICE_REGEX)
+                && !(new BigDecimal(price)).equals(BigDecimal.ZERO);
     }
 
     @Override
     public boolean checkDuration(String duration) {
-        return duration != null && duration.matches(DURATION_REGEX);
+        return duration != null && duration.matches(DURATION_REGEX)
+                && !(new BigDecimal(duration)).equals(BigDecimal.ZERO);
     }
 
     @Override
@@ -90,7 +93,8 @@ public class GiftCertificateValidatorImpl implements GiftCertificateValidator {
         if (certificateData.containsKey(NAME) && !checkName((String) certificateData.get(NAME))) {
             return false;
         }
-        if (certificateData.containsKey(DESCRIPTION) && !checkDescription((String) certificateData.get(DESCRIPTION))) {
+        if (certificateData.containsKey(DESCRIPTION)
+                && !checkDescription((String) certificateData.get(DESCRIPTION))) {
             return false;
         }
         if (certificateData.containsKey(PRICE) && !checkPrice((String) certificateData.get(PRICE))) {

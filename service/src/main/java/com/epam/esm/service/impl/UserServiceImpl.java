@@ -14,6 +14,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
+ * The type User service.
+ *
  * @author YanaV
  * @project GiftCertificate
  */
@@ -22,6 +24,12 @@ public class UserServiceImpl implements UserService {
     private final UserRepository repository;
     private final UserMapper mapper;
 
+    /**
+     * Instantiates a new User service.
+     *
+     * @param repository the repository
+     * @param mapper     the mapper
+     */
     @Autowired
     public UserServiceImpl(UserRepository repository, @Qualifier("userMapper") UserMapper mapper) {
         this.repository = repository;

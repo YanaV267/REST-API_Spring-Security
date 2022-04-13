@@ -1,6 +1,5 @@
 package com.epam.esm.service;
 
-import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -12,13 +11,6 @@ import java.util.Set;
  * @project GiftCertificate
  */
 public interface BaseService<T> {
-    /**
-     * Create boolean.
-     *
-     * @param data the data
-     * @return the boolean
-     */
-    boolean create(Map<String, Object> data);
 
     /**
      * Delete boolean.

@@ -12,14 +12,7 @@ import java.util.Set;
  * @author YanaV
  * @project GiftCertificate
  */
-public interface GiftCertificateService extends BaseService<GiftCertificateDto> {
-    /**
-     * Update boolean.
-     *
-     * @param certificateData the certificate data
-     * @return the boolean
-     */
-    boolean update(Map<String, Object> certificateData);
+public interface GiftCertificateService extends CompleteBaseService<GiftCertificateDto> {
 
     /**
      * Find by several parameters set.

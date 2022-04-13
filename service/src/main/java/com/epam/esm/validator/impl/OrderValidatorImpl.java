@@ -11,6 +11,8 @@ import java.util.Map;
 import static com.epam.esm.util.ParameterName.*;
 
 /**
+ * The type Order validator.
+ *
  * @author YanaV
  * @project GiftCertificate
  */
@@ -22,6 +24,11 @@ public class OrderValidatorImpl implements OrderValidator {
 
     private final UserValidator userValidator;
 
+    /**
+     * Instantiates a new Order validator.
+     *
+     * @param userValidator the user validator
+     */
     @Autowired
     public OrderValidatorImpl(UserValidator userValidator) {
         this.userValidator = userValidator;

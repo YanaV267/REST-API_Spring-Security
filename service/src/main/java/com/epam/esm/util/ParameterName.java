@@ -16,6 +16,14 @@ public final class ParameterName {
      */
     public static final String TAGS = "tags";
     /**
+     * The constant USERS.
+     */
+    public static final String USERS = "users";
+    /**
+     * The constant ORDERS.
+     */
+    public static final String ORDERS = "orders";
+    /**
      * The constant TAG.
      */
     public static final String TAG = "tag";
@@ -27,6 +35,15 @@ public final class ParameterName {
      * The constant ID.
      */
     public static final String ID = "id";
+
+    /**
+     * The constant ID_USER.
+     */
+    public static final String ID_USER = "id_user";
+    /**
+     * The constant ID_CERTIFICATE.
+     */
+    public static final String ID_CERTIFICATE = "id_certificate";
     /**
      * The constant NAME.
      */
@@ -51,6 +68,19 @@ public final class ParameterName {
      * The constant LAST_UPDATE_DATE.
      */
     public static final String LAST_UPDATE_DATE = "last_update_date";
+    /**
+     * The constant COST.
+     */
+    public static final String COST = "cost";
+
+    /**
+     * The constant LOGIN.
+     */
+    public static final String LOGIN = "login";
+    /**
+     * The constant SURNAME.
+     */
+    public static final String SURNAME = "surname";
 
     private ParameterName() {
 

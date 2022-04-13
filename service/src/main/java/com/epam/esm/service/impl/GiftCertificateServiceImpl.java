@@ -69,10 +69,10 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
                     .map(Tag::new)
                     .collect(Collectors.toSet());
             GiftCertificate giftCertificate = new GiftCertificate.GiftCertificateBuilder()
-                    .setName(String.valueOf(certificateData.get(NAME)))
-                    .setDescription(String.valueOf(certificateData.get(DESCRIPTION)))
-                    .setPrice(new BigDecimal(String.valueOf(certificateData.get(PRICE))))
-                    .setDuration(Integer.parseInt(String.valueOf(certificateData.get(DURATION))))
+                    .setName((String) certificateData.get(NAME))
+                    .setDescription((String) certificateData.get(DESCRIPTION))
+                    .setPrice(new BigDecimal((String) certificateData.get(PRICE)))
+                    .setDuration(Integer.parseInt((String) certificateData.get(DURATION)))
                     .setTags(tags)
                     .build();
             return purchaseRepository.create(giftCertificate);
@@ -87,7 +87,7 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
                 && validator.checkId((String) certificateData.get(ID))
                 && validator.checkCertificateData(certificateData)) {
             GiftCertificate giftCertificate = retrieveCertificateData(certificateData);
-            giftCertificate.setId(Long.parseLong(String.valueOf(certificateData.get(ID))));
+            giftCertificate.setId(Long.parseLong((String) certificateData.get(ID)));
             if (certificateData.containsKey(TAGS)) {
                 Set<Tag> tags = ((ArrayList<Map<String, String>>) certificateData.get(TAGS)).stream()
                         .map(t -> t.get(NAME))
@@ -157,26 +157,26 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
      * @param certificateData the certificate data
      * @return the gift certificate
      */
-    public GiftCertificate retrieveCertificateData(Map<String, Object> certificateData) {
+    private GiftCertificate retrieveCertificateData(Map<String, Object> certificateData) {
         GiftCertificate giftCertificate = new GiftCertificate();
         if (certificateData.containsKey(NAME)) {
-            giftCertificate.setName(String.valueOf(certificateData.get(NAME)));
+            giftCertificate.setName((String) certificateData.get(NAME));
         }
         if (certificateData.containsKey(DESCRIPTION)) {
-            giftCertificate.setDescription(String.valueOf(certificateData.get(DESCRIPTION)));
+            giftCertificate.setDescription((String) certificateData.get(DESCRIPTION));
         }
         if (certificateData.containsKey(PRICE)) {
-            giftCertificate.setPrice(new BigDecimal(String.valueOf(certificateData.get(PRICE))));
+            giftCertificate.setPrice(new BigDecimal((String) certificateData.get(PRICE)));
         }
         if (certificateData.containsKey(DURATION)) {
-            giftCertificate.setDuration(Integer.parseInt(String.valueOf(certificateData.get(DURATION))));
+            giftCertificate.setDuration(Integer.parseInt((String) certificateData.get(DURATION)));
         }
         if (certificateData.containsKey(CREATE_DATE)) {
-            LocalDateTime formattedDate = dateFormatter.format(String.valueOf(certificateData.get(CREATE_DATE)));
+            LocalDateTime formattedDate = dateFormatter.format((String) certificateData.get(CREATE_DATE));
             giftCertificate.setCreateDate(formattedDate);
         }
         if (certificateData.containsKey(LAST_UPDATE_DATE)) {
-            LocalDateTime formattedDate = dateFormatter.format(String.valueOf(certificateData.get(LAST_UPDATE_DATE)));
+            LocalDateTime formattedDate = dateFormatter.format((String) certificateData.get(LAST_UPDATE_DATE));
             giftCertificate.setLastUpdateDate(formattedDate);
         }
         return giftCertificate;
