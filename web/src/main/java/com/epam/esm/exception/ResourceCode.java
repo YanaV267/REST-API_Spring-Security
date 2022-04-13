@@ -1,7 +1,9 @@
 package com.epam.esm.exception;
 
 import com.epam.esm.dto.GiftCertificateDto;
+import com.epam.esm.dto.OrderDto;
 import com.epam.esm.dto.TagDto;
+import com.epam.esm.dto.UserDto;
 
 import java.util.Arrays;
 
@@ -23,7 +25,15 @@ public enum ResourceCode {
     /**
      * Tag resource code.
      */
-    TAG(TagDto.class, "02");
+    TAG(TagDto.class, "02"),
+    /**
+     * User resource code.
+     */
+    USER(UserDto.class, "03"),
+    /**
+     * Order resource code.
+     */
+    ORDER(OrderDto.class, "04");
 
     private final Class<?> resourceClass;
     private final String code;
