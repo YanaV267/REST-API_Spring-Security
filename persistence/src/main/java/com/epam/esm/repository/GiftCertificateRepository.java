@@ -12,22 +12,7 @@ import java.util.Set;
  * @author YanaV
  * @project GiftCertificate
  */
-public interface GiftCertificateRepository extends BaseRepository<GiftCertificate> {
-    /**
-     * Create long.
-     *
-     * @param certificate the certificate
-     * @return the long
-     */
-    long create(GiftCertificate certificate);
-
-    /**
-     * Update.
-     *
-     * @param giftCertificate the gift certificate
-     */
-    void update(GiftCertificate giftCertificate);
-
+public interface GiftCertificateRepository extends CompleteBaseRepository<GiftCertificate> {
     /**
      * Find by several parameters set.
      *

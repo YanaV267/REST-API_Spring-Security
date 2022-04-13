@@ -1,6 +1,7 @@
 package test.epam.esm.repository;
 
 import com.epam.esm.entity.GiftCertificate;
+import com.epam.esm.entity.Tag;
 import com.epam.esm.repository.GiftCertificateRepository;
 import com.epam.esm.repository.impl.GiftCertificateRepositoryImpl;
 import org.junit.jupiter.api.Assertions;
@@ -75,10 +76,10 @@ class GiftCertificateRepositoryTest {
 
     @ParameterizedTest
     @MethodSource("provideSearchParameters")
-    void findBySeveralParameters(GiftCertificate certificate, String tagName,
+    void findBySeveralParameters(GiftCertificate certificate, List<Tag> tags,
                                  List<String> sortTypes) {
         long expected = 2;
-        Set<GiftCertificate> certificates = repository.findBySeveralParameters(certificate, tagName, sortTypes);
+        Set<GiftCertificate> certificates = repository.findBySeveralParameters(certificate, tags, sortTypes);
         int actual = certificates.size();
         Assertions.assertEquals(expected, actual);
     }
@@ -114,7 +115,11 @@ class GiftCertificateRepositoryTest {
                         .setId(2)
                         .setName("discount")
                         .setDuration(90)
-                        .build(), "travelling", null},
+                        .build(), "travelling", new ArrayList<Tag>() {
+                    {
+                        add(new Tag("travelling"));
+                    }
+                }},
                 {new GiftCertificate.GiftCertificateBuilder()
                         .setId(2)
                         .setDescription("all")
@@ -123,7 +128,7 @@ class GiftCertificateRepositoryTest {
                 {new GiftCertificate.GiftCertificateBuilder()
                         .setId(1)
                         .setPrice(new BigDecimal("30"))
-                        .build(), "cars", new ArrayList<String>() {
+                        .build(), "cars", null, new ArrayList<String>() {
                     {
                         add("price_desc");
                     }

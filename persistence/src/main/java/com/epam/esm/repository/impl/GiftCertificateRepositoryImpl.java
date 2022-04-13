@@ -29,7 +29,7 @@ import java.util.Set;
 public class GiftCertificateRepositoryImpl implements GiftCertificateRepository {
     private static final String INSERT_CERTIFICATE = "INSERT INTO gift_certificates " +
             "(name, description, price, duration, create_date, last_update_date) VALUES (?, ?, ?, ?, now(3), now(3))";
-    private static final String UPDATE_CERTIFICATE = "UPDATE gift_certificate SET ";
+    private static final String UPDATE_CERTIFICATE = "UPDATE gift_certificates SET ";
     private static final String DELETE_CERTIFICATE = "DELETE FROM gift_certificates WHERE id = ?";
     private static final String SELECT_CERTIFICATES = "SELECT certificates.id, certificates.name, description, " +
             "price, duration, certificates.create_date, last_update_date, tags.id, tags.name FROM gift_certificates certificates " +
@@ -73,8 +73,11 @@ public class GiftCertificateRepositoryImpl implements GiftCertificateRepository 
     public void update(GiftCertificate certificate) {
         template.update(new GiftCertificateQueryBuilder(UPDATE_CERTIFICATE)
                 .addNameParameter(certificate.getName())
+                .checkQueryEnding()
                 .addDescriptionParameter(certificate.getDescription())
+                .checkQueryEnding()
                 .addPriceParameter(certificate.getPrice())
+                .checkQueryEnding()
                 .addDurationParameter(certificate.getDuration())
                 .checkQueryEnding()
                 .addLastUpdateDateNowParameter()
