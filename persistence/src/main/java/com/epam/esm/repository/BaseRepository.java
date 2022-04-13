@@ -12,14 +12,6 @@ import java.util.Set;
  */
 public interface BaseRepository<T> {
     /**
-     * Create long.
-     *
-     * @param t the t
-     * @return the long
-     */
-    long create(T t);
-
-    /**
      * Delete.
      *
      * @param id the id

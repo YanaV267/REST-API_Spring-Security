@@ -25,11 +25,11 @@ import java.util.Set;
  */
 @Repository
 public class TagRepositoryImpl implements TagRepository {
-    private static final String INSERT_TAG = "INSERT INTO tag (name) VALUES (?)";
-    private static final String DELETE_TAG = "DELETE FROM tag WHERE id = ?";
-    private static final String SELECT_ALL_TAGS = "SELECT id, name FROM tag";
-    private static final String SELECT_TAG_BY_ID = "SELECT id, name FROM tag WHERE id = ?";
-    private static final String SELECT_TAG_BY_NAME = "SELECT id, name FROM tag WHERE name = ?";
+    private static final String INSERT_TAG = "INSERT INTO tags (name) VALUES (?)";
+    private static final String DELETE_TAG = "DELETE FROM tags WHERE id = ?";
+    private static final String SELECT_ALL_TAGS = "SELECT tags.id, tags.name FROM tags";
+    private static final String SELECT_TAG_BY_ID = "SELECT tags.id, tags.name FROM tags WHERE id = ?";
+    private static final String SELECT_TAG_BY_NAME = "SELECT tags.id, tags.name FROM tags WHERE name = ?";
     private final JdbcTemplate template;
 
     /**

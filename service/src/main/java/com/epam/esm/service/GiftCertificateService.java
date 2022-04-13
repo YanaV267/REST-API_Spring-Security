@@ -25,8 +25,10 @@ public interface GiftCertificateService extends BaseService<GiftCertificateDto> 
      * Find by several parameters set.
      *
      * @param certificateData the certificate data
+     * @param tags            the tags
      * @param sortTypes       the sort types
      * @return the set
      */
-    Set<GiftCertificateDto> findBySeveralParameters(Map<String, Object> certificateData, List<String> sortTypes);
+    Set<GiftCertificateDto> findBySeveralParameters(Map<String, Object> certificateData, List<String> tags,
+                                                    List<String> sortTypes);
 }

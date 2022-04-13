@@ -1,5 +1,6 @@
 package com.epam.esm.builder;
 
+import com.epam.esm.entity.Tag;
 import com.epam.esm.repository.ColumnName;
 
 import java.math.BigDecimal;
@@ -99,7 +100,7 @@ public class GiftCertificateQueryBuilder {
     public GiftCertificateQueryBuilder addDescriptionParameter(String description) {
         if (description != null) {
             checkQueryEnding();
-            query.append(DESCRIPTION)
+            query.append(GIFT_CERTIFICATE_DESCRIPTION)
                     .append(EQUALS)
                     .append(QUOTE)
                     .append(description)
@@ -120,7 +121,7 @@ public class GiftCertificateQueryBuilder {
             if (!query.toString().endsWith(WHERE_CLAUSE)) {
                 query.append(AND_OPERATOR);
             }
-            query.append(DESCRIPTION)
+            query.append(GIFT_CERTIFICATE_DESCRIPTION)
                     .append(LIKE_OPERATOR)
                     .append(QUOTE)
                     .append(LIKE_WILDCARD)
@@ -140,7 +141,7 @@ public class GiftCertificateQueryBuilder {
     public GiftCertificateQueryBuilder addPriceParameter(BigDecimal price) {
         if (price != null) {
             checkQueryEnding();
-            query.append(PRICE)
+            query.append(GIFT_CERTIFICATE_PRICE)
                     .append(EQUALS)
                     .append(price.doubleValue());
         }
@@ -156,7 +157,7 @@ public class GiftCertificateQueryBuilder {
     public GiftCertificateQueryBuilder addDurationParameter(int duration) {
         if (duration != 0) {
             checkQueryEnding();
-            query.append(DURATION)
+            query.append(GIFT_CERTIFICATE_DURATION)
                     .append(EQUALS)
                     .append(duration);
         }
@@ -172,7 +173,7 @@ public class GiftCertificateQueryBuilder {
     public GiftCertificateQueryBuilder addCreateDateParameter(LocalDateTime createDate) {
         if (createDate != null) {
             checkQueryEnding();
-            query.append(CREATE_DATE)
+            query.append(GIFT_CERTIFICATE_CREATE_DATE)
                     .append(EQUALS)
                     .append(QUOTE)
                     .append(createDate)
@@ -190,7 +191,7 @@ public class GiftCertificateQueryBuilder {
     public GiftCertificateQueryBuilder addLastUpdateDateParameter(LocalDateTime lastUpdateDate) {
         if (lastUpdateDate != null) {
             checkQueryEnding();
-            query.append(LAST_UPDATE_DATE)
+            query.append(GIFT_CERTIFICATE_LAST_UPDATE_DATE)
                     .append(EQUALS)
                     .append(QUOTE)
                     .append(lastUpdateDate)
@@ -205,7 +206,7 @@ public class GiftCertificateQueryBuilder {
      * @return the gift certificate query builder
      */
     public GiftCertificateQueryBuilder addLastUpdateDateNowParameter() {
-        query.append(LAST_UPDATE_DATE)
+        query.append(GIFT_CERTIFICATE_LAST_UPDATE_DATE)
                 .append(EQUALS)
                 .append(NOW_TIME);
         return this;
@@ -214,19 +215,24 @@ public class GiftCertificateQueryBuilder {
     /**
      * Add tag name gift certificate query builder.
      *
-     * @param tagName the tag name
+     * @param tags the tags
      * @return the gift certificate query builder
      */
-    public GiftCertificateQueryBuilder addTagName(String tagName) {
-        if (tagName != null) {
+    public GiftCertificateQueryBuilder addTags(List<Tag> tags) {
+        if (tags != null && !tags.isEmpty()) {
             if (!query.toString().endsWith(WHERE_CLAUSE)) {
                 query.append(AND_OPERATOR);
             }
-            query.append(TAG_NAME)
-                    .append(EQUALS)
-                    .append(QUOTE)
-                    .append(tagName)
-                    .append(QUOTE);
+            for (int i = 0; i < tags.size(); i++) {
+                query.append(TAG_NAME)
+                        .append(EQUALS)
+                        .append(QUOTE)
+                        .append(tags.get(i).getName())
+                        .append(QUOTE);
+                if (i != tags.size() - 1) {
+                    query.append(AND_OPERATOR);
+                }
+            }
         }
         return this;
     }
@@ -244,7 +250,7 @@ public class GiftCertificateQueryBuilder {
                 if (!query.toString().endsWith(ORDER_BY_OPERATOR)) {
                     query.append(COMMA);
                 }
-                if (!sortType.substring(0, sortType.indexOf(UNDERSCORE)).equals(ColumnName.NAME)) {
+                if (!sortType.substring(0, sortType.indexOf(UNDERSCORE)).equals(GIFT_CERTIFICATE_NAME)) {
                     query.append(sortType, 0, sortType.indexOf(UNDERSCORE));
                 } else {
                     query.append(ColumnName.GIFT_CERTIFICATE_NAME);

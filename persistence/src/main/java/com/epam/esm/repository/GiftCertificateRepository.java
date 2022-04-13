@@ -1,6 +1,7 @@
 package com.epam.esm.repository;
 
 import com.epam.esm.entity.GiftCertificate;
+import com.epam.esm.entity.Tag;
 
 import java.util.List;
 import java.util.Set;
@@ -13,6 +14,14 @@ import java.util.Set;
  */
 public interface GiftCertificateRepository extends BaseRepository<GiftCertificate> {
     /**
+     * Create long.
+     *
+     * @param certificate the certificate
+     * @return the long
+     */
+    long create(GiftCertificate certificate);
+
+    /**
      * Update.
      *
      * @param giftCertificate the gift certificate
@@ -23,10 +32,10 @@ public interface GiftCertificateRepository extends BaseRepository<GiftCertificat
      * Find by several parameters set.
      *
      * @param certificate the certificate
-     * @param tagName     the tag name
+     * @param tags        the tag name
      * @param sortTypes   the sort types
      * @return the set
      */
-    Set<GiftCertificate> findBySeveralParameters(GiftCertificate certificate, String tagName,
+    Set<GiftCertificate> findBySeveralParameters(GiftCertificate certificate, List<Tag> tags,
                                                  List<String> sortTypes);
 }

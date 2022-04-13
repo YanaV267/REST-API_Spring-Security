@@ -3,6 +3,8 @@ package com.epam.esm.validator.impl;
 import com.epam.esm.validator.TagValidator;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 /**
  * The type Tag validator.
  *
@@ -16,5 +18,12 @@ public class TagValidatorImpl implements TagValidator {
     @Override
     public boolean checkName(String name) {
         return name != null && name.matches(NAME_REGEX);
+    }
+
+    @Override
+    public boolean checkNames(List<String> names) {
+        return names.stream()
+                .map(this::checkName)
+                .noneMatch(r -> r.equals(Boolean.FALSE));
     }
 }

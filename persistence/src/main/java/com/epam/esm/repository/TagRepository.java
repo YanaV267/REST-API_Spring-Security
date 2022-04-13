@@ -12,6 +12,14 @@ import java.util.Optional;
  */
 public interface TagRepository extends BaseRepository<Tag> {
     /**
+     * Create long.
+     *
+     * @param tag the tag
+     * @return the long
+     */
+    long create(Tag tag);
+
+    /**
      * Find by name optional.
      *
      * @param name the name

@@ -117,14 +117,16 @@ public class GiftCertificateController {
      * Find by several parameters set.
      *
      * @param certificateData the certificate data
+     * @param tagNames        the tagNames
      * @param sortTypes       the sort types
      * @return the set
      */
     @GetMapping
     @ResponseStatus(FOUND)
     public Set<GiftCertificateDto> findBySeveralParameters(@RequestParam Map<String, Object> certificateData,
+                                                           @RequestParam(value = "tag", required = false) List<String> tagNames,
                                                            @RequestParam(value = "sort", required = false) List<String> sortTypes) {
-        Set<GiftCertificateDto> certificates = certificateService.findBySeveralParameters(certificateData, sortTypes);
+        Set<GiftCertificateDto> certificates = certificateService.findBySeveralParameters(certificateData, tagNames, sortTypes);
         if (!certificates.isEmpty()) {
             return certificates;
         } else {

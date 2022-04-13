@@ -107,15 +107,16 @@ class GiftCertificateServiceTest {
 
     @ParameterizedTest
     @MethodSource("provideSearchParameters")
-    void findBySeveralParameters(Map<String, Object> certificateData, List<String> sortTypes) {
+    public void findBySeveralParameters(Map<String, Object> certificateData, List<String> tagNames,
+                                        List<String> sortTypes) {
         when(validator.checkAllCertificateData(anyMap())).thenReturn(true);
         when(dateFormatter.format(anyString())).thenReturn(LocalDateTime.now());
-        when(repository.findBySeveralParameters(any(GiftCertificate.class), anyString(), anyList()))
+        when(repository.findBySeveralParameters(any(GiftCertificate.class), anyList(), anyList()))
                 .thenReturn(new LinkedHashSet<>());
         when(mapper.mapToDto(any(GiftCertificate.class))).thenReturn(new GiftCertificateDto());
 
         int expected = 1;
-        Set<GiftCertificateDto> certificates = service.findBySeveralParameters(certificateData, sortTypes);
+        Set<GiftCertificateDto> certificates = service.findBySeveralParameters(certificateData, tagNames, sortTypes);
         int actual = certificates.size();
         Assertions.assertEquals(expected, actual);
     }
@@ -154,6 +155,10 @@ class GiftCertificateServiceTest {
                     }
                 }, new ArrayList<String>() {
                     {
+                        add("car");
+                    }
+                }, new ArrayList<String>() {
+                    {
                         add("name_asc");
                         add("price_desc");
                     }
@@ -163,6 +168,11 @@ class GiftCertificateServiceTest {
                         put(NAME, "european countries tours");
                         put(PRICE, "70");
                         put(DURATION, "15");
+                    }
+                }, new ArrayList<String>() {
+                    {
+                        add("travelling");
+                        add("car");
                     }
                 }, new ArrayList<String>() {
                     {

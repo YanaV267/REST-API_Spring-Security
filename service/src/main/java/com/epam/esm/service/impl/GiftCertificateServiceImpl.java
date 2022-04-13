@@ -9,6 +9,7 @@ import com.epam.esm.repository.GiftCertificateRepository;
 import com.epam.esm.service.GiftCertificateService;
 import com.epam.esm.util.CertificateDateFormatter;
 import com.epam.esm.validator.GiftCertificateValidator;
+import com.epam.esm.validator.TagValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -31,6 +32,7 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
     private final GiftCertificateRepository repository;
     private final CertificatePurchaseRepository purchaseRepository;
     private final GiftCertificateValidator validator;
+    private final TagValidator tagValidator;
     private final GiftCertificateMapper mapper;
     private final CertificateDateFormatter dateFormatter;
 
@@ -40,6 +42,7 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
      * @param repository         the repository
      * @param purchaseRepository the purchase repository
      * @param validator          the validator
+     * @param tagValidator       the tag validator
      * @param mapper             the mapper
      * @param dateFormatter      the date formatter
      */
@@ -47,11 +50,13 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
     public GiftCertificateServiceImpl(GiftCertificateRepository repository,
                                       CertificatePurchaseRepository purchaseRepository,
                                       GiftCertificateValidator validator,
+                                      TagValidator tagValidator,
                                       @Qualifier("certificateMapper") GiftCertificateMapper mapper,
                                       CertificateDateFormatter dateFormatter) {
         this.repository = repository;
         this.purchaseRepository = purchaseRepository;
         this.validator = validator;
+        this.tagValidator = tagValidator;
         this.mapper = mapper;
         this.dateFormatter = dateFormatter;
     }
@@ -126,16 +131,19 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
     }
 
     @Override
-    public Set<GiftCertificateDto> findBySeveralParameters(Map<String, Object> certificateData, List<String> sortTypes) {
-        if (!certificateData.isEmpty() && validator.checkCertificateData(certificateData)) {
+    public Set<GiftCertificateDto> findBySeveralParameters(Map<String, Object> certificateData, List<String> tagNames,
+                                                           List<String> sortTypes) {
+        if (!certificateData.isEmpty() && validator.checkCertificateData(certificateData)
+                && tagValidator.checkNames(tagNames)) {
             GiftCertificate giftCertificate = retrieveCertificateData(certificateData);
             int id = certificateData.size() == 1 && certificateData.containsKey(SORT) ? 0 : 1;
             giftCertificate.setId(id);
-            String tagName = null;
-            if (certificateData.containsKey(TAG)) {
-                tagName = String.valueOf(certificateData.get(TAG));
+            List<Tag> tags = new LinkedList<>();
+            for (String tagName : tagNames) {
+                Tag tag = new Tag(tagName);
+                tags.add(tag);
             }
-            Set<GiftCertificate> certificates = repository.findBySeveralParameters(giftCertificate, tagName, sortTypes);
+            Set<GiftCertificate> certificates = repository.findBySeveralParameters(giftCertificate, tags, sortTypes);
             return certificates.stream()
                     .map(mapper::mapToDto)
                     .collect(Collectors.toCollection(LinkedHashSet::new));

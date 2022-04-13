@@ -30,12 +30,12 @@ CREATE TABLE IF NOT EXISTS `certificate_purchase`
     `id_tag`         INT NOT NULL,
     CONSTRAINT `certificate_id`
         FOREIGN KEY (`id_certificate`)
-            REFERENCES `gift_certificate` (`id`)
+            REFERENCES gift_certificates (`id`)
             ON DELETE CASCADE
             ON UPDATE CASCADE,
     CONSTRAINT `tag_id`
         FOREIGN KEY (`id_tag`)
-            REFERENCES `tag` (`id`)
+            REFERENCES tags (`id`)
             ON DELETE CASCADE
             ON UPDATE CASCADE
 );

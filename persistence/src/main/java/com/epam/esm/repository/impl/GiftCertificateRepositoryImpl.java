@@ -2,6 +2,7 @@ package com.epam.esm.repository.impl;
 
 import com.epam.esm.builder.GiftCertificateQueryBuilder;
 import com.epam.esm.entity.GiftCertificate;
+import com.epam.esm.entity.Tag;
 import com.epam.esm.mapper.GiftCertificateExtractor;
 import com.epam.esm.repository.GiftCertificateRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,24 +27,27 @@ import java.util.Set;
  */
 @Repository
 public class GiftCertificateRepositoryImpl implements GiftCertificateRepository {
-    private static final String INSERT_CERTIFICATE = "INSERT INTO gift_certificate " +
+    private static final String INSERT_CERTIFICATE = "INSERT INTO gift_certificates " +
             "(name, description, price, duration, create_date, last_update_date) VALUES (?, ?, ?, ?, now(3), now(3))";
     private static final String UPDATE_CERTIFICATE = "UPDATE gift_certificate SET ";
-    private static final String DELETE_CERTIFICATE = "DELETE FROM gift_certificate WHERE id = ?";
-    private static final String SELECT_CERTIFICATES = "SELECT gift_certificate.id, gift_certificate.name, description, " +
-            "price, duration, create_date, last_update_date, tag.id, tag.name FROM gift_certificate " +
-            "JOIN certificate_purchase ON certificate_purchase.id_certificate = gift_certificate.id " +
-            "JOIN tag ON certificate_purchase.id_tag = tag.id";
+    private static final String DELETE_CERTIFICATE = "DELETE FROM gift_certificates WHERE id = ?";
+    private static final String SELECT_CERTIFICATES = "SELECT certificates.id, certificates.name, description, " +
+            "price, duration, certificates.create_date, last_update_date, tags.id, tags.name FROM gift_certificates certificates " +
+            "JOIN certificate_purchase ON certificate_purchase.id_certificate = certificates.id " +
+            "JOIN tags ON certificate_purchase.id_tag = tags.id";
     private final JdbcTemplate template;
+    private final GiftCertificateExtractor certificateExtractor;
 
     /**
      * Instantiates a new Gift certificate repository.
      *
-     * @param dataSource the data source
+     * @param dataSource           the data source
+     * @param certificateExtractor the certificate extractor
      */
     @Autowired
-    public GiftCertificateRepositoryImpl(DataSource dataSource) {
+    public GiftCertificateRepositoryImpl(DataSource dataSource, GiftCertificateExtractor certificateExtractor) {
         this.template = new JdbcTemplate(dataSource);
+        this.certificateExtractor = certificateExtractor;
     }
 
     @Override
@@ -86,7 +90,7 @@ public class GiftCertificateRepositoryImpl implements GiftCertificateRepository 
 
     @Override
     public Set<GiftCertificate> findAll() {
-        List<GiftCertificate> certificates = template.query(SELECT_CERTIFICATES, new GiftCertificateExtractor());
+        List<GiftCertificate> certificates = template.query(SELECT_CERTIFICATES, certificateExtractor);
         if (certificates != null) {
             return new LinkedHashSet<>(certificates);
         } else {
@@ -99,7 +103,7 @@ public class GiftCertificateRepositoryImpl implements GiftCertificateRepository 
         List<GiftCertificate> certificates = template.query(new GiftCertificateQueryBuilder(SELECT_CERTIFICATES)
                 .addWhereClause()
                 .addIdParameter(id)
-                .build(), new GiftCertificateExtractor());
+                .build(), certificateExtractor);
         if (certificates != null) {
             return certificates.stream().findFirst();
         } else {
@@ -108,7 +112,7 @@ public class GiftCertificateRepositoryImpl implements GiftCertificateRepository 
     }
 
     @Override
-    public Set<GiftCertificate> findBySeveralParameters(GiftCertificate certificate, String tagName,
+    public Set<GiftCertificate> findBySeveralParameters(GiftCertificate certificate, List<Tag> tags,
                                                         List<String> sortTypes) {
         List<GiftCertificate> certificates = template.query(
                 new GiftCertificateQueryBuilder(SELECT_CERTIFICATES)
@@ -119,9 +123,9 @@ public class GiftCertificateRepositoryImpl implements GiftCertificateRepository 
                         .addDurationParameter(certificate.getDuration())
                         .addCreateDateParameter(certificate.getCreateDate())
                         .addLastUpdateDateParameter(certificate.getLastUpdateDate())
-                        .addTagName(tagName)
+                        .addTags(tags)
                         .addSorting(sortTypes)
-                        .build(), new GiftCertificateExtractor());
+                        .build(), certificateExtractor);
         if (certificates != null) {
             return new LinkedHashSet<>(certificates);
         } else {

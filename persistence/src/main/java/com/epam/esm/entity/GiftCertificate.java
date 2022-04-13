@@ -194,6 +194,9 @@ public class GiftCertificate {
         if (lastUpdateDate != null ? lastUpdateDate.equals(certificate.lastUpdateDate) : certificate.lastUpdateDate == null) {
             return false;
         }
+        if (tags != null ? tags.equals(certificate.tags) : certificate.tags == null) {
+            return false;
+        }
         return id == certificate.id && duration == certificate.duration;
     }
 

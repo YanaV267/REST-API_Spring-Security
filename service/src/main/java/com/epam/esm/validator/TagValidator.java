@@ -1,5 +1,7 @@
 package com.epam.esm.validator;
 
+import java.util.List;
+
 /**
  * The interface Tag validator.
  *
@@ -14,4 +16,12 @@ public interface TagValidator {
      * @return the boolean
      */
     boolean checkName(String name);
+
+    /**
+     * Check names boolean.
+     *
+     * @param names the names
+     * @return the boolean
+     */
+    boolean checkNames(List<String> names);
 }
