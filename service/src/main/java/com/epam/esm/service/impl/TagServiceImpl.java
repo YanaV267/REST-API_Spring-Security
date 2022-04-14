@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -44,21 +45,25 @@ public class TagServiceImpl implements TagService {
     }
 
     @Override
+    @Transactional
     public boolean create(Map<String, Object> tagData) {
         if (validator.checkName((String) tagData.get(ParameterName.NAME))) {
-            Tag tag = new Tag();
-            tag.setName((String) tagData.get(ParameterName.NAME));
-            repository.create(tag);
-            return true;
-        } else {
-            return false;
+            String name = (String) tagData.get(ParameterName.NAME);
+            if (!findByName(name).isPresent()) {
+                Tag tag = new Tag();
+                tag.setName(name);
+                repository.create(tag);
+                return true;
+            }
         }
+        return false;
     }
 
     @Override
     public boolean delete(long id) {
-        if (repository.findById(id).isPresent()) {
-            repository.delete(id);
+        Optional<Tag> tag = repository.findById(id);
+        if (tag.isPresent()) {
+            repository.delete(tag.get());
             return true;
         } else {
             return false;

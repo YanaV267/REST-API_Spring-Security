@@ -4,7 +4,6 @@ import com.epam.esm.dto.GiftCertificateDto;
 import com.epam.esm.entity.GiftCertificate;
 import com.epam.esm.entity.Tag;
 import com.epam.esm.mapper.impl.GiftCertificateMapper;
-import com.epam.esm.repository.CertificatePurchaseRepository;
 import com.epam.esm.repository.GiftCertificateRepository;
 import com.epam.esm.service.GiftCertificateService;
 import com.epam.esm.util.CertificateDateFormatter;
@@ -14,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -30,7 +30,6 @@ import static com.epam.esm.util.ParameterName.*;
 @Service
 public class GiftCertificateServiceImpl implements GiftCertificateService {
     private final GiftCertificateRepository repository;
-    private final CertificatePurchaseRepository purchaseRepository;
     private final GiftCertificateValidator validator;
     private final TagValidator tagValidator;
     private final GiftCertificateMapper mapper;
@@ -39,22 +38,19 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
     /**
      * Instantiates a new Gift certificate service.
      *
-     * @param repository         the repository
-     * @param purchaseRepository the purchase repository
-     * @param validator          the validator
-     * @param tagValidator       the tag validator
-     * @param mapper             the mapper
-     * @param dateFormatter      the date formatter
+     * @param repository    the repository
+     * @param validator     the validator
+     * @param tagValidator  the tag validator
+     * @param mapper        the mapper
+     * @param dateFormatter the date formatter
      */
     @Autowired
     public GiftCertificateServiceImpl(GiftCertificateRepository repository,
-                                      CertificatePurchaseRepository purchaseRepository,
                                       GiftCertificateValidator validator,
                                       TagValidator tagValidator,
                                       @Qualifier("certificateServiceMapper") GiftCertificateMapper mapper,
                                       CertificateDateFormatter dateFormatter) {
         this.repository = repository;
-        this.purchaseRepository = purchaseRepository;
         this.validator = validator;
         this.tagValidator = tagValidator;
         this.mapper = mapper;
@@ -62,6 +58,7 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
     }
 
     @Override
+    @Transactional
     public boolean create(Map<String, Object> certificateData) {
         if (validator.checkAllCertificateData(certificateData)) {
             Set<Tag> tags = ((ArrayList<Map<String, String>>) certificateData.get(TAGS)).stream()
@@ -75,13 +72,15 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
                     .setDuration(Integer.parseInt((String) certificateData.get(DURATION)))
                     .setTags(tags)
                     .build();
-            return purchaseRepository.create(giftCertificate);
+            repository.create(giftCertificate);
+            return true;
         } else {
             return false;
         }
     }
 
     @Override
+    @Transactional
     public boolean update(Map<String, Object> certificateData) {
         if (!certificateData.isEmpty() && certificateData.containsKey(ID)
                 && validator.checkId((String) certificateData.get(ID))
@@ -95,7 +94,8 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
                         .collect(Collectors.toSet());
                 giftCertificate.setTags(tags);
             }
-            return purchaseRepository.update(giftCertificate);
+            repository.update(giftCertificate);
+            return true;
         } else {
             return false;
         }
@@ -103,8 +103,9 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
 
     @Override
     public boolean delete(long id) {
-        if (repository.findById(id).isPresent()) {
-            repository.delete(id);
+        Optional<GiftCertificate> certificate = repository.findById(id);
+        if (certificate.isPresent()) {
+            repository.delete(certificate.get());
             return true;
         } else {
             return false;

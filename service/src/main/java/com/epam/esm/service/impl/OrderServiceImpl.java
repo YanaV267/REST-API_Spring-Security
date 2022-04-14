@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.LinkedHashSet;
@@ -55,6 +56,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    @Transactional
     public boolean create(Map<String, Object> orderData) {
         if (validator.checkAllOrderData(orderData)) {
             Order order = new Order.OrderBuilder()
@@ -62,8 +64,8 @@ public class OrderServiceImpl implements OrderService {
                     .setCertificate(new GiftCertificate(Long.parseLong((String) orderData.get(ID_CERTIFICATE))))
                     .setCost(new BigDecimal((String) orderData.get(COST)))
                     .build();
-            long id = repository.create(order);
-            return id != 0;
+            repository.create(order);
+            return true;
         }
         return false;
     }
@@ -81,8 +83,9 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public boolean delete(long id) {
-        if (repository.findById(id).isPresent()) {
-            repository.delete(id);
+        Optional<Order> order = repository.findById(id);
+        if (order.isPresent()) {
+            repository.delete(order.get());
             return true;
         } else {
             return false;
@@ -120,15 +123,6 @@ public class OrderServiceImpl implements OrderService {
     public Set<OrderDto> findBySeveralParameters(Map<String, Object> orderData) {
         if (validator.checkOrderData(orderData)) {
             Order order = retrieveOrderData(orderData);
-            if (orderData.containsKey(LOGIN)) {
-                order.getUser().setName((String) orderData.get(LOGIN));
-            }
-            if (orderData.containsKey(SURNAME)) {
-                order.getUser().setName((String) orderData.get(SURNAME));
-            }
-            if (orderData.containsKey(NAME)) {
-                order.getUser().setName((String) orderData.get(NAME));
-            }
             Set<Order> orders = repository.findOrdersBySeveralParameters(order);
             return orders.stream()
                     .map(mapper::mapToDto)

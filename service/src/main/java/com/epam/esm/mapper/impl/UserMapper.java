@@ -2,7 +2,6 @@ package com.epam.esm.mapper.impl;
 
 import com.epam.esm.dto.OrderDto;
 import com.epam.esm.dto.UserDto;
-import com.epam.esm.entity.Order;
 import com.epam.esm.entity.User;
 import com.epam.esm.mapper.Mapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,16 +48,6 @@ public class UserMapper implements Mapper<User, UserDto> {
 
     @Override
     public User mapToEntity(UserDto userDto) {
-        User user = new User();
-        user.setId(userDto.getId());
-        user.setLogin(userDto.getLogin());
-        user.setSurname(userDto.getSurname());
-        user.setName(userDto.getName());
-        user.setBalance(userDto.getBalance());
-        Set<Order> orders = userDto.getOrders().stream()
-                .map(orderMapper::mapToEntity)
-                .collect(Collectors.toSet());
-        user.setOrders(orders);
-        return user;
+        throw new UnsupportedOperationException("Mapping from DTO to Entity is unsupported for User entity.");
     }
 }
