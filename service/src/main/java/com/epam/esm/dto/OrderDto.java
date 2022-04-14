@@ -1,7 +1,5 @@
 package com.epam.esm.dto;
 
-import com.epam.esm.entity.GiftCertificate;
-
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
@@ -16,13 +14,14 @@ public class OrderDto {
     private UserDto userDto;
     private BigDecimal cost;
     private LocalDateTime createDate;
-    private GiftCertificate certificate;
+    private GiftCertificateDto certificate;
 
     /**
      * Instantiates a new Order dto.
      */
     public OrderDto() {
-        certificate = new GiftCertificate();
+        userDto = new UserDto();
+        certificate = new GiftCertificateDto();
     }
 
     /**
@@ -102,7 +101,7 @@ public class OrderDto {
      *
      * @return the certificate
      */
-    public GiftCertificate getCertificate() {
+    public GiftCertificateDto getCertificate() {
         return certificate;
     }
 
@@ -111,7 +110,7 @@ public class OrderDto {
      *
      * @param certificate the certificate
      */
-    public void setCertificate(GiftCertificate certificate) {
+    public void setCertificate(GiftCertificateDto certificate) {
         this.certificate = certificate;
     }
 

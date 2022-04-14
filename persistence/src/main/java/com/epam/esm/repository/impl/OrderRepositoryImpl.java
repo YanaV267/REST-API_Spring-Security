@@ -3,7 +3,7 @@ package com.epam.esm.repository.impl;
 import com.epam.esm.builder.GiftCertificateQueryBuilder;
 import com.epam.esm.builder.OrderQueryBuilder;
 import com.epam.esm.entity.Order;
-import com.epam.esm.mapper.OrderExtractor;
+import com.epam.esm.mapper.OrderMapper;
 import com.epam.esm.repository.OrderRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -31,24 +31,26 @@ public class OrderRepositoryImpl implements OrderRepository {
             "VALUES (?, ?, ?, now(3))";
     private static final String UPDATE_ORDER = "UPDATE orders SET ";
     private static final String DELETE_ORDER = "DELETE FROM orders WHERE id = ?";
-    private static final String SELECT_ORDERS = "SELECT orders.id, id_user, login, surname, users.name, balance, " +
-            "id_certificate, certificates.name, description, price, duration, certificates.create_date, last_update_date, cost, " +
-            "orders.create_date FROM orders " +
+    private static final String SELECT_ORDERS = "SELECT orders.id, users.id, login, surname, users.name, balance, " +
+            "certificates.id, certificates.name, description, price, duration, certificates.create_date, last_update_date, " +
+            "cost, orders.create_date, tags.id, tags.name FROM orders " +
             "JOIN gift_certificates certificates on orders.id_certificate = certificates.id " +
-            "JOIN users on orders.id_user = users.id";
+            "JOIN users on orders.id_user = users.id " +
+            "JOIN certificate_purchase on certificates.id = certificate_purchase.id_certificate " +
+            "JOIN tags on certificate_purchase.id_tag = tags.id";
     private final JdbcTemplate template;
-    private final OrderExtractor orderExtractor;
+    private final OrderMapper orderMapper;
 
     /**
      * Instantiates a new Order repository.
      *
-     * @param dataSource     the data source
-     * @param orderExtractor the order extractor
+     * @param dataSource  the data source
+     * @param orderMapper the order mapper
      */
     @Autowired
-    public OrderRepositoryImpl(DataSource dataSource, OrderExtractor orderExtractor) {
+    public OrderRepositoryImpl(DataSource dataSource, OrderMapper orderMapper) {
         this.template = new JdbcTemplate(dataSource);
-        this.orderExtractor = orderExtractor;
+        this.orderMapper = orderMapper;
     }
 
     @Override
@@ -89,12 +91,8 @@ public class OrderRepositoryImpl implements OrderRepository {
 
     @Override
     public Set<Order> findAll() {
-        List<Order> orders = template.query(SELECT_ORDERS, orderExtractor);
-        if (orders != null) {
-            return new LinkedHashSet<>(orders);
-        } else {
-            return new LinkedHashSet<>();
-        }
+        List<Order> orders = template.query(SELECT_ORDERS, orderMapper);
+        return new LinkedHashSet<>(orders);
     }
 
     @Override
@@ -102,22 +100,14 @@ public class OrderRepositoryImpl implements OrderRepository {
         List<Order> orders = template.query(new GiftCertificateQueryBuilder(SELECT_ORDERS)
                 .addWhereClause()
                 .addIdParameter(id)
-                .build(), orderExtractor);
-        if (orders != null) {
-            return orders.stream().findFirst();
-        } else {
-            return Optional.empty();
-        }
+                .build(), orderMapper);
+        return orders.stream().findFirst();
     }
 
     @Override
     public Set<Order> findAllOrdersByUser(long userId) {
-        List<Order> orders = template.query(SELECT_ORDERS, orderExtractor);
-        if (orders != null) {
-            return new LinkedHashSet<>(orders);
-        } else {
-            return new LinkedHashSet<>();
-        }
+        List<Order> orders = template.query(SELECT_ORDERS, orderMapper);
+        return new LinkedHashSet<>(orders);
     }
 
     @Override
@@ -133,11 +123,7 @@ public class OrderRepositoryImpl implements OrderRepository {
                         .addCertificateNameLikeParameter(order.getCertificate().getName())
                         .addCostParameter(order.getCost())
                         .addCreateDateParameter(order.getCreateDate())
-                        .build(), orderExtractor);
-        if (orders != null) {
-            return new LinkedHashSet<>(orders);
-        } else {
-            return new LinkedHashSet<>();
-        }
+                        .build(), orderMapper);
+        return new LinkedHashSet<>(orders);
     }
 }

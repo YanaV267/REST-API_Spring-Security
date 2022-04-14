@@ -66,6 +66,22 @@ public class UserController {
     }
 
     /**
+     * Retrieve all with orders set.
+     *
+     * @return the set
+     */
+    @GetMapping("/orders")
+    @ResponseStatus(FOUND)
+    public Set<UserDto> retrieveAllWithOrders() {
+        Set<UserDto> users = userService.findAllWithOrders();
+        if (!users.isEmpty()) {
+            return users;
+        } else {
+            throw new NoDataFoundException(USERS, UserDto.class);
+        }
+    }
+
+    /**
      * Find by id user dto.
      *
      * @param id the id

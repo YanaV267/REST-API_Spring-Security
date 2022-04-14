@@ -11,6 +11,12 @@ import org.springframework.core.env.Environment;
 import javax.sql.DataSource;
 import java.util.Objects;
 
+/**
+ * The type Gift certificate application.
+ *
+ * @author YanaV
+ * @project GiftCertificate
+ */
 @SpringBootApplication
 @PropertySource("classpath:/database/prod.properties")
 public class GiftCertificateApplication {
@@ -22,6 +28,11 @@ public class GiftCertificateApplication {
     @Autowired
     private Environment environment;
 
+    /**
+     * Prod data source data source.
+     *
+     * @return the data source
+     */
     @Bean
     public DataSource prodDataSource() {
         BasicDataSource dataSource = new BasicDataSource();
@@ -33,6 +44,11 @@ public class GiftCertificateApplication {
         return dataSource;
     }
 
+    /**
+     * The entry point of application.
+     *
+     * @param args the input arguments
+     */
     public static void main(String[] args) {
         SpringApplication.run(GiftCertificateApplication.class, args);
     }

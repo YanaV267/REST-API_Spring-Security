@@ -21,7 +21,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static com.epam.esm.repository.ColumnName.*;
 import static com.epam.esm.util.ParameterName.*;
 
 /**
@@ -47,7 +46,7 @@ public class OrderServiceImpl implements OrderService {
      */
     @Autowired
     public OrderServiceImpl(OrderRepository repository, OrderValidator validator,
-                            @Qualifier("orderMapper") OrderMapper mapper,
+                            @Qualifier("orderServiceMapper") OrderMapper mapper,
                             CertificateDateFormatter dateFormatter) {
         this.repository = repository;
         this.validator = validator;
@@ -59,9 +58,9 @@ public class OrderServiceImpl implements OrderService {
     public boolean create(Map<String, Object> orderData) {
         if (validator.checkAllOrderData(orderData)) {
             Order order = new Order.OrderBuilder()
-                    .setUser(new User((Long) orderData.get(USER_ID)))
-                    .setCertificate(new GiftCertificate((Long) orderData.get(GIFT_CERTIFICATE_ID)))
-                    .setCost(new BigDecimal((String) orderData.get(ORDER_COST)))
+                    .setUser(new User(Long.parseLong((String) orderData.get(ID_USER))))
+                    .setCertificate(new GiftCertificate(Long.parseLong((String) orderData.get(ID_CERTIFICATE))))
+                    .setCost(new BigDecimal((String) orderData.get(COST)))
                     .build();
             long id = repository.create(order);
             return id != 0;
@@ -140,11 +139,11 @@ public class OrderServiceImpl implements OrderService {
 
     private Order retrieveOrderData(Map<String, Object> orderData) {
         Order giftCertificate = new Order();
-        if (orderData.containsKey(USER_ID)) {
-            giftCertificate.setUser(new User((Long) orderData.get(USER_ID)));
+        if (orderData.containsKey(ID_USER)) {
+            giftCertificate.setUser(new User(Long.parseLong((String) orderData.get(ID_USER))));
         }
-        if (orderData.containsKey(GIFT_CERTIFICATE_ID)) {
-            giftCertificate.setCertificate(new GiftCertificate((Long) orderData.get(GIFT_CERTIFICATE_ID)));
+        if (orderData.containsKey(ID_CERTIFICATE)) {
+            giftCertificate.setCertificate(new GiftCertificate(Long.parseLong((String) orderData.get(ID_CERTIFICATE))));
         }
         if (orderData.containsKey(COST)) {
             giftCertificate.setCost(new BigDecimal((String) orderData.get(COST)));

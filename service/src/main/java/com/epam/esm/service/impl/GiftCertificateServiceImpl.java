@@ -51,7 +51,7 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
                                       CertificatePurchaseRepository purchaseRepository,
                                       GiftCertificateValidator validator,
                                       TagValidator tagValidator,
-                                      @Qualifier("certificateMapper") GiftCertificateMapper mapper,
+                                      @Qualifier("certificateServiceMapper") GiftCertificateMapper mapper,
                                       CertificateDateFormatter dateFormatter) {
         this.repository = repository;
         this.purchaseRepository = purchaseRepository;

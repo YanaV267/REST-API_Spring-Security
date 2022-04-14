@@ -1,13 +1,12 @@
 package com.epam.esm.mapper.impl;
 
+import com.epam.esm.dto.GiftCertificateDto;
 import com.epam.esm.dto.OrderDto;
-import com.epam.esm.dto.UserDto;
+import com.epam.esm.entity.GiftCertificate;
 import com.epam.esm.entity.Order;
-import com.epam.esm.entity.User;
 import com.epam.esm.mapper.Mapper;
 import com.epam.esm.util.CertificateDateFormatter;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -18,43 +17,43 @@ import java.time.LocalDateTime;
  * @author YanaV
  * @project GiftCertificate
  */
-@Service("orderMapper")
+@Service("orderServiceMapper")
 public class OrderMapper implements Mapper<Order, OrderDto> {
-    private final UserMapper userMapper;
     private final CertificateDateFormatter dateFormatter;
+    private final GiftCertificateMapper certificateMapper;
 
     /**
      * Instantiates a new Order mapper.
      *
-     * @param userMapper    the user mapper
-     * @param dateFormatter the date formatter
+     * @param dateFormatter     the date formatter
+     * @param certificateMapper the certificate mapper
      */
     @Autowired
-    public OrderMapper(@Qualifier("userMapper") UserMapper userMapper, CertificateDateFormatter dateFormatter) {
-        this.userMapper = userMapper;
+    public OrderMapper(CertificateDateFormatter dateFormatter, GiftCertificateMapper certificateMapper) {
         this.dateFormatter = dateFormatter;
+        this.certificateMapper = certificateMapper;
     }
 
     @Override
     public OrderDto mapToDto(Order order) {
         OrderDto orderDto = new OrderDto();
-        UserDto userDto = userMapper.mapToDto(order.getUser());
         orderDto.setId(order.getId());
-        orderDto.setUser(userDto);
-        orderDto.setCertificate(order.getCertificate());
+        orderDto.setCost(order.getCost());
         orderDto.setCreateDate(order.getCreateDate());
+        GiftCertificateDto certificateDto = certificateMapper.mapToDto(order.getCertificate());
+        orderDto.setCertificate(certificateDto);
         return orderDto;
     }
 
     @Override
     public Order mapToEntity(OrderDto orderDto) {
         Order order = new Order();
-        User user = userMapper.mapToEntity(orderDto.getUser());
         order.setId(orderDto.getId());
-        order.setUser(user);
-        order.setCertificate(orderDto.getCertificate());
+        order.setCost(orderDto.getCost());
         LocalDateTime formattedDate = dateFormatter.format(orderDto.getCreateDate());
         order.setCreateDate(formattedDate);
+        GiftCertificate certificate = certificateMapper.mapToEntity(orderDto.getCertificate());
+        order.setCertificate(certificate);
         return order;
     }
 }

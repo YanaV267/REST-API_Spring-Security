@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
  * @author YanaV
  * @project GiftCertificate
  */
-@Service("tagMapper")
+@Service("tagServiceMapper")
 public class TagMapper implements Mapper<Tag, TagDto> {
     @Override
     public TagDto mapToDto(Tag tag) {

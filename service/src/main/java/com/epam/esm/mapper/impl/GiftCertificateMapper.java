@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
  * @author YanaV
  * @project GiftCertificate
  */
-@Service("certificateMapper")
+@Service("certificateServiceMapper")
 public class GiftCertificateMapper implements Mapper<GiftCertificate, GiftCertificateDto> {
     private final TagMapper tagMapper;
     private final CertificateDateFormatter dateFormatter;
@@ -32,7 +32,7 @@ public class GiftCertificateMapper implements Mapper<GiftCertificate, GiftCertif
      * @param dateFormatter the date formatter
      */
     @Autowired
-    public GiftCertificateMapper(@Qualifier("tagMapper") TagMapper tagMapper, CertificateDateFormatter dateFormatter) {
+    public GiftCertificateMapper(@Qualifier("tagServiceMapper") TagMapper tagMapper, CertificateDateFormatter dateFormatter) {
         this.tagMapper = tagMapper;
         this.dateFormatter = dateFormatter;
     }

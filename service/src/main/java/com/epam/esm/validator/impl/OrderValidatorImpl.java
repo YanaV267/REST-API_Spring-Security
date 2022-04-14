@@ -54,8 +54,7 @@ public class OrderValidatorImpl implements OrderValidator {
     public boolean checkAllOrderData(Map<String, Object> orderData) {
         return checkId((String) orderData.get(ID_USER))
                 && checkId((String) orderData.get(ID_CERTIFICATE))
-                && checkCost((String) orderData.get(COST))
-                && checkCreateDate((String) orderData.get(CREATE_DATE));
+                && checkCost((String) orderData.get(COST));
     }
 
     @Override

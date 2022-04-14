@@ -2,7 +2,6 @@ package com.epam.esm.repository.impl;
 
 import com.epam.esm.entity.User;
 import com.epam.esm.mapper.UserExtractor;
-import com.epam.esm.repository.BaseRepository;
 import com.epam.esm.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -23,8 +22,14 @@ import java.util.Set;
 @Repository
 public class UserRepositoryImpl implements UserRepository {
     private static final String DELETE_USER = "DELETE FROM users WHERE id = ?";
-    private static final String SELECT_USERS = "SELECT users.id, login, users.name, surname, balance " +
-            "FROM users";
+    private static final String SELECT_USERS = "SELECT users.id, login, users.name, surname, balance FROM users";
+    private static final String SELECT_USERS_WITH_ORDERS = "SELECT users.id, login, users.name, surname, balance," +
+            "certificates.id, certificates.name, description, price, duration, certificates.create_date, last_update_date, " +
+            "orders.id, cost, orders.create_date, tags.id, tags.name FROM users " +
+            "JOIN orders on users.id = orders.id_user " +
+            "JOIN gift_certificates certificates on orders.id_certificate = certificates.id " +
+            "JOIN certificate_purchase on certificates.id = certificate_purchase.id_certificate " +
+            "JOIN tags on certificate_purchase.id_tag = tags.id";
     private static final String SELECT_USERS_BY_ID = "SELECT users.id, login, users.name, surname, balance " +
             "FROM users WHERE users.id = ";
     private final JdbcTemplate template;
@@ -50,6 +55,16 @@ public class UserRepositoryImpl implements UserRepository {
     @Override
     public Set<User> findAll() {
         List<User> users = template.query(SELECT_USERS, userExtractor);
+        if (users != null) {
+            return new LinkedHashSet<>(users);
+        } else {
+            return new LinkedHashSet<>();
+        }
+    }
+
+    @Override
+    public Set<User> findAllWithOrders() {
+        List<User> users = template.query(SELECT_USERS_WITH_ORDERS, userExtractor);
         if (users != null) {
             return new LinkedHashSet<>(users);
         } else {

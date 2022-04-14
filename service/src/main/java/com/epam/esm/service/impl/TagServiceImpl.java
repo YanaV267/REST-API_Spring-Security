@@ -37,7 +37,7 @@ public class TagServiceImpl implements TagService {
      */
     @Autowired
     public TagServiceImpl(TagRepository repository, TagValidator validator,
-                          @Qualifier("tagMapper") TagMapper mapper) {
+                          @Qualifier("tagServiceMapper") TagMapper mapper) {
         this.repository = repository;
         this.validator = validator;
         this.mapper = mapper;

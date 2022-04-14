@@ -31,7 +31,7 @@ public class UserServiceImpl implements UserService {
      * @param mapper     the mapper
      */
     @Autowired
-    public UserServiceImpl(UserRepository repository, @Qualifier("userMapper") UserMapper mapper) {
+    public UserServiceImpl(UserRepository repository, @Qualifier("userServiceMapper") UserMapper mapper) {
         this.repository = repository;
         this.mapper = mapper;
     }
@@ -49,6 +49,14 @@ public class UserServiceImpl implements UserService {
     @Override
     public Set<UserDto> findAll() {
         Set<User> users = repository.findAll();
+        return users.stream()
+                .map(mapper::mapToDto)
+                .collect(Collectors.toSet());
+    }
+
+    @Override
+    public Set<UserDto> findAllWithOrders() {
+        Set<User> users = repository.findAllWithOrders();
         return users.stream()
                 .map(mapper::mapToDto)
                 .collect(Collectors.toSet());

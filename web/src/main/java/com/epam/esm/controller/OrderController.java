@@ -85,7 +85,7 @@ public class OrderController {
      *
      * @return the set
      */
-    @GetMapping
+    @GetMapping("/all")
     @ResponseStatus(FOUND)
     public Set<OrderDto> retrieveAll() {
         Set<OrderDto> orders = orderService.findAll();

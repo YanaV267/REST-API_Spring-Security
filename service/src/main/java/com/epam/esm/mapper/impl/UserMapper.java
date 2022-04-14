@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
  * @author YanaV
  * @project GiftCertificate
  */
-@Service("userMapper")
+@Service("userServiceMapper")
 public class UserMapper implements Mapper<User, UserDto> {
     private final OrderMapper orderMapper;
 
@@ -28,7 +28,7 @@ public class UserMapper implements Mapper<User, UserDto> {
      * @param orderMapper the order mapper
      */
     @Autowired
-    public UserMapper(@Qualifier("orderMapper") OrderMapper orderMapper) {
+    public UserMapper(@Qualifier("orderServiceMapper") OrderMapper orderMapper) {
         this.orderMapper = orderMapper;
     }
 
