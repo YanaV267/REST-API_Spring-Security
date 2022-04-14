@@ -1,23 +1,19 @@
 package com.epam.esm.repository.impl;
 
-import com.epam.esm.builder.GiftCertificateQueryBuilder;
-import com.epam.esm.builder.OrderQueryBuilder;
 import com.epam.esm.entity.Order;
-import com.epam.esm.mapper.OrderMapper;
 import com.epam.esm.repository.OrderRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.support.GeneratedKeyHolder;
-import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
-import javax.sql.DataSource;
-import java.sql.PreparedStatement;
-import java.sql.Statement;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
+import javax.persistence.PersistenceContext;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
+import java.util.*;
+
+import static com.epam.esm.repository.ColumnName.*;
 
 /**
  * The type Order repository.
@@ -27,103 +23,89 @@ import java.util.Set;
  */
 @Repository
 public class OrderRepositoryImpl implements OrderRepository {
-    private static final String INSERT_ORDER = "INSERT INTO orders (id_user, id_certificate, cost, create_date) " +
-            "VALUES (?, ?, ?, now(3))";
-    private static final String UPDATE_ORDER = "UPDATE orders SET ";
-    private static final String DELETE_ORDER = "DELETE FROM orders WHERE id = ?";
-    private static final String SELECT_ORDERS = "SELECT orders.id, users.id, login, surname, users.name, balance, " +
-            "certificates.id, certificates.name, description, price, duration, certificates.create_date, last_update_date, " +
-            "cost, orders.create_date, tags.id, tags.name FROM orders " +
-            "JOIN gift_certificates certificates on orders.id_certificate = certificates.id " +
-            "JOIN users on orders.id_user = users.id " +
-            "JOIN certificate_purchase on certificates.id = certificate_purchase.id_certificate " +
-            "JOIN tags on certificate_purchase.id_tag = tags.id";
-    private final JdbcTemplate template;
-    private final OrderMapper orderMapper;
-
-    /**
-     * Instantiates a new Order repository.
-     *
-     * @param dataSource  the data source
-     * @param orderMapper the order mapper
-     */
-    @Autowired
-    public OrderRepositoryImpl(DataSource dataSource, OrderMapper orderMapper) {
-        this.template = new JdbcTemplate(dataSource);
-        this.orderMapper = orderMapper;
-    }
+    @PersistenceContext
+    private EntityManager entityManager;
 
     @Override
     public long create(Order order) {
-        KeyHolder keyHolder = new GeneratedKeyHolder();
-        template.update(connection -> {
-            PreparedStatement statement = connection.prepareStatement(INSERT_ORDER, Statement.RETURN_GENERATED_KEYS);
-            statement.setLong(1, order.getUser().getId());
-            statement.setLong(2, order.getCertificate().getId());
-            statement.setBigDecimal(3, order.getCost());
-            return statement;
-        }, keyHolder);
-        Number key = keyHolder.getKey();
-        if (key != null) {
-            return key.longValue();
-        } else {
-            return 0;
-        }
+        entityManager.persist(order);
+        return order.getId();
     }
 
     @Override
     public void update(Order order) {
-        template.update(new OrderQueryBuilder(UPDATE_ORDER)
-                .addUserIdParameter(order.getUser().getId())
-                .checkQueryEnding()
-                .addCertificateIdParameter(order.getCertificate().getId())
-                .checkQueryEnding()
-                .addCostParameter(order.getCost())
-                .addWhereClause()
-                .addIdParameter(order.getId())
-                .build());
+        entityManager.merge(order);
     }
 
     @Override
-    public void delete(long id) {
-        template.update(DELETE_ORDER, id);
+    public void delete(Order order) {
+        entityManager.remove(order);
     }
 
     @Override
     public Set<Order> findAll() {
-        List<Order> orders = template.query(SELECT_ORDERS, orderMapper);
-        return new LinkedHashSet<>(orders);
+        CriteriaQuery<Order> query = entityManager.getCriteriaBuilder()
+                .createQuery(Order.class);
+        Root<Order> root = query.from(Order.class);
+        query.select(root);
+        return new LinkedHashSet<>(entityManager.createQuery(query)
+                .getResultList());
     }
 
     @Override
     public Optional<Order> findById(long id) {
-        List<Order> orders = template.query(new GiftCertificateQueryBuilder(SELECT_ORDERS)
-                .addWhereClause()
-                .addIdParameter(id)
-                .build(), orderMapper);
-        return orders.stream().findFirst();
+        try {
+            Order order = entityManager.find(Order.class, id);
+            return Optional.of(order);
+        } catch (NoResultException exception) {
+            return Optional.empty();
+        }
     }
 
     @Override
     public Set<Order> findAllOrdersByUser(long userId) {
-        List<Order> orders = template.query(SELECT_ORDERS, orderMapper);
-        return new LinkedHashSet<>(orders);
+        CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+        CriteriaQuery<Order> query = entityManager.getCriteriaBuilder()
+                .createQuery(Order.class);
+        Root<Order> root = query.from(Order.class);
+        root.join(USER);
+        query.select(root).where(builder.equal(root.get(USER).get(ID), userId));
+        return new LinkedHashSet<>(entityManager.createQuery(query)
+                .getResultList());
     }
 
     @Override
     public Set<Order> findOrdersBySeveralParameters(Order order) {
-        List<Order> orders = template.query(
-                new OrderQueryBuilder(SELECT_ORDERS)
-                        .addWhereClause(order.getId())
-                        .addIdParameter(order.getId())
-                        .addIdParameter(order.getId())
-                        .addUserSurnameLikeParameter(order.getUser().getSurname())
-                        .addUserNameLikeParameter(order.getUser().getName())
-                        .addCertificateIdParameter(order.getCertificate().getId())
-                        .addCertificateNameLikeParameter(order.getCertificate().getName())
-                        .addCostParameter(order.getCost())
-                        .addCreateDateParameter(order.getCreateDate())
-                        .build(), orderMapper);
-        return new LinkedHashSet<>(orders);
+        CriteriaQuery<Order> query = entityManager.getCriteriaBuilder()
+                .createQuery(Order.class);
+        Root<Order> root = query.from(Order.class);
+        root.join(USER);
+        root.join(CERTIFICATE);
+        Predicate[] predicates = createPredicates(root, order)
+                .toArray(new Predicate[0]);
+        query.select(root)
+                .where(predicates);
+        return new LinkedHashSet<>(entityManager.createQuery(query)
+                .getResultList());
+    }
+
+    private List<Predicate> createPredicates(Root<Order> root, Order order) {
+        CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+        List<Predicate> predicates = new ArrayList<>();
+        if (order.getUser().getId() != 0) {
+            predicates.add(builder.like(root.get(USER).get(NAME),
+                    String.valueOf(order.getUser().getId())));
+        }
+        if (order.getCertificate().getId() != 0) {
+            predicates.add(builder.like(root.get(CERTIFICATE).get(NAME),
+                    String.valueOf(order.getCertificate().getId())));
+        }
+        if (order.getCost() != null) {
+            predicates.add(builder.like(root.get(COST), String.valueOf(order.getCost())));
+        }
+        if (order.getCreateDate() != null) {
+            predicates.add(builder.equal(root.get(CREATE_DATE), String.valueOf(order.getCreateDate())));
+        }
+        return predicates;
     }
 }

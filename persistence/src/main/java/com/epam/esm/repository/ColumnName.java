@@ -8,76 +8,69 @@ package com.epam.esm.repository;
  */
 public final class ColumnName {
     /**
-     * The constant TAG_ID.
+     * The constant TAGS.
      */
-    public static final String TAG_ID = "tags.id";
+    public static final String TAGS = "tags";
     /**
-     * The constant TAG_NAME.
+     * The constant CERTIFICATE.
      */
-    public static final String TAG_NAME = "tags.name";
+    public static final String CERTIFICATE = "certificate";
 
     /**
-     * The constant GIFT_CERTIFICATE_ID.
+     * The constant ORDERS.
      */
-    public static final String GIFT_CERTIFICATE_ID = "certificates.id";
+    public static final String ORDERS = "orders";
     /**
-     * The constant GIFT_CERTIFICATE_NAME.
+     * The constant USER.
      */
-    public static final String GIFT_CERTIFICATE_NAME = "certificates.name";
+    public static final String USER = "user";
     /**
-     * The constant GIFT_CERTIFICATE_DESCRIPTION.
+     * The constant ID.
      */
-    public static final String GIFT_CERTIFICATE_DESCRIPTION = "description";
+    public static final String ID = "id";
     /**
-     * The constant GIFT_CERTIFICATE_PRICE.
+     * The constant NAME.
      */
-    public static final String GIFT_CERTIFICATE_PRICE = "price";
-    /**
-     * The constant GIFT_CERTIFICATE_DURATION.
-     */
-    public static final String GIFT_CERTIFICATE_DURATION = "duration";
-    /**
-     * The constant GIFT_CERTIFICATE_CREATE_DATE.
-     */
-    public static final String GIFT_CERTIFICATE_CREATE_DATE = "certificates.create_date";
-    /**
-     * The constant GIFT_CERTIFICATE_LAST_UPDATE_DATE.
-     */
-    public static final String GIFT_CERTIFICATE_LAST_UPDATE_DATE = "last_update_date";
+    public static final String NAME = "name";
 
     /**
-     * The constant USER_ID.
+     * The constant DESCRIPTION.
      */
-    public static final String USER_ID = "users.id";
+    public static final String DESCRIPTION = "description";
     /**
-     * The constant USER_LOGIN.
+     * The constant PRICE.
      */
-    public static final String USER_LOGIN = "login";
+    public static final String PRICE = "price";
     /**
-     * The constant USER_SURNAME.
+     * The constant DURATION.
      */
-    public static final String USER_SURNAME = "surname";
+    public static final String DURATION = "duration";
     /**
-     * The constant USER_NAME.
+     * The constant CREATE_DATE.
      */
-    public static final String USER_NAME = "users.name";
+    public static final String CREATE_DATE = "create_date";
     /**
-     * The constant USER_BALANCE.
+     * The constant LAST_UPDATE_DATE.
      */
-    public static final String USER_BALANCE = "balance";
+    public static final String LAST_UPDATE_DATE = "last_update_date";
 
     /**
-     * The constant ORDER_ID.
+     * The constant LOGIN.
      */
-    public static final String ORDER_ID = "orders.id";
+    public static final String LOGIN = "login";
     /**
-     * The constant ORDER_COST.
+     * The constant SURNAME.
      */
-    public static final String ORDER_COST = "cost";
+    public static final String SURNAME = "surname";
     /**
-     * The constant ORDER_CREATE_DATE.
+     * The constant BALANCE.
      */
-    public static final String ORDER_CREATE_DATE = "orders.create_date";
+    public static final String BALANCE = "balance";
+
+    /**
+     * The constant COST.
+     */
+    public static final String COST = "cost";
 
     private ColumnName() {
 

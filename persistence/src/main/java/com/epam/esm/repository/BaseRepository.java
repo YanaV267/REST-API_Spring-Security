@@ -14,9 +14,9 @@ public interface BaseRepository<T> {
     /**
      * Delete.
      *
-     * @param id the id
+     * @param t the t
      */
-    void delete(long id);
+    void delete(T t);
 
     /**
      * Find all set.

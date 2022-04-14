@@ -53,7 +53,9 @@ class GiftCertificateRepositoryTest {
     @ValueSource(longs = {2, 7})
     void delete(long id) {
         long expected = 1;
-        repository.delete(id);
+        GiftCertificate giftCertificate = new GiftCertificate();
+        giftCertificate.setId(id);
+        repository.delete(giftCertificate);
         Set<GiftCertificate> certificates = repository.findAll();
         int actual = certificates.size();
         Assertions.assertEquals(expected, actual);

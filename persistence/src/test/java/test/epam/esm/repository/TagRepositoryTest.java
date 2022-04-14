@@ -35,7 +35,9 @@ class TagRepositoryTest {
     @ValueSource(longs = {4, 1, 7})
     void delete(long id) {
         int expected = 2;
-        repository.delete(id);
+        Tag tag = new Tag();
+        tag.setId(id);
+        repository.delete(tag);
         Set<Tag> tags = repository.findAll();
         int actual = tags.size();
         Assertions.assertEquals(expected, actual);
