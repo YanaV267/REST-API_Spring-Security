@@ -60,6 +60,7 @@ public class TagServiceImpl implements TagService {
     }
 
     @Override
+    @Transactional
     public boolean delete(long id) {
         Optional<Tag> tag = repository.findById(id);
         if (tag.isPresent()) {

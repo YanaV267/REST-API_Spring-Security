@@ -3,7 +3,6 @@ package test.epam.esm.service;
 import com.epam.esm.dto.GiftCertificateDto;
 import com.epam.esm.entity.GiftCertificate;
 import com.epam.esm.mapper.impl.GiftCertificateMapper;
-import com.epam.esm.repository.CertificatePurchaseRepository;
 import com.epam.esm.repository.GiftCertificateRepository;
 import com.epam.esm.service.GiftCertificateService;
 import com.epam.esm.service.impl.GiftCertificateServiceImpl;
@@ -39,8 +38,6 @@ class GiftCertificateServiceTest {
     @Mock
     private GiftCertificateRepository repository;
     @Mock
-    private CertificatePurchaseRepository purchaseRepository;
-    @Mock
     private GiftCertificateValidator validator;
     @Mock
     private GiftCertificateMapper mapper;
@@ -57,7 +54,7 @@ class GiftCertificateServiceTest {
     void create(Map<String, Object> certificateData) {
         when(validator.checkAllCertificateData(anyMap())).thenReturn(false);
         when(dateFormatter.format(anyString())).thenReturn(LocalDateTime.now());
-        when(purchaseRepository.create(any(GiftCertificate.class))).thenReturn(true);
+        when(repository.create(any(GiftCertificate.class))).thenReturn(anyLong());
 
         boolean actual = service.create(certificateData);
         Assertions.assertFalse(actual);
@@ -68,7 +65,7 @@ class GiftCertificateServiceTest {
     void update(Map<String, Object> certificateData) {
         when(validator.checkAllCertificateData(anyMap())).thenReturn(false);
         when(dateFormatter.format(anyString())).thenReturn(LocalDateTime.now());
-        when(purchaseRepository.update(any(GiftCertificate.class))).thenReturn(true);
+        doNothing().when(repository).update(any(GiftCertificate.class));
 
         boolean actual = service.update(certificateData);
         Assertions.assertTrue(actual);
@@ -78,7 +75,7 @@ class GiftCertificateServiceTest {
     @ValueSource(longs = {1, 4, 14, 5})
     void delete(long id) {
         when(repository.findById(anyLong())).thenReturn(Optional.empty());
-        doNothing().when(repository).delete(anyLong());
+        doNothing().when(repository).delete(any(GiftCertificate.class));
 
         boolean actual = service.delete(id);
         Assertions.assertFalse(actual);
@@ -107,7 +104,7 @@ class GiftCertificateServiceTest {
 
     @ParameterizedTest
     @MethodSource("provideSearchParameters")
-    public void findBySeveralParameters(Map<String, Object> certificateData, List<String> tagNames,
+    void findBySeveralParameters(Map<String, Object> certificateData, List<String> tagNames,
                                         List<String> sortTypes) {
         when(validator.checkAllCertificateData(anyMap())).thenReturn(true);
         when(dateFormatter.format(anyString())).thenReturn(LocalDateTime.now());

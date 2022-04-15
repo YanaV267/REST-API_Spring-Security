@@ -65,12 +65,12 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
                     .map(t -> t.get(NAME))
                     .map(Tag::new)
                     .collect(Collectors.toSet());
-            GiftCertificate giftCertificate = new GiftCertificate.GiftCertificateBuilder()
-                    .setName((String) certificateData.get(NAME))
-                    .setDescription((String) certificateData.get(DESCRIPTION))
-                    .setPrice(new BigDecimal((String) certificateData.get(PRICE)))
-                    .setDuration(Integer.parseInt((String) certificateData.get(DURATION)))
-                    .setTags(tags)
+            GiftCertificate giftCertificate = GiftCertificate.builder()
+                    .name((String) certificateData.get(NAME))
+                    .description((String) certificateData.get(DESCRIPTION))
+                    .price(new BigDecimal((String) certificateData.get(PRICE)))
+                    .duration(Integer.parseInt((String) certificateData.get(DURATION)))
+                    .tags(tags)
                     .build();
             repository.create(giftCertificate);
             return true;
@@ -85,23 +85,27 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
         if (!certificateData.isEmpty() && certificateData.containsKey(ID)
                 && validator.checkId((String) certificateData.get(ID))
                 && validator.checkCertificateData(certificateData)) {
-            GiftCertificate giftCertificate = retrieveCertificateData(certificateData);
-            giftCertificate.setId(Long.parseLong((String) certificateData.get(ID)));
-            if (certificateData.containsKey(TAGS)) {
-                Set<Tag> tags = ((ArrayList<Map<String, String>>) certificateData.get(TAGS)).stream()
-                        .map(t -> t.get(NAME))
-                        .map(Tag::new)
-                        .collect(Collectors.toSet());
-                giftCertificate.setTags(tags);
+            long id = Long.parseLong((String) certificateData.get(ID));
+            Optional<GiftCertificate> foundCertificate = repository.findById(id);
+            if (foundCertificate.isPresent()) {
+                GiftCertificate certificate = retrieveCertificateData(certificateData);
+                certificate.setId(id);
+                if (certificateData.containsKey(TAGS)) {
+                    Set<Tag> tags = ((ArrayList<Map<String, String>>) certificateData.get(TAGS)).stream()
+                            .map(t -> t.get(NAME))
+                            .map(Tag::new)
+                            .collect(Collectors.toSet());
+                    certificate.setTags(tags);
+                }
+                repository.update(certificate);
+                return true;
             }
-            repository.update(giftCertificate);
-            return true;
-        } else {
-            return false;
         }
+        return false;
     }
 
     @Override
+    @Transactional
     public boolean delete(long id) {
         Optional<GiftCertificate> certificate = repository.findById(id);
         if (certificate.isPresent()) {

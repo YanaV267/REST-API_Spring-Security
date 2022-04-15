@@ -5,7 +5,9 @@ import com.epam.esm.entity.GiftCertificate;
 import com.epam.esm.entity.Order;
 import com.epam.esm.entity.User;
 import com.epam.esm.mapper.impl.OrderMapper;
+import com.epam.esm.repository.GiftCertificateRepository;
 import com.epam.esm.repository.OrderRepository;
+import com.epam.esm.repository.UserRepository;
 import com.epam.esm.service.OrderService;
 import com.epam.esm.util.CertificateDateFormatter;
 import com.epam.esm.validator.OrderValidator;
@@ -33,6 +35,8 @@ import static com.epam.esm.util.ParameterName.*;
 @Service
 public class OrderServiceImpl implements OrderService {
     private final OrderRepository repository;
+    private final GiftCertificateRepository certificateRepository;
+    private final UserRepository userRepository;
     private final OrderValidator validator;
     private final OrderMapper mapper;
     private final CertificateDateFormatter dateFormatter;
@@ -40,16 +44,22 @@ public class OrderServiceImpl implements OrderService {
     /**
      * Instantiates a new Order service.
      *
-     * @param repository    the repository
-     * @param validator     the validator
-     * @param mapper        the mapper
-     * @param dateFormatter the date formatter
+     * @param repository            the repository
+     * @param validator             the validator
+     * @param certificateRepository the certificate repository
+     * @param userRepository        the user repository
+     * @param mapper                the mapper
+     * @param dateFormatter         the date formatter
      */
     @Autowired
     public OrderServiceImpl(OrderRepository repository, OrderValidator validator,
+                            GiftCertificateRepository certificateRepository,
+                            UserRepository userRepository,
                             @Qualifier("orderServiceMapper") OrderMapper mapper,
                             CertificateDateFormatter dateFormatter) {
         this.repository = repository;
+        this.certificateRepository = certificateRepository;
+        this.userRepository = userRepository;
         this.validator = validator;
         this.mapper = mapper;
         this.dateFormatter = dateFormatter;
@@ -59,13 +69,19 @@ public class OrderServiceImpl implements OrderService {
     @Transactional
     public boolean create(Map<String, Object> orderData) {
         if (validator.checkAllOrderData(orderData)) {
-            Order order = new Order.OrderBuilder()
-                    .setUser(new User(Long.parseLong((String) orderData.get(ID_USER))))
-                    .setCertificate(new GiftCertificate(Long.parseLong((String) orderData.get(ID_CERTIFICATE))))
-                    .setCost(new BigDecimal((String) orderData.get(COST)))
-                    .build();
-            repository.create(order);
-            return true;
+            long certificateId = Long.parseLong((String) orderData.get(ID_CERTIFICATE));
+            long userId = Long.parseLong((String) orderData.get(ID_USER));
+            Optional<GiftCertificate> certificate = certificateRepository.findById(certificateId);
+            Optional<User> user = userRepository.findById(userId);
+            if (certificate.isPresent() && user.isPresent()) {
+                Order order = Order.builder()
+                        .user(new User(userId))
+                        .certificate(new GiftCertificate(certificateId))
+                        .cost(certificate.get().getPrice())
+                        .build();
+                repository.create(order);
+                return true;
+            }
         }
         return false;
     }
@@ -82,6 +98,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    @Transactional
     public boolean delete(long id) {
         Optional<Order> order = repository.findById(id);
         if (order.isPresent()) {

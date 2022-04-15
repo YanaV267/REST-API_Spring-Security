@@ -58,7 +58,7 @@ class TagServiceTest {
     @ValueSource(longs = {3, 7, 2})
     void delete(long id) {
         when(repository.findById(anyLong())).thenReturn(Optional.empty());
-        doNothing().when(repository).delete(anyLong());
+        doNothing().when(repository).delete(any(Tag.class));
 
         boolean actual = service.delete(id);
         Assertions.assertTrue(actual);
