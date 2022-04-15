@@ -1,8 +1,10 @@
 package com.epam.esm.entity;
 
-import lombok.*;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.io.Serializable;
 
 /**
  * The type Tag.
@@ -12,12 +14,9 @@ import javax.persistence.*;
  */
 @Entity
 @Table(name = "tags")
-@Setter
-@Getter
-@EqualsAndHashCode
+@Data
 @NoArgsConstructor
-@AllArgsConstructor
-public class Tag {
+public class Tag implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
@@ -30,13 +29,5 @@ public class Tag {
      */
     public Tag(String name) {
         this.name = name;
-    }
-
-    @Override
-    public String toString() {
-        StringBuilder sb = new StringBuilder(getClass().getSimpleName()).append("{");
-        sb.append("id=").append(id);
-        sb.append(" , name='").append(name).append("'}");
-        return sb.toString();
     }
 }

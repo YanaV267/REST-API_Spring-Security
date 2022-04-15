@@ -2,9 +2,10 @@ package com.epam.esm.entity;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -19,8 +20,8 @@ import java.util.Set;
 @Table(name = "users")
 @Getter
 @EqualsAndHashCode
-@NoArgsConstructor
-public class User {
+@ToString
+public class User implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
@@ -35,6 +36,10 @@ public class User {
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     private Set<Order> orders;
 
+    public User() {
+        orders = new LinkedHashSet<>();
+    }
+
     /**
      * Instantiates a new User.
      *
@@ -43,17 +48,5 @@ public class User {
     public User(long id) {
         this.id = id;
         orders = new LinkedHashSet<>();
-    }
-
-    @Override
-    public String toString() {
-        StringBuilder sb = new StringBuilder(getClass().getSimpleName()).append("{");
-        sb.append("id=").append(id);
-        sb.append(" , login='").append(login);
-        sb.append("' , surname='").append(surname);
-        sb.append("' , name='").append(name);
-        sb.append("' , balance=").append(balance);
-        sb.append(" , orders=").append(orders).append("}");
-        return sb.toString();
     }
 }

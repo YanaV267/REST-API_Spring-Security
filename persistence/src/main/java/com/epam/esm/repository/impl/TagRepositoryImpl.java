@@ -50,12 +50,8 @@ public class TagRepositoryImpl implements TagRepository {
 
     @Override
     public Optional<Tag> findById(long id) {
-        try {
-            Tag tag = entityManager.find(Tag.class, id);
-            return Optional.of(tag);
-        } catch (NoResultException exception) {
-            return Optional.empty();
-        }
+        Tag tag = entityManager.find(Tag.class, id);
+        return Optional.ofNullable(tag);
     }
 
     @Override

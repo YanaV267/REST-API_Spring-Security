@@ -5,7 +5,6 @@ import com.epam.esm.repository.UserRepository;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
-import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
@@ -13,7 +12,7 @@ import java.util.LinkedHashSet;
 import java.util.Optional;
 import java.util.Set;
 
-import static com.epam.esm.repository.ColumnName.*;
+import static com.epam.esm.repository.ColumnName.ORDERS;
 
 /**
  * The type User repository.
@@ -54,11 +53,7 @@ public class UserRepositoryImpl implements UserRepository {
 
     @Override
     public Optional<User> findById(long id) {
-        try {
-            User user = entityManager.find(User.class, id);
-            return Optional.of(user);
-        } catch (NoResultException exception) {
-            return Optional.empty();
-        }
+        User user = entityManager.find(User.class, id);
+        return Optional.ofNullable(user);
     }
 }

@@ -6,7 +6,6 @@ import com.epam.esm.repository.GiftCertificateRepository;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
-import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.criteria.*;
 import java.util.*;
@@ -35,7 +34,25 @@ public class GiftCertificateRepositoryImpl implements GiftCertificateRepository 
 
     @Override
     public void update(GiftCertificate certificate) {
-        entityManager.merge(certificate);
+        CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+        CriteriaUpdate<GiftCertificate> query = entityManager.getCriteriaBuilder()
+                .createCriteriaUpdate(GiftCertificate.class);
+        Root<GiftCertificate> root = query.from(GiftCertificate.class);
+        if (certificate.getName() != null) {
+            query = query.set(root.get(NAME), certificate.getName());
+        }
+        if (certificate.getDescription() != null) {
+            query = query.set(root.get(DESCRIPTION), certificate.getDescription());
+        }
+        if (certificate.getPrice() != null) {
+            query = query.set(root.get(PRICE), certificate.getPrice());
+        }
+        if (certificate.getDuration() != 0) {
+            query = query.set(root.get(DURATION), certificate.getDuration());
+        }
+        query.where(builder.equal(root.get(ID), certificate.getId()));
+        entityManager.createQuery(query)
+                .executeUpdate();
     }
 
     @Override
@@ -55,12 +72,8 @@ public class GiftCertificateRepositoryImpl implements GiftCertificateRepository 
 
     @Override
     public Optional<GiftCertificate> findById(long id) {
-        try {
-            GiftCertificate certificate = entityManager.find(GiftCertificate.class, id);
-            return Optional.of(certificate);
-        } catch (NoResultException exception) {
-            return Optional.empty();
-        }
+        GiftCertificate certificate = entityManager.find(GiftCertificate.class, id);
+        return Optional.ofNullable(certificate);
     }
 
     @Override
@@ -91,16 +104,16 @@ public class GiftCertificateRepositoryImpl implements GiftCertificateRepository 
             predicates.add(builder.like(root.get(DESCRIPTION), certificate.getDescription()));
         }
         if (certificate.getPrice() != null) {
-            predicates.add(builder.equal(root.get(PRICE), String.valueOf(certificate.getPrice())));
+            predicates.add(builder.equal(root.get(PRICE), certificate.getPrice()));
         }
         if (certificate.getDuration() != 0) {
-            predicates.add(builder.equal(root.get(DURATION), String.valueOf(certificate.getDuration())));
+            predicates.add(builder.equal(root.get(DURATION), certificate.getDuration()));
         }
         if (certificate.getCreateDate() != null) {
-            predicates.add(builder.equal(root.get(CREATE_DATE), String.valueOf(certificate.getCreateDate())));
+            predicates.add(builder.equal(root.get(CREATE_DATE), certificate.getCreateDate()));
         }
         if (certificate.getLastUpdateDate() != null) {
-            predicates.add(builder.equal(root.get(LAST_UPDATE_DATE), String.valueOf(certificate.getLastUpdateDate())));
+            predicates.add(builder.equal(root.get(LAST_UPDATE_DATE), certificate.getLastUpdateDate()));
         }
         if (tags != null) {
             for (Tag tag : tags) {
