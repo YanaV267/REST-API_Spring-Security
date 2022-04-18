@@ -5,21 +5,18 @@ import com.epam.esm.entity.GiftCertificate;
 import com.epam.esm.mapper.impl.GiftCertificateMapper;
 import com.epam.esm.repository.GiftCertificateRepository;
 import com.epam.esm.service.GiftCertificateService;
-import com.epam.esm.service.impl.GiftCertificateServiceImpl;
 import com.epam.esm.util.CertificateDateFormatter;
 import com.epam.esm.validator.GiftCertificateValidator;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -29,12 +26,8 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
-        classes = GiftCertificateServiceImpl.class)
-@ExtendWith(SpringExtension.class)
+@ExtendWith(MockitoExtension.class)
 class GiftCertificateServiceTest {
-    @Autowired
-    private GiftCertificateService service;
     @Mock
     private GiftCertificateRepository repository;
     @Mock
@@ -43,6 +36,8 @@ class GiftCertificateServiceTest {
     private GiftCertificateMapper mapper;
     @Mock
     private CertificateDateFormatter dateFormatter;
+    @InjectMocks
+    private GiftCertificateService service;
 
     @BeforeEach
     void init() {
@@ -63,7 +58,7 @@ class GiftCertificateServiceTest {
     @ParameterizedTest
     @MethodSource("provideCertificateData")
     void update(Map<String, Object> certificateData) {
-        when(validator.checkAllCertificateData(anyMap())).thenReturn(false);
+        when(validator.checkCertificateData(anyMap())).thenReturn(false);
         when(dateFormatter.format(anyString())).thenReturn(LocalDateTime.now());
         doNothing().when(repository).update(any(GiftCertificate.class));
 
@@ -81,13 +76,14 @@ class GiftCertificateServiceTest {
         Assertions.assertFalse(actual);
     }
 
-    @Test
-    void findAll() {
-        when(repository.findAll()).thenReturn(new LinkedHashSet<>());
+    @ParameterizedTest
+    @ValueSource(ints = {7, 30})
+    void findAll(int startElementNumber) {
+        when(repository.findAll(startElementNumber)).thenReturn(new LinkedHashSet<>());
         when(mapper.mapToDto(any(GiftCertificate.class))).thenReturn(new GiftCertificateDto());
 
         int expected = 9;
-        Set<GiftCertificateDto> tags = service.findAll();
+        Set<GiftCertificateDto> tags = service.findAll(startElementNumber);
         int actual = tags.size();
         Assertions.assertEquals(expected, actual);
     }
@@ -104,23 +100,24 @@ class GiftCertificateServiceTest {
 
     @ParameterizedTest
     @MethodSource("provideSearchParameters")
-    void findBySeveralParameters(Map<String, Object> certificateData, List<String> tagNames,
-                                        List<String> sortTypes) {
-        when(validator.checkAllCertificateData(anyMap())).thenReturn(true);
+    void findBySeveralParameters(int startElementNumber, Map<String, Object> certificateData,
+                                 List<String> tagNames, List<String> sortTypes) {
+        when(validator.checkCertificateData(anyMap())).thenReturn(true);
         when(dateFormatter.format(anyString())).thenReturn(LocalDateTime.now());
-        when(repository.findBySeveralParameters(any(GiftCertificate.class), anyList(), anyList()))
+        when(repository.findBySeveralParameters(anyInt(), any(GiftCertificate.class), anyList(), anyList()))
                 .thenReturn(new LinkedHashSet<>());
         when(mapper.mapToDto(any(GiftCertificate.class))).thenReturn(new GiftCertificateDto());
 
         int expected = 1;
-        Set<GiftCertificateDto> certificates = service.findBySeveralParameters(certificateData, tagNames, sortTypes);
+        Set<GiftCertificateDto> certificates = service.findBySeveralParameters(startElementNumber,
+                certificateData, tagNames, sortTypes);
         int actual = certificates.size();
         Assertions.assertEquals(expected, actual);
     }
 
     private static Object[][] provideCertificateData() {
         return new Object[][]{
-                {new HashMap<String, Object>() {
+                {30, new HashMap<String, Object>() {
                     {
                         put(ID, "4");
                         put(NAME, "european countries tours");
@@ -131,7 +128,7 @@ class GiftCertificateServiceTest {
                         put(TAGS, "{'cars', 'food'}");
                     }
                 }},
-                {new HashMap<String, Object>() {
+                {24, new HashMap<String, Object>() {
                     {
                         put(NAME, "furniture purchase");
                         put(DESCRIPTION, "7% discount on all goods");

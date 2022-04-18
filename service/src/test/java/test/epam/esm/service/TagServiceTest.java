@@ -4,21 +4,18 @@ import com.epam.esm.dto.TagDto;
 import com.epam.esm.entity.Tag;
 import com.epam.esm.mapper.impl.TagMapper;
 import com.epam.esm.repository.TagRepository;
-import com.epam.esm.service.TagService;
 import com.epam.esm.service.impl.TagServiceImpl;
 import com.epam.esm.validator.TagValidator;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.*;
 
@@ -27,17 +24,16 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = TagServiceImpl.class)
-@ExtendWith(SpringExtension.class)
+@ExtendWith(MockitoExtension.class)
 class TagServiceTest {
-    @Autowired
-    private TagService service;
     @Mock
     private TagRepository repository;
     @Mock
     private TagValidator validator;
     @Mock
     private TagMapper mapper;
+    @InjectMocks
+    private TagServiceImpl service;
 
     @BeforeEach
     void init() {
@@ -64,13 +60,14 @@ class TagServiceTest {
         Assertions.assertTrue(actual);
     }
 
-    @Test
-    void findAll() {
-        when(repository.findAll()).thenReturn(new LinkedHashSet<>());
+    @ParameterizedTest
+    @ValueSource(ints = {4, 45})
+    void findAll(int page) {
+        when(repository.findAll(anyInt())).thenReturn(new LinkedHashSet<>());
         when(mapper.mapToDto(any(Tag.class))).thenReturn(new TagDto());
 
         int expected = 4;
-        Set<TagDto> tags = service.findAll();
+        Set<TagDto> tags = service.findAll(page);
         int actual = tags.size();
         Assertions.assertEquals(expected, actual);
     }

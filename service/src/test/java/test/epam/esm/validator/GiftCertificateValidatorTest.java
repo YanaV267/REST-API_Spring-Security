@@ -2,14 +2,15 @@ package test.epam.esm.validator;
 
 import com.epam.esm.validator.GiftCertificateValidator;
 import com.epam.esm.validator.impl.GiftCertificateValidatorImpl;
+import com.epam.esm.validator.impl.TagValidatorImpl;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -17,8 +18,8 @@ import java.util.Map;
 import static com.epam.esm.util.ParameterName.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
-        classes = GiftCertificateValidatorImpl.class)
-@ExtendWith(SpringExtension.class)
+        classes = {GiftCertificateValidatorImpl.class, TagValidatorImpl.class})
+@EnableAutoConfiguration
 class GiftCertificateValidatorTest {
     @Autowired
     private GiftCertificateValidator validator;

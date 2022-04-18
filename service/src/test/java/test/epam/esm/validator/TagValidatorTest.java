@@ -3,16 +3,15 @@ package test.epam.esm.validator;
 import com.epam.esm.validator.TagValidator;
 import com.epam.esm.validator.impl.TagValidatorImpl;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
         classes = TagValidatorImpl.class)
-@ExtendWith(SpringExtension.class)
+@EnableAutoConfiguration
 class TagValidatorTest {
     @Autowired
     private TagValidator validator;

@@ -4,21 +4,24 @@ import com.epam.esm.entity.Tag;
 import com.epam.esm.repository.TagRepository;
 import com.epam.esm.repository.impl.TagRepositoryImpl;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import javax.persistence.EntityManager;
 import java.util.Optional;
 import java.util.Set;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
-        classes = TagRepositoryImpl.class)
-@ExtendWith(SpringExtension.class)
+        classes = {TagRepositoryImpl.class, EntityManager.class})
+@EnableAutoConfiguration
+@EntityScan(basePackages = "com.epam.esm")
 class TagRepositoryTest {
     @Autowired
     private TagRepository repository;
@@ -34,19 +37,19 @@ class TagRepositoryTest {
     @ParameterizedTest
     @ValueSource(longs = {4, 1, 7})
     void delete(long id) {
-        int expected = 2;
         Tag tag = new Tag();
         tag.setId(id);
         repository.delete(tag);
-        Set<Tag> tags = repository.findAll();
-        int actual = tags.size();
-        Assertions.assertEquals(expected, actual);
+
+        Optional<Tag> deletedTag = repository.findById(id);
+        Assertions.assertFalse(deletedTag.isPresent());
     }
 
-    @Test
-    void findAll() {
+    @ParameterizedTest
+    @ValueSource(ints = {15})
+    void findAll(int startElementNumber) {
         long expected = 4;
-        Set<Tag> tags = repository.findAll();
+        Set<Tag> tags = repository.findAll(startElementNumber);
         int actual = tags.size();
         Assertions.assertEquals(expected, actual);
     }
