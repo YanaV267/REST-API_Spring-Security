@@ -81,12 +81,13 @@ public class OrderController {
     /**
      * Retrieve all set.
      *
+     * @param page the page
      * @return the set
      */
-    @GetMapping("/all")
+    @GetMapping(value = "/all", produces = APPLICATION_JSON_VALUE)
     @ResponseStatus(FOUND)
-    public Set<OrderDto> retrieveAll() {
-        Set<OrderDto> orders = orderService.findAll();
+    public Set<OrderDto> retrieveAll(@RequestParam int page) {
+        Set<OrderDto> orders = orderService.findAll(page);
         if (!orders.isEmpty()) {
             return orders;
         } else {
@@ -100,7 +101,7 @@ public class OrderController {
      * @param id the id
      * @return the order dto
      */
-    @GetMapping("/{id}")
+    @GetMapping(value = "/{id}", produces = APPLICATION_JSON_VALUE)
     @ResponseStatus(FOUND)
     public OrderDto findById(@PathVariable long id) {
         Optional<OrderDto> order = orderService.findById(id);
@@ -115,12 +116,13 @@ public class OrderController {
      * Find all by user set.
      *
      * @param userId the user id
+     * @param page   the page
      * @return the set
      */
-    @GetMapping("/user/{userId}")
+    @GetMapping(value = "/user/{userId}", produces = APPLICATION_JSON_VALUE)
     @ResponseStatus(FOUND)
-    public Set<OrderDto> findAllByUser(@PathVariable long userId) {
-        Set<OrderDto> orders = orderService.findAllByUser(userId);
+    public Set<OrderDto> findAllByUser(@PathVariable long userId, @RequestParam int page) {
+        Set<OrderDto> orders = orderService.findAllByUser(page, userId);
         if (!orders.isEmpty()) {
             return orders;
         } else {
@@ -131,13 +133,15 @@ public class OrderController {
     /**
      * Find by several parameters set.
      *
+     * @param page            the page
      * @param certificateData the certificate data
      * @return the set
      */
-    @GetMapping
+    @GetMapping(produces = APPLICATION_JSON_VALUE)
     @ResponseStatus(FOUND)
-    public Set<OrderDto> findBySeveralParameters(@RequestParam Map<String, Object> certificateData) {
-        Set<OrderDto> orders = orderService.findBySeveralParameters(certificateData);
+    public Set<OrderDto> findBySeveralParameters(@RequestParam int page,
+                                                 @RequestParam Map<String, Object> certificateData) {
+        Set<OrderDto> orders = orderService.findBySeveralParameters(page, certificateData);
         if (!orders.isEmpty()) {
             return orders;
         } else {

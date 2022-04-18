@@ -14,14 +14,16 @@ public interface UserRepository extends BaseRepository<User> {
     /**
      * Find all with orders set.
      *
+     * @param firstElementNumber the first element number
      * @return the set
      */
-    Set<User> findAllWithOrders();
+    Set<User> findAllWithOrders(int firstElementNumber);
 
     /**
      * Find with highest order cost set.
      *
+     * @param firstElementNumber the first element number
      * @return the set
      */
-    Set<User> findWithHighestOrderCost();
+    Set<User> findWithHighestOrderCost(int firstElementNumber);
 }

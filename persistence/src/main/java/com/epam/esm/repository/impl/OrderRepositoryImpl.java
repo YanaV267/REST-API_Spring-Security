@@ -57,12 +57,14 @@ public class OrderRepositoryImpl implements OrderRepository {
     }
 
     @Override
-    public Set<Order> findAll() {
+    public Set<Order> findAll(int firstElementNumber) {
         CriteriaQuery<Order> query = entityManager.getCriteriaBuilder()
                 .createQuery(Order.class);
         Root<Order> root = query.from(Order.class);
         query.select(root);
         return new LinkedHashSet<>(entityManager.createQuery(query)
+                .setFirstResult(firstElementNumber)
+                .setMaxResults(MAX_RESULT_AMOUNT)
                 .getResultList());
     }
 
@@ -73,18 +75,20 @@ public class OrderRepositoryImpl implements OrderRepository {
     }
 
     @Override
-    public Set<Order> findAllOrdersByUser(long userId) {
+    public Set<Order> findAllOrdersByUser(int firstElementNumber, long userId) {
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
         CriteriaQuery<Order> query = builder.createQuery(Order.class);
         Root<Order> root = query.from(Order.class);
         query.select(root)
                 .where(builder.equal(root.join(USER).get(ID), userId));
         return new LinkedHashSet<>(entityManager.createQuery(query)
+                .setFirstResult(firstElementNumber)
+                .setMaxResults(MAX_RESULT_AMOUNT)
                 .getResultList());
     }
 
     @Override
-    public Set<Order> findOrdersBySeveralParameters(Order order) {
+    public Set<Order> findOrdersBySeveralParameters(int firstElementNumber, Order order) {
         CriteriaQuery<Order> query = entityManager.getCriteriaBuilder()
                 .createQuery(Order.class);
         Root<Order> root = query.from(Order.class);
@@ -95,6 +99,8 @@ public class OrderRepositoryImpl implements OrderRepository {
         query.select(root)
                 .where(predicates);
         return new LinkedHashSet<>(entityManager.createQuery(query)
+                .setFirstResult(firstElementNumber)
+                .setMaxResults(MAX_RESULT_AMOUNT)
                 .getResultList());
     }
 

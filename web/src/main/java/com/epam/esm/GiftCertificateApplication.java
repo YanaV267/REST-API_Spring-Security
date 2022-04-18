@@ -2,6 +2,7 @@ package com.epam.esm;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 /**
  * The type Gift certificate application.
@@ -10,6 +11,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  * @project GiftCertificate
  */
 @SpringBootApplication
+@EnableWebMvc
 public class GiftCertificateApplication {
     /**
      * The entry point of application.

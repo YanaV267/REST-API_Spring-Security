@@ -50,16 +50,18 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Set<UserDto> findAll() {
-        Set<User> users = repository.findAll();
+    public Set<UserDto> findAll(int page) {
+        int firstElementNumber = getFirstElementNumber(page);
+        Set<User> users = repository.findAll(firstElementNumber);
         return users.stream()
                 .map(mapper::mapToDto)
                 .collect(Collectors.toSet());
     }
 
     @Override
-    public Set<UserDto> findAllWithOrders() {
-        Set<User> users = repository.findAllWithOrders();
+    public Set<UserDto> findAllWithOrders(int page) {
+        int firstElementNumber = getFirstElementNumber(page);
+        Set<User> users = repository.findAllWithOrders(firstElementNumber);
         return users.stream()
                 .map(mapper::mapToDto)
                 .collect(Collectors.toSet());
@@ -77,8 +79,9 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Set<UserDto> findWithHighestOrderCost() {
-        Set<User> orders = repository.findWithHighestOrderCost();
+    public Set<UserDto> findWithHighestOrderCost(int page) {
+        int firstElementNumber = getFirstElementNumber(page);
+        Set<User> orders = repository.findWithHighestOrderCost(firstElementNumber);
         return orders.stream()
                 .map(mapper::mapToDto)
                 .collect(Collectors.toSet());

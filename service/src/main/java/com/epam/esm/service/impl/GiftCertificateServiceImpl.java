@@ -117,8 +117,9 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
     }
 
     @Override
-    public Set<GiftCertificateDto> findAll() {
-        Set<GiftCertificate> certificates = repository.findAll();
+    public Set<GiftCertificateDto> findAll(int page) {
+        int firstElementNumber = getFirstElementNumber(page);
+        Set<GiftCertificate> certificates = repository.findAll(firstElementNumber);
         return certificates.stream()
                 .map(mapper::mapToDto)
                 .collect(Collectors.toSet());
@@ -136,19 +137,21 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
     }
 
     @Override
-    public Set<GiftCertificateDto> findBySeveralParameters(Map<String, Object> certificateData, List<String> tagNames,
-                                                           List<String> sortTypes) {
+    public Set<GiftCertificateDto> findBySeveralParameters(int page, Map<String, Object> certificateData,
+                                                           List<String> tagNames, List<String> sortTypes) {
         if (!certificateData.isEmpty() && validator.checkCertificateData(certificateData)
                 && tagValidator.checkNames(tagNames)) {
             GiftCertificate giftCertificate = retrieveCertificateData(certificateData);
-            int id = certificateData.size() == 1 && certificateData.containsKey(SORT) ? 0 : 1;
-            giftCertificate.setId(id);
             List<Tag> tags = new LinkedList<>();
             for (String tagName : tagNames) {
                 Tag tag = new Tag(tagName);
                 tags.add(tag);
             }
-            Set<GiftCertificate> certificates = repository.findBySeveralParameters(giftCertificate, tags, sortTypes);
+            int id = certificateData.size() == 2 && certificateData.containsKey(SORT) ? 0 : 1;
+            giftCertificate.setId(id);
+            int firstElementNumber = getFirstElementNumber(page);
+            Set<GiftCertificate> certificates = repository.findBySeveralParameters(firstElementNumber,
+                    giftCertificate, tags, sortTypes);
             return certificates.stream()
                     .map(mapper::mapToDto)
                     .collect(Collectors.toCollection(LinkedHashSet::new));

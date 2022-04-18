@@ -110,8 +110,9 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public Set<OrderDto> findAll() {
-        Set<Order> orders = repository.findAll();
+    public Set<OrderDto> findAll(int page) {
+        int firstElementNumber = getFirstElementNumber(page);
+        Set<Order> orders = repository.findAll(firstElementNumber);
         return orders.stream()
                 .map(mapper::mapToDto)
                 .collect(Collectors.toSet());
@@ -129,18 +130,20 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public Set<OrderDto> findAllByUser(long userId) {
-        Set<Order> orders = repository.findAllOrdersByUser(userId);
+    public Set<OrderDto> findAllByUser(int page, long userId) {
+        int firstElementNumber = getFirstElementNumber(page);
+        Set<Order> orders = repository.findAllOrdersByUser(firstElementNumber, userId);
         return orders.stream()
                 .map(mapper::mapToDto)
                 .collect(Collectors.toSet());
     }
 
     @Override
-    public Set<OrderDto> findBySeveralParameters(Map<String, Object> orderData) {
+    public Set<OrderDto> findBySeveralParameters(int page, Map<String, Object> orderData) {
         if (validator.checkOrderData(orderData)) {
             Order order = retrieveOrderData(orderData);
-            Set<Order> orders = repository.findOrdersBySeveralParameters(order);
+            int firstElementNumber = getFirstElementNumber(page);
+            Set<Order> orders = repository.findOrdersBySeveralParameters(firstElementNumber, order);
             return orders.stream()
                     .map(mapper::mapToDto)
                     .collect(Collectors.toSet());

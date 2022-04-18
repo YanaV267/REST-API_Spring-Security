@@ -68,12 +68,13 @@ public class TagController {
     /**
      * Retrieve all set.
      *
+     * @param page the page
      * @return the set
      */
-    @GetMapping
+    @GetMapping(produces = APPLICATION_JSON_VALUE)
     @ResponseStatus(FOUND)
-    public Set<TagDto> retrieveAll() {
-        Set<TagDto> tags = tagService.findAll();
+    public Set<TagDto> retrieveAll(@RequestParam int page) {
+        Set<TagDto> tags = tagService.findAll(page);
         if (!tags.isEmpty()) {
             return tags;
         } else {
@@ -87,7 +88,7 @@ public class TagController {
      * @param id the id
      * @return the tag dto
      */
-    @GetMapping("/{id}")
+    @GetMapping(value = "/{id}", produces = APPLICATION_JSON_VALUE)
     @ResponseStatus(FOUND)
     public TagDto findById(@PathVariable long id) {
         Optional<TagDto> tag = tagService.findById(id);
@@ -104,7 +105,7 @@ public class TagController {
      * @param name the name
      * @return the tag dto
      */
-    @GetMapping(params = "name")
+    @GetMapping(params = "name", produces = APPLICATION_JSON_VALUE)
     @ResponseStatus(FOUND)
     public TagDto findByName(@RequestParam String name) {
         Optional<TagDto> tag = tagService.findByName(name);
@@ -118,12 +119,13 @@ public class TagController {
     /**
      * Find most used tag set.
      *
+     * @param page the page
      * @return the set
      */
-    @GetMapping("/most-used-tag")
+    @GetMapping(value = "/most-used-tag", produces = APPLICATION_JSON_VALUE)
     @ResponseStatus(FOUND)
-    public Set<TagDto> findMostUsedTag() {
-        Set<TagDto> orders = tagService.findMostUsedTag();
+    public Set<TagDto> findMostUsedTag(@RequestParam int page) {
+        Set<TagDto> orders = tagService.findMostUsedTag(page);
         if (!orders.isEmpty()) {
             return orders;
         } else {

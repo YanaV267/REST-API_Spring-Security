@@ -14,16 +14,18 @@ public interface OrderRepository extends CompleteBaseRepository<Order> {
     /**
      * Find all orders by user set.
      *
-     * @param userId the user id
+     * @param firstElementNumber the first element number
+     * @param userId             the user id
      * @return the set
      */
-    Set<Order> findAllOrdersByUser(long userId);
+    Set<Order> findAllOrdersByUser(int firstElementNumber, long userId);
 
     /**
      * Find orders by several parameters set.
      *
-     * @param order the order
+     * @param firstElementNumber the first element number
+     * @param order              the order
      * @return the set
      */
-    Set<Order> findOrdersBySeveralParameters(Order order);
+    Set<Order> findOrdersBySeveralParameters(int firstElementNumber, Order order);
 }

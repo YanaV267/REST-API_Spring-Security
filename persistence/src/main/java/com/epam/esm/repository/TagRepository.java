@@ -31,7 +31,8 @@ public interface TagRepository extends BaseRepository<Tag> {
     /**
      * Find most used tag set.
      *
+     * @param firstElementNumber the first element number
      * @return the set
      */
-    Set<Tag> findMostUsedTag();
+    Set<Tag> findMostUsedTag(int firstElementNumber);
 }

@@ -61,12 +61,14 @@ public class GiftCertificateRepositoryImpl implements GiftCertificateRepository 
     }
 
     @Override
-    public Set<GiftCertificate> findAll() {
+    public Set<GiftCertificate> findAll(int firstElementNumber) {
         CriteriaQuery<GiftCertificate> query = entityManager.getCriteriaBuilder()
                 .createQuery(GiftCertificate.class);
         Root<GiftCertificate> root = query.from(GiftCertificate.class);
         query.select(root);
         return new LinkedHashSet<>(entityManager.createQuery(query)
+                .setFirstResult(firstElementNumber)
+                .setMaxResults(MAX_RESULT_AMOUNT)
                 .getResultList());
     }
 
@@ -77,7 +79,7 @@ public class GiftCertificateRepositoryImpl implements GiftCertificateRepository 
     }
 
     @Override
-    public Set<GiftCertificate> findBySeveralParameters(GiftCertificate certificate, List<Tag> tags,
+    public Set<GiftCertificate> findBySeveralParameters(int firstElementNumber, GiftCertificate certificate, List<Tag> tags,
                                                         List<String> sortTypes) {
         CriteriaQuery<GiftCertificate> query = entityManager.getCriteriaBuilder()
                 .createQuery(GiftCertificate.class);
@@ -89,6 +91,8 @@ public class GiftCertificateRepositoryImpl implements GiftCertificateRepository 
                 .where(predicates)
                 .orderBy(orderList);
         return new LinkedHashSet<>(entityManager.createQuery(query)
+                .setFirstResult(firstElementNumber)
+                .setMaxResults(MAX_RESULT_AMOUNT)
                 .getResultList());
     }
 

@@ -72,8 +72,9 @@ public class TagServiceImpl implements TagService {
     }
 
     @Override
-    public Set<TagDto> findAll() {
-        Set<Tag> tags = repository.findAll();
+    public Set<TagDto> findAll(int page) {
+        int firstElementNumber = getFirstElementNumber(page);
+        Set<Tag> tags = repository.findAll(firstElementNumber);
         return tags.stream()
                 .map(mapper::mapToDto)
                 .collect(Collectors.toSet());
@@ -102,11 +103,11 @@ public class TagServiceImpl implements TagService {
     }
 
     @Override
-    public Set<TagDto> findMostUsedTag() {
-        return repository.findMostUsedTag()
+    public Set<TagDto> findMostUsedTag(int page) {
+        int firstElementNumber = getFirstElementNumber(page);
+        return repository.findMostUsedTag(firstElementNumber)
                 .stream()
                 .map(mapper::mapToDto)
                 .collect(Collectors.toSet());
     }
-
 }

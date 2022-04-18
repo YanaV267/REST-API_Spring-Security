@@ -11,6 +11,10 @@ import java.util.Set;
  * @project GiftCertificate
  */
 public interface BaseService<T> {
+    /**
+     * The constant MAX_RESULT_AMOUNT.
+     */
+    int MAX_RESULT_AMOUNT = 15;
 
     /**
      * Delete boolean.
@@ -23,9 +27,10 @@ public interface BaseService<T> {
     /**
      * Find all set.
      *
+     * @param page the page
      * @return the set
      */
-    Set<T> findAll();
+    Set<T> findAll(int page);
 
     /**
      * Find by id optional.
@@ -34,4 +39,14 @@ public interface BaseService<T> {
      * @return the optional
      */
     Optional<T> findById(long id);
+
+    /**
+     * Gets first element number.
+     *
+     * @param page the page
+     * @return the first element number
+     */
+    default int getFirstElementNumber(int page) {
+        return (page - 1) * MAX_RESULT_AMOUNT;
+    }
 }

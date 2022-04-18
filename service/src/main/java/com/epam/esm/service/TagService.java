@@ -32,7 +32,8 @@ public interface TagService extends BaseService<TagDto> {
     /**
      * Find most used tag set.
      *
+     * @param page the page
      * @return the set
      */
-    Set<TagDto> findMostUsedTag();
+    Set<TagDto> findMostUsedTag(int page);
 }

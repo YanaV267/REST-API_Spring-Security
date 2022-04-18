@@ -40,12 +40,14 @@ public class TagRepositoryImpl implements TagRepository {
     }
 
     @Override
-    public Set<Tag> findAll() {
+    public Set<Tag> findAll(int firstElementNumber) {
         CriteriaQuery<Tag> query = entityManager.getCriteriaBuilder()
                 .createQuery(Tag.class);
         Root<Tag> root = query.from(Tag.class);
         query.select(root);
         return new LinkedHashSet<>(entityManager.createQuery(query)
+                .setFirstResult(firstElementNumber)
+                .setMaxResults(MAX_RESULT_AMOUNT)
                 .getResultList());
     }
 
@@ -72,7 +74,7 @@ public class TagRepositoryImpl implements TagRepository {
     }
 
     @Override
-    public Set<Tag> findMostUsedTag() {
+    public Set<Tag> findMostUsedTag(int firstElementNumber) {
         Query query = entityManager.createNativeQuery("SELECT id, name FROM " +
                 "(SELECT max(amount), id, name FROM " +
                 "(SELECT o.id_user, count(*) AS amount, t.id AS id, t.name as name FROM tags t " +
@@ -87,6 +89,9 @@ public class TagRepositoryImpl implements TagRepository {
                 "GROUP BY id_user) AS order_sum) " +
                 "AS max_sum) " +
                 "GROUP BY id_user, name) AS most_used", Tag.class);
-        return new LinkedHashSet<>(query.getResultList());
+        return new LinkedHashSet<>(query
+                .setFirstResult(firstElementNumber)
+                .setMaxResults(MAX_RESULT_AMOUNT)
+                .getResultList());
     }
 }

@@ -17,11 +17,12 @@ public interface GiftCertificateService extends CompleteBaseService<GiftCertific
     /**
      * Find by several parameters set.
      *
+     * @param page            the page
      * @param certificateData the certificate data
      * @param tags            the tags
      * @param sortTypes       the sort types
      * @return the set
      */
-    Set<GiftCertificateDto> findBySeveralParameters(Map<String, Object> certificateData, List<String> tags,
+    Set<GiftCertificateDto> findBySeveralParameters(int page, Map<String, Object> certificateData, List<String> tags,
                                                     List<String> sortTypes);
 }

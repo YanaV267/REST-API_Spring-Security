@@ -51,7 +51,7 @@ public class BaseExceptionHandler {
      * @param exception the exception
      * @return the response error entity
      */
-    @ExceptionHandler(BadRequestException.class)
+    @ExceptionHandler({BadRequestException.class, HttpClientErrorException.BadRequest.class})
     public ResponseErrorEntity requestFailed(BadRequestException exception) {
         return new ResponseErrorEntity(BAD_REQUEST.value(), exception.getResourceClass(), BAD_REQUEST_MESSAGE);
     }

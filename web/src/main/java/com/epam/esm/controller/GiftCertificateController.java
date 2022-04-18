@@ -83,12 +83,13 @@ public class GiftCertificateController {
     /**
      * Retrieve all set.
      *
+     * @param page the page
      * @return the set
      */
     @GetMapping(value = "/all", produces = APPLICATION_JSON_VALUE)
     @ResponseStatus(FOUND)
-    public Set<GiftCertificateDto> retrieveAll() {
-        Set<GiftCertificateDto> certificates = certificateService.findAll();
+    public Set<GiftCertificateDto> retrieveAll(@RequestParam int page) {
+        Set<GiftCertificateDto> certificates = certificateService.findAll(page);
         if (!certificates.isEmpty()) {
             return certificates;
         } else {
@@ -102,7 +103,7 @@ public class GiftCertificateController {
      * @param id the id
      * @return the gift certificate dto
      */
-    @GetMapping(value = "/{id}")
+    @GetMapping(value = "/{id}", produces = APPLICATION_JSON_VALUE)
     @ResponseStatus(FOUND)
     public GiftCertificateDto findById(@PathVariable long id) {
         Optional<GiftCertificateDto> giftCertificate = certificateService.findById(id);
@@ -116,17 +117,20 @@ public class GiftCertificateController {
     /**
      * Find by several parameters set.
      *
+     * @param page            the page
      * @param certificateData the certificate data
      * @param tagNames        the tagNames
      * @param sortTypes       the sort types
      * @return the set
      */
-    @GetMapping
+    @GetMapping(produces = APPLICATION_JSON_VALUE)
     @ResponseStatus(FOUND)
-    public Set<GiftCertificateDto> findBySeveralParameters(@RequestParam Map<String, Object> certificateData,
+    public Set<GiftCertificateDto> findBySeveralParameters(@RequestParam(value = "page") int page,
+                                                           @RequestParam Map<String, Object> certificateData,
                                                            @RequestParam(value = "tag", required = false) List<String> tagNames,
                                                            @RequestParam(value = "sort", required = false) List<String> sortTypes) {
-        Set<GiftCertificateDto> certificates = certificateService.findBySeveralParameters(certificateData, tagNames, sortTypes);
+        Set<GiftCertificateDto> certificates = certificateService.findBySeveralParameters(page,
+                certificateData, tagNames, sortTypes);
         if (!certificates.isEmpty()) {
             return certificates;
         } else {

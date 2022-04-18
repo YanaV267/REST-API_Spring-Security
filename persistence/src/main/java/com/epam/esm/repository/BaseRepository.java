@@ -12,6 +12,11 @@ import java.util.Set;
  */
 public interface BaseRepository<T> {
     /**
+     * The constant MAX_RESULT_AMOUNT.
+     */
+    int MAX_RESULT_AMOUNT = 15;
+
+    /**
      * Delete.
      *
      * @param t the t
@@ -21,9 +26,10 @@ public interface BaseRepository<T> {
     /**
      * Find all set.
      *
+     * @param firstElementNumber the first element number
      * @return the set
      */
-    Set<T> findAll();
+    Set<T> findAll(int firstElementNumber);
 
     /**
      * Find by id optional.

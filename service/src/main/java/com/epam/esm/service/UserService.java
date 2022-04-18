@@ -14,14 +14,16 @@ public interface UserService extends BaseService<UserDto> {
     /**
      * Find all with orders set.
      *
+     * @param page the page
      * @return the set
      */
-    Set<UserDto> findAllWithOrders();
+    Set<UserDto> findAllWithOrders(int page);
 
     /**
      * Find with highest order cost set.
      *
+     * @param page the page
      * @return the set
      */
-    Set<UserDto> findWithHighestOrderCost();
+    Set<UserDto> findWithHighestOrderCost(int page);
 }
