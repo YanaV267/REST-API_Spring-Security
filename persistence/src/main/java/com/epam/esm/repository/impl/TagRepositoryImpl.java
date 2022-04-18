@@ -7,6 +7,7 @@ import org.springframework.stereotype.Repository;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
@@ -68,5 +69,24 @@ public class TagRepositoryImpl implements TagRepository {
         } catch (NoResultException exception) {
             return Optional.empty();
         }
+    }
+
+    @Override
+    public Set<Tag> findMostUsedTag() {
+        Query query = entityManager.createNativeQuery("SELECT id, name FROM " +
+                "(SELECT max(amount), id, name FROM " +
+                "(SELECT o.id_user, count(*) AS amount, t.id AS id, t.name as name FROM tags t " +
+                "JOIN certificate_purchase cp ON t.id = cp.id_tag " +
+                "JOIN gift_certificates gc ON gc.id = cp.id_certificate " +
+                "JOIN orders o ON o.id_certificate = gc.id " +
+                "GROUP BY id_user, t.name ORDER BY amount DESC) AS tag_amount " +
+                "WHERE id_user = " +
+                "(SELECT id_user FROM " +
+                "(SELECT id_user, max(summary) FROM " +
+                "(SELECT id_user, sum(cost) AS summary FROM orders " +
+                "GROUP BY id_user) AS order_sum) " +
+                "AS max_sum) " +
+                "GROUP BY id_user, name) AS most_used", Tag.class);
+        return new LinkedHashSet<>(query.getResultList());
     }
 }

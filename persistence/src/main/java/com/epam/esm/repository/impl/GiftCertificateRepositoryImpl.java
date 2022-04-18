@@ -94,7 +94,6 @@ public class GiftCertificateRepositoryImpl implements GiftCertificateRepository 
 
     private List<Predicate> createPredicates(Root<GiftCertificate> root,
                                              GiftCertificate certificate, List<Tag> tags) {
-        Join<GiftCertificate, Tag> joinTags = root.join(TAGS);
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
         List<Predicate> predicates = new ArrayList<>();
         if (certificate.getName() != null) {
@@ -117,7 +116,7 @@ public class GiftCertificateRepositoryImpl implements GiftCertificateRepository 
         }
         if (tags != null) {
             for (Tag tag : tags) {
-                predicates.add(builder.like(joinTags.get(NAME), tag.getName()));
+                predicates.add(builder.like(root.join(TAGS).get(NAME), tag.getName()));
             }
         }
         return predicates;

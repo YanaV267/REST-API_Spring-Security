@@ -9,8 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Optional;
 import java.util.Set;
 
-import static com.epam.esm.util.ParameterName.ID;
-import static com.epam.esm.util.ParameterName.USERS;
+import static com.epam.esm.util.ParameterName.*;
 import static org.springframework.http.HttpStatus.FOUND;
 import static org.springframework.http.HttpStatus.OK;
 
@@ -95,6 +94,22 @@ public class UserController {
             return user.get();
         } else {
             throw new NoDataFoundException(ID, id, UserDto.class);
+        }
+    }
+
+    /**
+     * Find with highest order cost set.
+     *
+     * @return the set
+     */
+    @GetMapping("/highest-order-cost")
+    @ResponseStatus(FOUND)
+    public Set<UserDto> findWithHighestOrderCost() {
+        Set<UserDto> orders = userService.findWithHighestOrderCost();
+        if (!orders.isEmpty()) {
+            return orders;
+        } else {
+            throw new NoDataFoundException(HIGHEST_ORDER_COST, UserDto.class);
         }
     }
 }

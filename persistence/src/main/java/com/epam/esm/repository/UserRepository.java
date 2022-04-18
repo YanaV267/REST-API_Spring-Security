@@ -17,4 +17,11 @@ public interface UserRepository extends BaseRepository<User> {
      * @return the set
      */
     Set<User> findAllWithOrders();
+
+    /**
+     * Find with highest order cost set.
+     *
+     * @return the set
+     */
+    Set<User> findWithHighestOrderCost();
 }

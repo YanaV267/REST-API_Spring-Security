@@ -81,6 +81,15 @@ public final class ParameterName {
      * The constant SURNAME.
      */
     public static final String SURNAME = "surname";
+    /**
+     * The constant HIGHEST_ORDER_COST.
+     */
+    public static final String HIGHEST_ORDER_COST = "highest_order_cost";
+
+    /**
+     * The constant MOST_USED_TAG.
+     */
+    public static final String MOST_USED_TAG = "most_used_tags";
 
     private ParameterName() {
 

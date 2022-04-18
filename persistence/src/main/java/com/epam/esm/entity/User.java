@@ -34,8 +34,12 @@ public class User implements Serializable {
     @Column
     private BigDecimal balance;
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+    @EqualsAndHashCode.Exclude
     private Set<Order> orders;
 
+    /**
+     * Instantiates a new User.
+     */
     public User() {
         orders = new LinkedHashSet<>();
     }

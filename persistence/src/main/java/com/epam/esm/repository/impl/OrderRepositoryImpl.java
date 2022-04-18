@@ -75,11 +75,10 @@ public class OrderRepositoryImpl implements OrderRepository {
     @Override
     public Set<Order> findAllOrdersByUser(long userId) {
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
-        CriteriaQuery<Order> query = entityManager.getCriteriaBuilder()
-                .createQuery(Order.class);
+        CriteriaQuery<Order> query = builder.createQuery(Order.class);
         Root<Order> root = query.from(Order.class);
-        root.join(USER);
-        query.select(root).where(builder.equal(root.get(USER).get(ID), userId));
+        query.select(root)
+                .where(builder.equal(root.join(USER).get(ID), userId));
         return new LinkedHashSet<>(entityManager.createQuery(query)
                 .getResultList());
     }

@@ -75,4 +75,12 @@ public class UserServiceImpl implements UserService {
             return Optional.empty();
         }
     }
+
+    @Override
+    public Set<UserDto> findWithHighestOrderCost() {
+        Set<User> orders = repository.findWithHighestOrderCost();
+        return orders.stream()
+                .map(mapper::mapToDto)
+                .collect(Collectors.toSet());
+    }
 }

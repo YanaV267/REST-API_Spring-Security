@@ -1,6 +1,5 @@
 package com.epam.esm.controller;
 
-import com.epam.esm.dto.GiftCertificateDto;
 import com.epam.esm.dto.OrderDto;
 import com.epam.esm.exception.BadRequestException;
 import com.epam.esm.exception.NoDataFoundException;
@@ -12,8 +11,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
-import static com.epam.esm.util.ParameterName.ID;
-import static com.epam.esm.util.ParameterName.TAGS;
+import static com.epam.esm.util.ParameterName.*;
 import static org.springframework.http.HttpStatus.*;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
@@ -92,7 +90,7 @@ public class OrderController {
         if (!orders.isEmpty()) {
             return orders;
         } else {
-            throw new NoDataFoundException(TAGS, OrderDto.class);
+            throw new NoDataFoundException(ORDERS, OrderDto.class);
         }
     }
 
@@ -126,7 +124,7 @@ public class OrderController {
         if (!orders.isEmpty()) {
             return orders;
         } else {
-            throw new NoDataFoundException(String.valueOf(userId), OrderDto.class);
+            throw new NoDataFoundException(ID_USER, userId, OrderDto.class);
         }
     }
 
@@ -143,7 +141,7 @@ public class OrderController {
         if (!orders.isEmpty()) {
             return orders;
         } else {
-            throw new NoDataFoundException(certificateData.toString(), GiftCertificateDto.class);
+            throw new NoDataFoundException(certificateData.toString(), OrderDto.class);
         }
     }
 }

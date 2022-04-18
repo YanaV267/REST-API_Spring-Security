@@ -1,5 +1,6 @@
 package com.epam.esm.controller;
 
+import com.epam.esm.dto.OrderDto;
 import com.epam.esm.dto.TagDto;
 import com.epam.esm.exception.BadRequestException;
 import com.epam.esm.exception.NoDataFoundException;
@@ -111,6 +112,22 @@ public class TagController {
             return tag.get();
         } else {
             throw new NoDataFoundException(NAME, name, TagDto.class);
+        }
+    }
+
+    /**
+     * Find most used tag set.
+     *
+     * @return the set
+     */
+    @GetMapping("/most-used-tag")
+    @ResponseStatus(FOUND)
+    public Set<TagDto> findMostUsedTag() {
+        Set<TagDto> orders = tagService.findMostUsedTag();
+        if (!orders.isEmpty()) {
+            return orders;
+        } else {
+            throw new NoDataFoundException(MOST_USED_TAG, OrderDto.class);
         }
     }
 }

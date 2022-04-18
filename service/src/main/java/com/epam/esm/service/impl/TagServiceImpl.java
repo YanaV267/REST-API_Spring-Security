@@ -100,4 +100,13 @@ public class TagServiceImpl implements TagService {
             return Optional.empty();
         }
     }
+
+    @Override
+    public Set<TagDto> findMostUsedTag() {
+        return repository.findMostUsedTag()
+                .stream()
+                .map(mapper::mapToDto)
+                .collect(Collectors.toSet());
+    }
+
 }

@@ -1,7 +1,6 @@
 package com.epam.esm.exception;
 
-import static com.epam.esm.util.ParameterName.CERTIFICATES;
-import static com.epam.esm.util.ParameterName.TAGS;
+import static com.epam.esm.util.ParameterName.*;
 
 /**
  * The type No data found exception.
@@ -58,8 +57,11 @@ public class NoDataFoundException extends RuntimeException {
      */
     public NoDataFoundException(String parameters, Class<?> resourceClass) {
         super();
-        if (parameters.equals(CERTIFICATES) || parameters.equals(TAGS)) {
+        if (parameters.equals(CERTIFICATES) || parameters.equals(TAGS)
+                || parameters.equals(ORDERS) || parameters.equals(USERS)) {
             this.parameters = parameters + DELIMITER + ALL_DATA_VALUE;
+        } else if (parameters.equals(MOST_USED_TAG) || parameters.equals(HIGHEST_ORDER_COST)) {
+            this.parameters = parameters;
         } else {
             this.parameters = parameters.replaceAll(DELIMITER.trim(), DELIMITER);
         }

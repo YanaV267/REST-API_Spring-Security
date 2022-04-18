@@ -17,4 +17,11 @@ public interface UserService extends BaseService<UserDto> {
      * @return the set
      */
     Set<UserDto> findAllWithOrders();
+
+    /**
+     * Find with highest order cost set.
+     *
+     * @return the set
+     */
+    Set<UserDto> findWithHighestOrderCost();
 }

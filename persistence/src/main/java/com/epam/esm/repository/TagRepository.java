@@ -3,6 +3,7 @@ package com.epam.esm.repository;
 import com.epam.esm.entity.Tag;
 
 import java.util.Optional;
+import java.util.Set;
 
 /**
  * The interface Tag repository.
@@ -26,4 +27,11 @@ public interface TagRepository extends BaseRepository<Tag> {
      * @return the optional
      */
     Optional<Tag> findByName(String name);
+
+    /**
+     * Find most used tag set.
+     *
+     * @return the set
+     */
+    Set<Tag> findMostUsedTag();
 }
