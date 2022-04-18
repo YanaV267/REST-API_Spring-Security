@@ -3,7 +3,6 @@ package com.epam.esm.service;
 import com.epam.esm.dto.GiftCertificateDto;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 /**
@@ -17,12 +16,12 @@ public interface GiftCertificateService extends CompleteBaseService<GiftCertific
     /**
      * Find by several parameters set.
      *
-     * @param page            the page
-     * @param certificateData the certificate data
-     * @param tags            the tags
-     * @param sortTypes       the sort types
+     * @param page           the page
+     * @param certificateDto the certificate dto
+     * @param tags           the tags
+     * @param sortTypes      the sort types
      * @return the set
      */
-    Set<GiftCertificateDto> findBySeveralParameters(int page, Map<String, Object> certificateData, List<String> tags,
-                                                    List<String> sortTypes);
+    Set<GiftCertificateDto> findBySeveralParameters(int page, GiftCertificateDto certificateDto,
+                                                    List<String> tags, List<String> sortTypes);
 }

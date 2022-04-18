@@ -2,7 +2,6 @@ package com.epam.esm.service;
 
 import com.epam.esm.dto.OrderDto;
 
-import java.util.Map;
 import java.util.Set;
 
 /**
@@ -24,9 +23,9 @@ public interface OrderService extends CompleteBaseService<OrderDto> {
     /**
      * Find by several parameters set.
      *
-     * @param page      the page
-     * @param orderData the order data
+     * @param page     the page
+     * @param orderDto the order dto
      * @return the set
      */
-    Set<OrderDto> findBySeveralParameters(int page, Map<String, Object> orderData);
+    Set<OrderDto> findBySeveralParameters(int page, OrderDto orderDto);
 }

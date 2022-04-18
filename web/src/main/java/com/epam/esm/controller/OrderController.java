@@ -5,9 +5,10 @@ import com.epam.esm.exception.BadRequestException;
 import com.epam.esm.exception.NoDataFoundException;
 import com.epam.esm.service.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Map;
+import javax.validation.constraints.Min;
 import java.util.Optional;
 import java.util.Set;
 
@@ -22,6 +23,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
  * @project GiftCertificate
  */
 @RestController
+@Validated
 @RequestMapping("/orders")
 public class OrderController {
     private final OrderService orderService;
@@ -39,12 +41,12 @@ public class OrderController {
     /**
      * Create.
      *
-     * @param orderData the order data
+     * @param orderDto the order dto
      */
     @PostMapping(consumes = APPLICATION_JSON_VALUE)
     @ResponseStatus(CREATED)
-    public void create(@RequestBody Map<String, Object> orderData) {
-        boolean isCreated = orderService.create(orderData);
+    public void create(@RequestBody OrderDto orderDto) {
+        boolean isCreated = orderService.create(orderDto);
         if (!isCreated) {
             throw new BadRequestException(OrderDto.class);
         }
@@ -53,12 +55,12 @@ public class OrderController {
     /**
      * Update.
      *
-     * @param orderData the order data
+     * @param orderDto the order dto
      */
     @PutMapping(consumes = APPLICATION_JSON_VALUE)
     @ResponseStatus(OK)
-    public void update(@RequestBody Map<String, Object> orderData) {
-        boolean isUpdated = orderService.update(orderData);
+    public void update(@RequestBody OrderDto orderDto) {
+        boolean isUpdated = orderService.update(orderDto);
         if (!isUpdated) {
             throw new BadRequestException(OrderDto.class);
         }
@@ -71,7 +73,7 @@ public class OrderController {
      */
     @DeleteMapping("/{id}")
     @ResponseStatus(OK)
-    public void delete(@PathVariable long id) {
+    public void delete(@PathVariable @Min(1) long id) {
         boolean isDeleted = orderService.delete(id);
         if (!isDeleted) {
             throw new NoDataFoundException(ID, id, OrderDto.class);
@@ -86,7 +88,7 @@ public class OrderController {
      */
     @GetMapping(value = "/all", produces = APPLICATION_JSON_VALUE)
     @ResponseStatus(FOUND)
-    public Set<OrderDto> retrieveAll(@RequestParam int page) {
+    public Set<OrderDto> retrieveAll(@RequestParam @Min(1) int page) {
         Set<OrderDto> orders = orderService.findAll(page);
         if (!orders.isEmpty()) {
             return orders;
@@ -103,7 +105,7 @@ public class OrderController {
      */
     @GetMapping(value = "/{id}", produces = APPLICATION_JSON_VALUE)
     @ResponseStatus(FOUND)
-    public OrderDto findById(@PathVariable long id) {
+    public OrderDto findById(@PathVariable @Min(1) long id) {
         Optional<OrderDto> order = orderService.findById(id);
         if (order.isPresent()) {
             return order.get();
@@ -121,7 +123,7 @@ public class OrderController {
      */
     @GetMapping(value = "/user/{userId}", produces = APPLICATION_JSON_VALUE)
     @ResponseStatus(FOUND)
-    public Set<OrderDto> findAllByUser(@PathVariable long userId, @RequestParam int page) {
+    public Set<OrderDto> findAllByUser(@PathVariable long userId, @RequestParam @Min(1) int page) {
         Set<OrderDto> orders = orderService.findAllByUser(page, userId);
         if (!orders.isEmpty()) {
             return orders;
@@ -133,19 +135,19 @@ public class OrderController {
     /**
      * Find by several parameters set.
      *
-     * @param page            the page
-     * @param certificateData the certificate data
+     * @param page     the page
+     * @param orderDto the certificate dto
      * @return the set
      */
     @GetMapping(produces = APPLICATION_JSON_VALUE)
     @ResponseStatus(FOUND)
-    public Set<OrderDto> findBySeveralParameters(@RequestParam int page,
-                                                 @RequestParam Map<String, Object> certificateData) {
-        Set<OrderDto> orders = orderService.findBySeveralParameters(page, certificateData);
+    public Set<OrderDto> findBySeveralParameters(@RequestParam @Min(1) int page,
+                                                 @RequestParam OrderDto orderDto) {
+        Set<OrderDto> orders = orderService.findBySeveralParameters(page, orderDto);
         if (!orders.isEmpty()) {
             return orders;
         } else {
-            throw new NoDataFoundException(certificateData.toString(), OrderDto.class);
+            throw new NoDataFoundException(orderDto.toString(), OrderDto.class);
         }
     }
 }

@@ -79,7 +79,7 @@ public class GiftCertificateRepositoryImpl implements GiftCertificateRepository 
     }
 
     @Override
-    public Set<GiftCertificate> findBySeveralParameters(int firstElementNumber, GiftCertificate certificate, List<Tag> tags,
+    public Set<GiftCertificate> findBySeveralParameters(int firstElementNumber, GiftCertificate certificate, Set<Tag> tags,
                                                         List<String> sortTypes) {
         CriteriaQuery<GiftCertificate> query = entityManager.getCriteriaBuilder()
                 .createQuery(GiftCertificate.class);
@@ -97,7 +97,7 @@ public class GiftCertificateRepositoryImpl implements GiftCertificateRepository 
     }
 
     private List<Predicate> createPredicates(Root<GiftCertificate> root,
-                                             GiftCertificate certificate, List<Tag> tags) {
+                                             GiftCertificate certificate, Set<Tag> tags) {
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
         List<Predicate> predicates = new ArrayList<>();
         if (certificate.getName() != null) {

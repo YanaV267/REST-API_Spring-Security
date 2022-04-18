@@ -1,6 +1,8 @@
 package com.epam.esm.exception;
 
+import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.client.HttpClientErrorException;
@@ -51,7 +53,8 @@ public class BaseExceptionHandler {
      * @param exception the exception
      * @return the response error entity
      */
-    @ExceptionHandler({BadRequestException.class, HttpClientErrorException.BadRequest.class})
+    @ExceptionHandler({BadRequestException.class, HttpClientErrorException.BadRequest.class,
+            MethodArgumentNotValidException.class, ConstraintViolationException.class})
     public ResponseErrorEntity requestFailed(BadRequestException exception) {
         return new ResponseErrorEntity(BAD_REQUEST.value(), exception.getResourceClass(), BAD_REQUEST_MESSAGE);
     }

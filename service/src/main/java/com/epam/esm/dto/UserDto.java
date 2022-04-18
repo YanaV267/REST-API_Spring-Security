@@ -1,10 +1,11 @@
 package com.epam.esm.dto;
 
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
+import javax.validation.Valid;
+import javax.validation.constraints.DecimalMin;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.Pattern;
 import java.math.BigDecimal;
 import java.util.Set;
 
@@ -14,26 +15,23 @@ import java.util.Set;
  * @author YanaV
  * @project GiftCertificate
  */
-@Getter
-@Setter
-@EqualsAndHashCode
+@Data
 @NoArgsConstructor
 public class UserDto {
+    @Min(1)
     private long id;
-    private String login;
-    private String surname;
-    private String name;
-    private BigDecimal balance;
-    private Set<OrderDto> orders;
 
-    @Override
-    public String toString() {
-        StringBuilder sb = new StringBuilder(getClass().getSimpleName()).append("{");
-        sb.append("id=").append(id);
-        sb.append(" , login='").append(login);
-        sb.append("' , surname='").append(surname);
-        sb.append("' , name='").append(name);
-        sb.append("' , balance=").append(balance).append("}");
-        return sb.toString();
-    }
+    @Pattern(regexp = "[\\p{Alnum}_]{1,30}")
+    private String login;
+
+    @Pattern(regexp = "[А-Яа-я\\p{Alpha}]{1,30}")
+    private String surname;
+
+    @Pattern(regexp = "[А-Яа-я\\p{Alpha}]{1,25}")
+    private String name;
+
+    @DecimalMin("0.0")
+    private BigDecimal balance;
+
+    private Set<@Valid OrderDto> orders;
 }

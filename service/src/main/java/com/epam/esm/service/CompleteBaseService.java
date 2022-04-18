@@ -1,7 +1,5 @@
 package com.epam.esm.service;
 
-import java.util.Map;
-
 /**
  * The interface Complete base service.
  *
@@ -13,16 +11,16 @@ public interface CompleteBaseService<T> extends BaseService<T> {
     /**
      * Create boolean.
      *
-     * @param data the data
+     * @param t the t
      * @return the boolean
      */
-    boolean create(Map<String, Object> data);
+    boolean create(T t);
 
     /**
      * Update boolean.
      *
-     * @param data the data
+     * @param t the t
      * @return the boolean
      */
-    boolean update(Map<String, Object> data);
+    boolean update(T t);
 }

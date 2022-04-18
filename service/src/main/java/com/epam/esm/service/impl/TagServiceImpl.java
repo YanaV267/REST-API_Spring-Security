@@ -5,14 +5,11 @@ import com.epam.esm.entity.Tag;
 import com.epam.esm.mapper.impl.TagMapper;
 import com.epam.esm.repository.TagRepository;
 import com.epam.esm.service.TagService;
-import com.epam.esm.util.ParameterName;
-import com.epam.esm.validator.TagValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -26,35 +23,29 @@ import java.util.stream.Collectors;
 @Service
 public class TagServiceImpl implements TagService {
     private final TagRepository repository;
-    private final TagValidator validator;
     private final TagMapper mapper;
 
     /**
      * Instantiates a new Tag service.
      *
      * @param repository the repository
-     * @param validator  the validator
      * @param mapper     the mapper
      */
     @Autowired
-    public TagServiceImpl(TagRepository repository, TagValidator validator,
-                          @Qualifier("tagServiceMapper") TagMapper mapper) {
+    public TagServiceImpl(TagRepository repository, @Qualifier("tagServiceMapper") TagMapper mapper) {
         this.repository = repository;
-        this.validator = validator;
         this.mapper = mapper;
     }
 
     @Override
     @Transactional
-    public boolean create(Map<String, Object> tagData) {
-        if (validator.checkName((String) tagData.get(ParameterName.NAME))) {
-            String name = (String) tagData.get(ParameterName.NAME);
-            if (!findByName(name).isPresent()) {
-                Tag tag = new Tag();
-                tag.setName(name);
-                repository.create(tag);
-                return true;
-            }
+    public boolean create(TagDto tagDto) {
+        String name = tagDto.getName();
+        if (!findByName(name).isPresent()) {
+            Tag tag = new Tag();
+            tag.setName(name);
+            repository.create(tag);
+            return true;
         }
         return false;
     }

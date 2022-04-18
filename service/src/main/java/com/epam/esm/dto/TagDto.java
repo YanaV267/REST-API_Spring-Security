@@ -1,9 +1,10 @@
 package com.epam.esm.dto;
 
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
+
+import javax.validation.constraints.Min;
+import javax.validation.constraints.Pattern;
 
 /**
  * The type Tag dto.
@@ -11,19 +12,12 @@ import lombok.Setter;
  * @author YanaV
  * @project GiftCertificate
  */
-@Getter
-@Setter
-@EqualsAndHashCode
+@Data
 @NoArgsConstructor
 public class TagDto {
+    @Min(1)
     private long id;
-    private String name;
 
-    @Override
-    public String toString() {
-        StringBuilder sb = new StringBuilder(getClass().getSimpleName()).append("{");
-        sb.append("id=").append(id);
-        sb.append(" , name='").append(name).append("'}");
-        return sb.toString();
-    }
+    @Pattern(regexp = "[а-я\\p{Lower} _]{2,50}")
+    private String name;
 }

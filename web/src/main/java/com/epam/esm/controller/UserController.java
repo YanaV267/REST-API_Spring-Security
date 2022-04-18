@@ -4,8 +4,10 @@ import com.epam.esm.dto.UserDto;
 import com.epam.esm.exception.NoDataFoundException;
 import com.epam.esm.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.constraints.Min;
 import java.util.Optional;
 import java.util.Set;
 
@@ -21,6 +23,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
  * @project GiftCertificate
  */
 @RestController
+@Validated
 @RequestMapping("/users")
 public class UserController {
     private final UserService userService;
@@ -42,7 +45,7 @@ public class UserController {
      */
     @DeleteMapping("/{id}")
     @ResponseStatus(OK)
-    public void delete(@PathVariable long id) {
+    public void delete(@PathVariable @Min(1) long id) {
         boolean isDeleted = userService.delete(id);
         if (!isDeleted) {
             throw new NoDataFoundException(ID, id, UserDto.class);
@@ -57,7 +60,7 @@ public class UserController {
      */
     @GetMapping(produces = APPLICATION_JSON_VALUE)
     @ResponseStatus(FOUND)
-    public Set<UserDto> retrieveAll(@RequestParam int page) {
+    public Set<UserDto> retrieveAll(@RequestParam @Min(1) int page) {
         Set<UserDto> users = userService.findAll(page);
         if (!users.isEmpty()) {
             return users;
@@ -74,7 +77,7 @@ public class UserController {
      */
     @GetMapping(value = "/orders", produces = APPLICATION_JSON_VALUE)
     @ResponseStatus(FOUND)
-    public Set<UserDto> retrieveAllWithOrders(@RequestParam int page) {
+    public Set<UserDto> retrieveAllWithOrders(@RequestParam @Min(1) int page) {
         Set<UserDto> users = userService.findAllWithOrders(page);
         if (!users.isEmpty()) {
             return users;
@@ -91,7 +94,7 @@ public class UserController {
      */
     @GetMapping(value = "/{id}", produces = APPLICATION_JSON_VALUE)
     @ResponseStatus(FOUND)
-    public UserDto findById(@PathVariable long id) {
+    public UserDto findById(@PathVariable @Min(1) long id) {
         Optional<UserDto> user = userService.findById(id);
         if (user.isPresent()) {
             return user.get();
@@ -108,7 +111,7 @@ public class UserController {
      */
     @GetMapping(value = "/highest-order-cost", produces = APPLICATION_JSON_VALUE)
     @ResponseStatus(FOUND)
-    public Set<UserDto> findWithHighestOrderCost(@RequestParam int page) {
+    public Set<UserDto> findWithHighestOrderCost(@RequestParam @Min(1) int page) {
         Set<UserDto> orders = userService.findWithHighestOrderCost(page);
         if (!orders.isEmpty()) {
             return orders;

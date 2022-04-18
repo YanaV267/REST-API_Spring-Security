@@ -5,10 +5,12 @@ import com.epam.esm.exception.BadRequestException;
 import com.epam.esm.exception.NoDataFoundException;
 import com.epam.esm.service.GiftCertificateService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.constraints.Min;
+import javax.validation.constraints.Pattern;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -24,6 +26,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
  * @project GiftCertificate
  */
 @RestController
+@Validated
 @RequestMapping("/certificates")
 public class GiftCertificateController {
     private final GiftCertificateService certificateService;
@@ -41,12 +44,12 @@ public class GiftCertificateController {
     /**
      * Create.
      *
-     * @param certificateData the certificate data
+     * @param certificateDto the certificate dto
      */
     @PostMapping(consumes = APPLICATION_JSON_VALUE)
     @ResponseStatus(CREATED)
-    public void create(@RequestBody Map<String, Object> certificateData) {
-        boolean isCreated = certificateService.create(certificateData);
+    public void create(@RequestBody GiftCertificateDto certificateDto) {
+        boolean isCreated = certificateService.create(certificateDto);
         if (!isCreated) {
             throw new BadRequestException(GiftCertificateDto.class);
         }
@@ -55,12 +58,12 @@ public class GiftCertificateController {
     /**
      * Update.
      *
-     * @param certificateData the certificate data
+     * @param certificateDto the certificate dto
      */
     @PutMapping(consumes = APPLICATION_JSON_VALUE)
     @ResponseStatus(OK)
-    public void update(@RequestBody Map<String, Object> certificateData) {
-        boolean isUpdated = certificateService.update(certificateData);
+    public void update(@RequestBody GiftCertificateDto certificateDto) {
+        boolean isUpdated = certificateService.update(certificateDto);
         if (!isUpdated) {
             throw new BadRequestException(GiftCertificateDto.class);
         }
@@ -73,7 +76,7 @@ public class GiftCertificateController {
      */
     @DeleteMapping("/{id}")
     @ResponseStatus(OK)
-    public void delete(@PathVariable long id) {
+    public void delete(@PathVariable @Min(1) long id) {
         boolean isDeleted = certificateService.delete(id);
         if (!isDeleted) {
             throw new NoDataFoundException(ID, id, GiftCertificateDto.class);
@@ -88,7 +91,7 @@ public class GiftCertificateController {
      */
     @GetMapping(value = "/all", produces = APPLICATION_JSON_VALUE)
     @ResponseStatus(FOUND)
-    public Set<GiftCertificateDto> retrieveAll(@RequestParam int page) {
+    public Set<GiftCertificateDto> retrieveAll(@RequestParam @Min(1) int page) {
         Set<GiftCertificateDto> certificates = certificateService.findAll(page);
         if (!certificates.isEmpty()) {
             return certificates;
@@ -105,7 +108,7 @@ public class GiftCertificateController {
      */
     @GetMapping(value = "/{id}", produces = APPLICATION_JSON_VALUE)
     @ResponseStatus(FOUND)
-    public GiftCertificateDto findById(@PathVariable long id) {
+    public GiftCertificateDto findById(@PathVariable @Min(1) long id) {
         Optional<GiftCertificateDto> giftCertificate = certificateService.findById(id);
         if (giftCertificate.isPresent()) {
             return giftCertificate.get();
@@ -117,24 +120,28 @@ public class GiftCertificateController {
     /**
      * Find by several parameters set.
      *
-     * @param page            the page
-     * @param certificateData the certificate data
-     * @param tagNames        the tagNames
-     * @param sortTypes       the sort types
+     * @param page           the page
+     * @param certificateDto the certificate dto
+     * @param tagNames       the tagNames
+     * @param sortTypes      the sort types
      * @return the set
      */
     @GetMapping(produces = APPLICATION_JSON_VALUE)
     @ResponseStatus(FOUND)
-    public Set<GiftCertificateDto> findBySeveralParameters(@RequestParam(value = "page") int page,
-                                                           @RequestParam Map<String, Object> certificateData,
-                                                           @RequestParam(value = "tag", required = false) List<String> tagNames,
-                                                           @RequestParam(value = "sort", required = false) List<String> sortTypes) {
-        Set<GiftCertificateDto> certificates = certificateService.findBySeveralParameters(page,
-                certificateData, tagNames, sortTypes);
+    public Set<GiftCertificateDto> findBySeveralParameters(
+            @RequestParam(value = "page") @Min(1) int page,
+            @RequestParam GiftCertificateDto certificateDto,
+            @RequestParam(value = "tag", required = false)
+                    List<@Pattern(regexp = "[а-я\\p{Lower} _]{2,50}")
+                            String> tagNames,
+            @RequestParam(value = "sort", required = false)
+                    List<@Pattern(regexp = "[a-z]_(de)|(a)sc") String> sortTypes) {
+        Set<GiftCertificateDto> certificates = certificateService.findBySeveralParameters(
+                page, certificateDto, tagNames, sortTypes);
         if (!certificates.isEmpty()) {
             return certificates;
         } else {
-            throw new NoDataFoundException(certificateData.toString(), GiftCertificateDto.class);
+            throw new NoDataFoundException(certificateDto.toString(), GiftCertificateDto.class);
         }
     }
 }

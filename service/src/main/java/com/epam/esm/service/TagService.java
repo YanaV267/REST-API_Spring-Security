@@ -2,7 +2,6 @@ package com.epam.esm.service;
 
 import com.epam.esm.dto.TagDto;
 
-import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -16,10 +15,10 @@ public interface TagService extends BaseService<TagDto> {
     /**
      * Create boolean.
      *
-     * @param tagData the tag data
+     * @param tagDto the tag dto
      * @return the boolean
      */
-    boolean create(Map<String, Object> tagData);
+    boolean create(TagDto tagDto);
 
     /**
      * Find by name optional.

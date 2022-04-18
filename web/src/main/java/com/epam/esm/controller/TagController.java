@@ -6,9 +6,12 @@ import com.epam.esm.exception.BadRequestException;
 import com.epam.esm.exception.NoDataFoundException;
 import com.epam.esm.service.TagService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Map;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
 import java.util.Optional;
 import java.util.Set;
 
@@ -23,6 +26,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
  * @project GiftCertificate
  */
 @RestController
+@Validated
 @RequestMapping("/tags")
 public class TagController {
     private final TagService tagService;
@@ -40,12 +44,12 @@ public class TagController {
     /**
      * Create.
      *
-     * @param tagData the tag data
+     * @param tagDto the tag dto
      */
     @PostMapping(consumes = APPLICATION_JSON_VALUE)
     @ResponseStatus(CREATED)
-    public void create(@RequestBody Map<String, Object> tagData) {
-        boolean isCreated = tagService.create(tagData);
+    public void create(@RequestBody TagDto tagDto) {
+        boolean isCreated = tagService.create(tagDto);
         if (!isCreated) {
             throw new BadRequestException(TagDto.class);
         }
@@ -58,7 +62,7 @@ public class TagController {
      */
     @DeleteMapping("/{id}")
     @ResponseStatus(OK)
-    public void delete(@PathVariable long id) {
+    public void delete(@PathVariable @Min(1) long id) {
         boolean isDeleted = tagService.delete(id);
         if (!isDeleted) {
             throw new NoDataFoundException(ID, id, TagDto.class);
@@ -73,7 +77,7 @@ public class TagController {
      */
     @GetMapping(produces = APPLICATION_JSON_VALUE)
     @ResponseStatus(FOUND)
-    public Set<TagDto> retrieveAll(@RequestParam int page) {
+    public Set<TagDto> retrieveAll(@RequestParam @Min(1) int page) {
         Set<TagDto> tags = tagService.findAll(page);
         if (!tags.isEmpty()) {
             return tags;
@@ -86,11 +90,11 @@ public class TagController {
      * Find by id tag dto.
      *
      * @param id the id
-     * @return the tag dto
+     * @return the tag dto0
      */
     @GetMapping(value = "/{id}", produces = APPLICATION_JSON_VALUE)
     @ResponseStatus(FOUND)
-    public TagDto findById(@PathVariable long id) {
+    public TagDto findById(@PathVariable @Min(1) long id) {
         Optional<TagDto> tag = tagService.findById(id);
         if (tag.isPresent()) {
             return tag.get();
@@ -107,7 +111,10 @@ public class TagController {
      */
     @GetMapping(params = "name", produces = APPLICATION_JSON_VALUE)
     @ResponseStatus(FOUND)
-    public TagDto findByName(@RequestParam String name) {
+    public TagDto findByName(@RequestParam
+                             @NotNull
+                             @Pattern(regexp = "[а-я\\p{Lower} _]{2,50}")
+                                     String name) {
         Optional<TagDto> tag = tagService.findByName(name);
         if (tag.isPresent()) {
             return tag.get();
@@ -124,7 +131,7 @@ public class TagController {
      */
     @GetMapping(value = "/most-used-tag", produces = APPLICATION_JSON_VALUE)
     @ResponseStatus(FOUND)
-    public Set<TagDto> findMostUsedTag(@RequestParam int page) {
+    public Set<TagDto> findMostUsedTag(@RequestParam @Min(1) int page) {
         Set<TagDto> orders = tagService.findMostUsedTag(page);
         if (!orders.isEmpty()) {
             return orders;

@@ -1,10 +1,13 @@
 package com.epam.esm.dto;
 
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
+import org.springframework.format.annotation.DateTimeFormat;
 
+import javax.validation.Valid;
+import javax.validation.constraints.DecimalMin;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
@@ -14,25 +17,23 @@ import java.time.LocalDateTime;
  * @author YanaV
  * @project GiftCertificate
  */
-@Getter
-@Setter
-@EqualsAndHashCode
+@Data
 @NoArgsConstructor
 public class OrderDto {
+    @Min(1)
     private long id;
-    private UserDto userDto;
-    private BigDecimal cost;
-    private LocalDateTime createDate;
-    private GiftCertificateDto certificate;
 
-    @Override
-    public String toString() {
-        StringBuilder sb = new StringBuilder(getClass().getSimpleName()).append("{");
-        sb.append("id=").append(id);
-        sb.append(" , user=").append(userDto.toString());
-        sb.append(" , cost=").append(cost);
-        sb.append(" , createDate=").append(createDate);
-        sb.append(" , certificates=").append(certificate.toString()).append("}");
-        return sb.toString();
-    }
+    @NotNull
+    @Valid
+    private UserDto userDto;
+
+    @DecimalMin("0.0")
+    private BigDecimal cost;
+
+    @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS")
+    private LocalDateTime createDate;
+
+    @NotNull
+    @Valid
+    private GiftCertificateDto certificateDto;
 }

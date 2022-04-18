@@ -75,7 +75,7 @@ public class OrderRepositoryImpl implements OrderRepository {
     }
 
     @Override
-    public Set<Order> findAllOrdersByUser(int firstElementNumber, long userId) {
+    public Set<Order> findAllByUser(int firstElementNumber, long userId) {
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
         CriteriaQuery<Order> query = builder.createQuery(Order.class);
         Root<Order> root = query.from(Order.class);
@@ -88,7 +88,7 @@ public class OrderRepositoryImpl implements OrderRepository {
     }
 
     @Override
-    public Set<Order> findOrdersBySeveralParameters(int firstElementNumber, Order order) {
+    public Set<Order> findBySeveralParameters(int firstElementNumber, Order order) {
         CriteriaQuery<Order> query = entityManager.getCriteriaBuilder()
                 .createQuery(Order.class);
         Root<Order> root = query.from(Order.class);

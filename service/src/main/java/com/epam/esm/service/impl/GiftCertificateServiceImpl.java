@@ -2,24 +2,19 @@ package com.epam.esm.service.impl;
 
 import com.epam.esm.dto.GiftCertificateDto;
 import com.epam.esm.entity.GiftCertificate;
-import com.epam.esm.entity.Tag;
 import com.epam.esm.mapper.impl.GiftCertificateMapper;
 import com.epam.esm.repository.GiftCertificateRepository;
 import com.epam.esm.service.GiftCertificateService;
-import com.epam.esm.util.CertificateDateFormatter;
-import com.epam.esm.validator.GiftCertificateValidator;
-import com.epam.esm.validator.TagValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.util.*;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
-
-import static com.epam.esm.util.ParameterName.*;
 
 /**
  * The type Gift certificate service.
@@ -30,76 +25,37 @@ import static com.epam.esm.util.ParameterName.*;
 @Service
 public class GiftCertificateServiceImpl implements GiftCertificateService {
     private final GiftCertificateRepository repository;
-    private final GiftCertificateValidator validator;
-    private final TagValidator tagValidator;
     private final GiftCertificateMapper mapper;
-    private final CertificateDateFormatter dateFormatter;
 
     /**
      * Instantiates a new Gift certificate service.
      *
-     * @param repository    the repository
-     * @param validator     the validator
-     * @param tagValidator  the tag validator
-     * @param mapper        the mapper
-     * @param dateFormatter the date formatter
+     * @param repository the repository
+     * @param mapper     the mapper
      */
     @Autowired
     public GiftCertificateServiceImpl(GiftCertificateRepository repository,
-                                      GiftCertificateValidator validator,
-                                      TagValidator tagValidator,
-                                      @Qualifier("certificateServiceMapper") GiftCertificateMapper mapper,
-                                      CertificateDateFormatter dateFormatter) {
+                                      @Qualifier("certificateServiceMapper") GiftCertificateMapper mapper) {
         this.repository = repository;
-        this.validator = validator;
-        this.tagValidator = tagValidator;
         this.mapper = mapper;
-        this.dateFormatter = dateFormatter;
     }
 
     @Override
     @Transactional
-    public boolean create(Map<String, Object> certificateData) {
-        if (validator.checkAllCertificateData(certificateData)) {
-            Set<Tag> tags = ((ArrayList<Map<String, String>>) certificateData.get(TAGS)).stream()
-                    .map(t -> t.get(NAME))
-                    .map(Tag::new)
-                    .collect(Collectors.toSet());
-            GiftCertificate giftCertificate = GiftCertificate.builder()
-                    .name((String) certificateData.get(NAME))
-                    .description((String) certificateData.get(DESCRIPTION))
-                    .price(new BigDecimal((String) certificateData.get(PRICE)))
-                    .duration(Integer.parseInt((String) certificateData.get(DURATION)))
-                    .tags(tags)
-                    .build();
-            repository.create(giftCertificate);
+    public boolean create(GiftCertificateDto giftCertificateDto) {
+        GiftCertificate certificate = mapper.mapToEntity(giftCertificateDto);
+        repository.create(certificate);
+        return true;
+    }
+
+    @Override
+    @Transactional
+    public boolean update(GiftCertificateDto giftCertificateDto) {
+        Optional<GiftCertificate> foundCertificate = repository.findById(giftCertificateDto.getId());
+        if (foundCertificate.isPresent()) {
+            GiftCertificate certificate = mapper.mapToEntity(giftCertificateDto);
+            repository.update(certificate);
             return true;
-        } else {
-            return false;
-        }
-    }
-
-    @Override
-    @Transactional
-    public boolean update(Map<String, Object> certificateData) {
-        if (!certificateData.isEmpty() && certificateData.containsKey(ID)
-                && validator.checkId((String) certificateData.get(ID))
-                && validator.checkCertificateData(certificateData)) {
-            long id = Long.parseLong((String) certificateData.get(ID));
-            Optional<GiftCertificate> foundCertificate = repository.findById(id);
-            if (foundCertificate.isPresent()) {
-                GiftCertificate certificate = retrieveCertificateData(certificateData);
-                certificate.setId(id);
-                if (certificateData.containsKey(TAGS)) {
-                    Set<Tag> tags = ((ArrayList<Map<String, String>>) certificateData.get(TAGS)).stream()
-                            .map(t -> t.get(NAME))
-                            .map(Tag::new)
-                            .collect(Collectors.toSet());
-                    certificate.setTags(tags);
-                }
-                repository.update(certificate);
-                return true;
-            }
         }
         return false;
     }
@@ -137,56 +93,14 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
     }
 
     @Override
-    public Set<GiftCertificateDto> findBySeveralParameters(int page, Map<String, Object> certificateData,
+    public Set<GiftCertificateDto> findBySeveralParameters(int page, GiftCertificateDto certificateDto,
                                                            List<String> tagNames, List<String> sortTypes) {
-        if (!certificateData.isEmpty() && validator.checkCertificateData(certificateData)
-                && tagValidator.checkNames(tagNames)) {
-            GiftCertificate giftCertificate = retrieveCertificateData(certificateData);
-            List<Tag> tags = new LinkedList<>();
-            for (String tagName : tagNames) {
-                Tag tag = new Tag(tagName);
-                tags.add(tag);
-            }
-            int id = certificateData.size() == 2 && certificateData.containsKey(SORT) ? 0 : 1;
-            giftCertificate.setId(id);
-            int firstElementNumber = getFirstElementNumber(page);
-            Set<GiftCertificate> certificates = repository.findBySeveralParameters(firstElementNumber,
-                    giftCertificate, tags, sortTypes);
-            return certificates.stream()
-                    .map(mapper::mapToDto)
-                    .collect(Collectors.toCollection(LinkedHashSet::new));
-        }
-        return new LinkedHashSet<>();
-    }
-
-    /**
-     * Retrieve certificate data gift certificate.
-     *
-     * @param certificateData the certificate data
-     * @return the gift certificate
-     */
-    private GiftCertificate retrieveCertificateData(Map<String, Object> certificateData) {
-        GiftCertificate giftCertificate = new GiftCertificate();
-        if (certificateData.containsKey(NAME)) {
-            giftCertificate.setName((String) certificateData.get(NAME));
-        }
-        if (certificateData.containsKey(DESCRIPTION)) {
-            giftCertificate.setDescription((String) certificateData.get(DESCRIPTION));
-        }
-        if (certificateData.containsKey(PRICE)) {
-            giftCertificate.setPrice(new BigDecimal((String) certificateData.get(PRICE)));
-        }
-        if (certificateData.containsKey(DURATION)) {
-            giftCertificate.setDuration(Integer.parseInt((String) certificateData.get(DURATION)));
-        }
-        if (certificateData.containsKey(CREATE_DATE)) {
-            LocalDateTime formattedDate = dateFormatter.format((String) certificateData.get(CREATE_DATE));
-            giftCertificate.setCreateDate(formattedDate);
-        }
-        if (certificateData.containsKey(LAST_UPDATE_DATE)) {
-            LocalDateTime formattedDate = dateFormatter.format((String) certificateData.get(LAST_UPDATE_DATE));
-            giftCertificate.setLastUpdateDate(formattedDate);
-        }
-        return giftCertificate;
+        GiftCertificate giftCertificate = mapper.mapToEntity(certificateDto);
+        int firstElementNumber = getFirstElementNumber(page);
+        Set<GiftCertificate> certificates = repository.findBySeveralParameters(firstElementNumber,
+                giftCertificate, giftCertificate.getTags(), sortTypes);
+        return certificates.stream()
+                .map(mapper::mapToDto)
+                .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 }
