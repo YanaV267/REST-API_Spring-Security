@@ -20,6 +20,7 @@ import static com.epam.esm.repository.ColumnName.*;
  */
 @Repository
 public class OrderRepositoryImpl implements OrderRepository {
+    private int lastPage;
     @PersistenceContext
     private EntityManager entityManager;
 
@@ -58,10 +59,15 @@ public class OrderRepositoryImpl implements OrderRepository {
 
     @Override
     public Set<Order> findAll(int firstElementNumber) {
-        CriteriaQuery<Order> query = entityManager.getCriteriaBuilder()
-                .createQuery(Order.class);
-        Root<Order> root = query.from(Order.class);
-        query.select(root);
+        CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+        CriteriaQuery<Order> query = builder.createQuery(Order.class);
+        CriteriaQuery<Long> pageQuery = builder.createQuery(Long.class);
+
+        query.select(query.from(Order.class));
+        pageQuery.select(builder.count(pageQuery.from(Order.class)));
+
+        long amount = entityManager.createQuery(pageQuery).getSingleResult();
+        lastPage = (int) Math.ceil((double) amount / MAX_RESULT_AMOUNT);
         return new LinkedHashSet<>(entityManager.createQuery(query)
                 .setFirstResult(firstElementNumber)
                 .setMaxResults(MAX_RESULT_AMOUNT)
@@ -78,9 +84,17 @@ public class OrderRepositoryImpl implements OrderRepository {
     public Set<Order> findAllByUser(int firstElementNumber, long userId) {
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
         CriteriaQuery<Order> query = builder.createQuery(Order.class);
+        CriteriaQuery<Long> pageQuery = builder.createQuery(Long.class);
         Root<Order> root = query.from(Order.class);
+        Root<Order> pageRoot = pageQuery.from(Order.class);
+
         query.select(root)
                 .where(builder.equal(root.join(USER).get(ID), userId));
+        pageQuery.select(builder.count(pageRoot))
+                .where(builder.equal(pageRoot.join(USER).get(ID), userId));
+
+        long amount = entityManager.createQuery(pageQuery).getSingleResult();
+        lastPage = (int) Math.ceil((double) amount / MAX_RESULT_AMOUNT);
         return new LinkedHashSet<>(entityManager.createQuery(query)
                 .setFirstResult(firstElementNumber)
                 .setMaxResults(MAX_RESULT_AMOUNT)
@@ -89,15 +103,21 @@ public class OrderRepositoryImpl implements OrderRepository {
 
     @Override
     public Set<Order> findBySeveralParameters(int firstElementNumber, Order order) {
-        CriteriaQuery<Order> query = entityManager.getCriteriaBuilder()
-                .createQuery(Order.class);
+        CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+        CriteriaQuery<Order> query = builder.createQuery(Order.class);
+        CriteriaQuery<Long> pageQuery = builder.createQuery(Long.class);
         Root<Order> root = query.from(Order.class);
-        root.join(USER);
-        root.join(CERTIFICATE);
-        Predicate[] predicates = createPredicates(root, order)
-                .toArray(new Predicate[0]);
-        query.select(root)
+        Root<Order> pageRoot = pageQuery.from(Order.class);
+
+        Predicate[] predicates = createPredicates(root, order).toArray(new Predicate[0]);
+        Predicate[] queryPredicates = createPredicates(pageRoot, order).toArray(new Predicate[0]);
+        query.select(root.join(USER).join(CERTIFICATE))
                 .where(predicates);
+        pageQuery.select(builder.count(root.join(USER).join(CERTIFICATE)))
+                .where(queryPredicates);
+
+        long amount = entityManager.createQuery(pageQuery).getSingleResult();
+        lastPage = (int) Math.ceil((double) amount / MAX_RESULT_AMOUNT);
         return new LinkedHashSet<>(entityManager.createQuery(query)
                 .setFirstResult(firstElementNumber)
                 .setMaxResults(MAX_RESULT_AMOUNT)
@@ -122,5 +142,10 @@ public class OrderRepositoryImpl implements OrderRepository {
             predicates.add(builder.equal(root.get(CREATE_DATE), order.getCreateDate()));
         }
         return predicates;
+    }
+
+    @Override
+    public int getLastPage() {
+        return lastPage;
     }
 }

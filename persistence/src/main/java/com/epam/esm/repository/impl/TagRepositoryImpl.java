@@ -25,6 +25,7 @@ import static com.epam.esm.repository.ColumnName.NAME;
  */
 @Repository
 public class TagRepositoryImpl implements TagRepository {
+    private int lastPage;
     @PersistenceContext
     private EntityManager entityManager;
 
@@ -41,10 +42,15 @@ public class TagRepositoryImpl implements TagRepository {
 
     @Override
     public Set<Tag> findAll(int firstElementNumber) {
-        CriteriaQuery<Tag> query = entityManager.getCriteriaBuilder()
-                .createQuery(Tag.class);
-        Root<Tag> root = query.from(Tag.class);
-        query.select(root);
+        CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+        CriteriaQuery<Tag> query = builder.createQuery(Tag.class);
+        CriteriaQuery<Long> pageQuery = builder.createQuery(Long.class);
+
+        query.select(query.from(Tag.class));
+        pageQuery.select(builder.count(pageQuery.from(Tag.class)));
+
+        long amount = entityManager.createQuery(pageQuery).getSingleResult();
+        lastPage = (int) Math.ceil((double) amount / MAX_RESULT_AMOUNT);
         return new LinkedHashSet<>(entityManager.createQuery(query)
                 .setFirstResult(firstElementNumber)
                 .setMaxResults(MAX_RESULT_AMOUNT)
@@ -75,8 +81,7 @@ public class TagRepositoryImpl implements TagRepository {
 
     @Override
     public Set<Tag> findMostUsedTag(int firstElementNumber) {
-        Query query = entityManager.createNativeQuery("SELECT id, name FROM " +
-                "(SELECT max(amount), id, name FROM " +
+        String querySql = "FROM (SELECT max(amount), id, name FROM " +
                 "(SELECT o.id_user, count(*) AS amount, t.id AS id, t.name as name FROM tags t " +
                 "JOIN certificate_purchase cp ON t.id = cp.id_tag " +
                 "JOIN gift_certificates gc ON gc.id = cp.id_certificate " +
@@ -88,10 +93,19 @@ public class TagRepositoryImpl implements TagRepository {
                 "(SELECT id_user, sum(cost) AS summary FROM orders " +
                 "GROUP BY id_user) AS order_sum) " +
                 "AS max_sum) " +
-                "GROUP BY id_user, name) AS most_used", Tag.class);
+                "GROUP BY id_user, name) AS most_used";
+        Query query = entityManager.createNativeQuery("SELECT id, name " + querySql, Tag.class);
+        Query pageQuery = entityManager.createNativeQuery("SELECT COUNT(id) " + querySql, Long.class);
+        long amount = (Long) pageQuery.getSingleResult();
+        lastPage = (int) Math.ceil((double) amount / MAX_RESULT_AMOUNT);
         return new LinkedHashSet<>(query
                 .setFirstResult(firstElementNumber)
                 .setMaxResults(MAX_RESULT_AMOUNT)
                 .getResultList());
+    }
+
+    @Override
+    public int getLastPage() {
+        return lastPage;
     }
 }

@@ -15,7 +15,10 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
@@ -27,6 +30,7 @@ import java.util.stream.Collectors;
  */
 @Service
 public class OrderServiceImpl implements OrderService {
+    private int lastPage;
     private final OrderRepository repository;
     private final GiftCertificateRepository certificateRepository;
     private final UserRepository userRepository;
@@ -97,6 +101,7 @@ public class OrderServiceImpl implements OrderService {
     public Set<OrderDto> findAll(int page) {
         int firstElementNumber = getFirstElementNumber(page);
         Set<Order> foundOrders = repository.findAll(firstElementNumber);
+        lastPage = repository.getLastPage();
         Set<OrderDto> orders = foundOrders.stream()
                 .map(mapper::mapToDto)
                 .collect(Collectors.toSet());
@@ -120,6 +125,7 @@ public class OrderServiceImpl implements OrderService {
         int firstElementNumber = getFirstElementNumber(page);
         Set<Order> foundOrders = repository.findAllByUser(firstElementNumber, userId);
         foundOrders.forEach(o -> o.setCertificate(null));
+        lastPage = repository.getLastPage();
         Set<OrderDto> orders = foundOrders.stream()
                 .map(mapper::mapToDto)
                 .collect(Collectors.toSet());
@@ -131,6 +137,7 @@ public class OrderServiceImpl implements OrderService {
         Order order = mapper.mapToEntity(orderDto);
         int firstElementNumber = getFirstElementNumber(page);
         Set<Order> foundOrders = repository.findBySeveralParameters(firstElementNumber, order);
+        lastPage = repository.getLastPage();
         Set<OrderDto> orders = foundOrders.stream()
                 .map(mapper::mapToDto)
                 .collect(Collectors.toSet());
@@ -145,5 +152,10 @@ public class OrderServiceImpl implements OrderService {
             o.getUser().setOrders(null);
         });
         return orders;
+    }
+
+    @Override
+    public int getLastPage() {
+        return lastPage;
     }
 }

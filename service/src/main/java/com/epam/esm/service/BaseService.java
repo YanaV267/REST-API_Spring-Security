@@ -49,4 +49,6 @@ public interface BaseService<T> {
     default int getFirstElementNumber(int page) {
         return (page - 1) * MAX_RESULT_AMOUNT;
     }
+
+    int getLastPage();
 }

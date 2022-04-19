@@ -35,7 +35,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 @RestController
 @Validated
 @RequestMapping("/certificates")
-public class GiftCertificateController {
+public class GiftCertificateController extends AbstractController<GiftCertificateDto> {
     private final GiftCertificateService certificateService;
 
     /**
@@ -102,10 +102,12 @@ public class GiftCertificateController {
     @ResponseStatus(FOUND)
     public CollectionModel<GiftCertificateDto> retrieveAll(@RequestParam @Min(1) int page) {
         Set<GiftCertificateDto> certificates = certificateService.findAll(page);
+        int lastPage = certificateService.getLastPage();
         if (!certificates.isEmpty()) {
             addLinksToCertificates(certificates);
-            Link link = linkTo(methodOn(GiftCertificateController.class).retrieveAll(page)).withSelfRel();
-            return CollectionModel.of(certificates, link);
+            CollectionModel<GiftCertificateDto> method = methodOn(GiftCertificateController.class).retrieveAll(page);
+            List<Link> links = addPagesLinks(method, page, lastPage);
+            return CollectionModel.of(certificates, links);
         } else {
             throw new NoDataFoundException(CERTIFICATES, GiftCertificateDto.class);
         }
@@ -151,11 +153,13 @@ public class GiftCertificateController {
                     List<@Pattern(regexp = "[a-z]_(de)|(a)sc") String> sortTypes) {
         Set<GiftCertificateDto> certificates = certificateService.findBySeveralParameters(
                 page, certificateDto, tagNames, sortTypes);
+        int lastPage = certificateService.getLastPage();
         if (!certificates.isEmpty()) {
             addLinksToCertificates(certificates);
-            Link link = linkTo(methodOn(GiftCertificateController.class)
-                    .retrieveBySeveralParameters(page, certificateDto, tagNames, sortTypes)).withSelfRel();
-            return CollectionModel.of(certificates, link);
+            CollectionModel<GiftCertificateDto> method = methodOn(GiftCertificateController.class)
+                    .retrieveBySeveralParameters(page, certificateDto, tagNames, sortTypes);
+            List<Link> links = addPagesLinks(method, page, lastPage);
+            return CollectionModel.of(certificates, links);
         } else {
             throw new NoDataFoundException(certificateDto.toString(), GiftCertificateDto.class);
         }

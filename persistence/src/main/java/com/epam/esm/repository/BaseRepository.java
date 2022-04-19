@@ -38,4 +38,6 @@ public interface BaseRepository<T> {
      * @return the optional
      */
     Optional<T> findById(long id);
+
+    int getLastPage();
 }

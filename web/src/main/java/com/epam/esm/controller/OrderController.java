@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -32,7 +33,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 @RestController
 @Validated
 @RequestMapping("/orders")
-public class OrderController {
+public class OrderController extends AbstractController<OrderDto> {
     private final OrderService orderService;
 
     /**
@@ -99,10 +100,12 @@ public class OrderController {
     @ResponseStatus(FOUND)
     public CollectionModel<OrderDto> retrieveAll(@RequestParam @Min(1) int page) {
         Set<OrderDto> orders = orderService.findAll(page);
+        int lastPage = orderService.getLastPage();
         if (!orders.isEmpty()) {
             addLinksToOrders(orders);
-            Link link = linkTo(methodOn(OrderController.class).retrieveAll(page)).withSelfRel();
-            return CollectionModel.of(orders, link);
+            CollectionModel<OrderDto> method = methodOn(OrderController.class).retrieveAll(page);
+            List<Link> links = addPagesLinks(method, page, lastPage);
+            return CollectionModel.of(orders, links);
         } else {
             throw new NoDataFoundException(ORDERS, OrderDto.class);
         }
@@ -139,10 +142,12 @@ public class OrderController {
     public CollectionModel<OrderDto> retrieveAllByUser(@PathVariable @Min(1) long userId,
                                                        @RequestParam @Min(1) int page) {
         Set<OrderDto> orders = orderService.findAllByUser(page, userId);
+        int lastPage = orderService.getLastPage();
         if (!orders.isEmpty()) {
             addLinksToOrders(orders);
-            Link link = linkTo(methodOn(OrderController.class).retrieveAllByUser(userId, page)).withSelfRel();
-            return CollectionModel.of(orders, link);
+            CollectionModel<OrderDto> method = methodOn(OrderController.class).retrieveAllByUser(userId, page);
+            List<Link> links = addPagesLinks(method, page, lastPage);
+            return CollectionModel.of(orders, links);
         } else {
             throw new NoDataFoundException(ID_USER, userId, OrderDto.class);
         }
@@ -160,11 +165,13 @@ public class OrderController {
     public CollectionModel<OrderDto> retrieveBySeveralParameters(@RequestParam @Min(1) int page,
                                                                  @RequestParam @Valid OrderDto orderDto) {
         Set<OrderDto> orders = orderService.findBySeveralParameters(page, orderDto);
+        int lastPage = orderService.getLastPage();
         if (!orders.isEmpty()) {
             addLinksToOrders(orders);
-            Link link = linkTo(methodOn(OrderController.class)
-                    .retrieveBySeveralParameters(page, orderDto)).withSelfRel();
-            return CollectionModel.of(orders, link);
+            CollectionModel<OrderDto> method = methodOn(OrderController.class)
+                    .retrieveBySeveralParameters(page, orderDto);
+            List<Link> links = addPagesLinks(method, page, lastPage);
+            return CollectionModel.of(orders, links);
         } else {
             throw new NoDataFoundException(orderDto.toString(), OrderDto.class);
         }

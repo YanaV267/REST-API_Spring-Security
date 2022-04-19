@@ -24,6 +24,7 @@ import java.util.stream.Collectors;
  */
 @Service
 public class GiftCertificateServiceImpl implements GiftCertificateService {
+    private int lastPage;
     private final GiftCertificateRepository repository;
     private final GiftCertificateMapper mapper;
 
@@ -76,6 +77,7 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
     public Set<GiftCertificateDto> findAll(int page) {
         int firstElementNumber = getFirstElementNumber(page);
         Set<GiftCertificate> certificates = repository.findAll(firstElementNumber);
+        lastPage = repository.getLastPage();
         return certificates.stream()
                 .map(mapper::mapToDto)
                 .collect(Collectors.toSet());
@@ -99,8 +101,14 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
         int firstElementNumber = getFirstElementNumber(page);
         Set<GiftCertificate> certificates = repository.findBySeveralParameters(firstElementNumber,
                 giftCertificate, giftCertificate.getTags(), sortTypes);
+        lastPage = repository.getLastPage();
         return certificates.stream()
                 .map(mapper::mapToDto)
                 .collect(Collectors.toCollection(LinkedHashSet::new));
+    }
+
+    @Override
+    public int getLastPage() {
+        return lastPage;
     }
 }

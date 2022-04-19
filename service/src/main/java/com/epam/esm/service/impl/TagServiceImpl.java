@@ -22,6 +22,7 @@ import java.util.stream.Collectors;
  */
 @Service
 public class TagServiceImpl implements TagService {
+    private int lastPage;
     private final TagRepository repository;
     private final TagMapper mapper;
 
@@ -66,6 +67,7 @@ public class TagServiceImpl implements TagService {
     public Set<TagDto> findAll(int page) {
         int firstElementNumber = getFirstElementNumber(page);
         Set<Tag> tags = repository.findAll(firstElementNumber);
+        lastPage = repository.getLastPage();
         return tags.stream()
                 .map(mapper::mapToDto)
                 .collect(Collectors.toSet());
@@ -96,9 +98,15 @@ public class TagServiceImpl implements TagService {
     @Override
     public Set<TagDto> findMostUsedTag(int page) {
         int firstElementNumber = getFirstElementNumber(page);
+        lastPage = repository.getLastPage();
         return repository.findMostUsedTag(firstElementNumber)
                 .stream()
                 .map(mapper::mapToDto)
                 .collect(Collectors.toSet());
+    }
+
+    @Override
+    public int getLastPage() {
+        return lastPage;
     }
 }

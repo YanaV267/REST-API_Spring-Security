@@ -20,6 +20,7 @@ import static com.epam.esm.repository.ColumnName.*;
  */
 @Repository
 public class GiftCertificateRepositoryImpl implements GiftCertificateRepository {
+    private int lastPage;
     private static final String UNDERSCORE = "_";
     private static final String DESC = "desc";
 
@@ -62,10 +63,15 @@ public class GiftCertificateRepositoryImpl implements GiftCertificateRepository 
 
     @Override
     public Set<GiftCertificate> findAll(int firstElementNumber) {
-        CriteriaQuery<GiftCertificate> query = entityManager.getCriteriaBuilder()
-                .createQuery(GiftCertificate.class);
-        Root<GiftCertificate> root = query.from(GiftCertificate.class);
-        query.select(root);
+        CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+        CriteriaQuery<GiftCertificate> query = builder.createQuery(GiftCertificate.class);
+        CriteriaQuery<Long> pageQuery = builder.createQuery(Long.class);
+
+        query.select(query.from(GiftCertificate.class));
+        pageQuery.select(builder.count(pageQuery.from(GiftCertificate.class)));
+
+        long amount = entityManager.createQuery(pageQuery).getSingleResult();
+        lastPage = (int) Math.ceil((double) amount / MAX_RESULT_AMOUNT);
         return new LinkedHashSet<>(entityManager.createQuery(query)
                 .setFirstResult(firstElementNumber)
                 .setMaxResults(MAX_RESULT_AMOUNT)
@@ -81,15 +87,25 @@ public class GiftCertificateRepositoryImpl implements GiftCertificateRepository 
     @Override
     public Set<GiftCertificate> findBySeveralParameters(int firstElementNumber, GiftCertificate certificate, Set<Tag> tags,
                                                         List<String> sortTypes) {
-        CriteriaQuery<GiftCertificate> query = entityManager.getCriteriaBuilder()
-                .createQuery(GiftCertificate.class);
+        CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+        CriteriaQuery<GiftCertificate> query = builder.createQuery(GiftCertificate.class);
+        CriteriaQuery<Long> pageQuery = builder.createQuery(Long.class);
         Root<GiftCertificate> root = query.from(GiftCertificate.class);
-        Predicate[] predicates = createPredicates(root, certificate, tags)
-                .toArray(new Predicate[0]);
+        Root<GiftCertificate> pageRoot = pageQuery.from(GiftCertificate.class);
+
+        Predicate[] predicates = createPredicates(root, certificate, tags).toArray(new Predicate[0]);
+        Predicate[] pagePredicates = createPredicates(pageRoot, certificate, tags).toArray(new Predicate[0]);
         List<Order> orderList = createOrders(root, sortTypes);
+        List<Order> pageOrderList = createOrders(pageRoot, sortTypes);
         query.select(root)
                 .where(predicates)
                 .orderBy(orderList);
+        pageQuery.select(builder.count(pageRoot))
+                .where(pagePredicates)
+                .orderBy(pageOrderList);
+
+        long amount = entityManager.createQuery(pageQuery).getSingleResult();
+        lastPage = (int) Math.ceil((double) amount / MAX_RESULT_AMOUNT);
         return new LinkedHashSet<>(entityManager.createQuery(query)
                 .setFirstResult(firstElementNumber)
                 .setMaxResults(MAX_RESULT_AMOUNT)
@@ -141,5 +157,10 @@ public class GiftCertificateRepositoryImpl implements GiftCertificateRepository 
             }
         }
         return orders;
+    }
+
+    @Override
+    public int getLastPage() {
+        return lastPage;
     }
 }

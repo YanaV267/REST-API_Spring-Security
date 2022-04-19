@@ -15,6 +15,7 @@ import javax.validation.Valid;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -33,7 +34,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 @RestController
 @Validated
 @RequestMapping("/tags")
-public class TagController {
+public class TagController extends AbstractController<TagDto> {
     private final TagService tagService;
 
     /**
@@ -84,10 +85,12 @@ public class TagController {
     @ResponseStatus(FOUND)
     public CollectionModel<TagDto> retrieveAll(@RequestParam @Min(1) int page) {
         Set<TagDto> tags = tagService.findAll(page);
+        int lastPage = tagService.getLastPage();
         if (!tags.isEmpty()) {
             addLinksToTags(tags);
-            Link link = linkTo(methodOn(TagController.class).retrieveAll(page)).withSelfRel();
-            return CollectionModel.of(tags, link);
+            CollectionModel<TagDto> method = methodOn(TagController.class).retrieveAll(page);
+            List<Link> links = addPagesLinks(method, page, lastPage);
+            return CollectionModel.of(tags, links);
         } else {
             throw new NoDataFoundException(TAGS, TagDto.class);
         }
@@ -121,9 +124,9 @@ public class TagController {
     @GetMapping(params = "name", produces = APPLICATION_JSON_VALUE)
     @ResponseStatus(FOUND)
     public TagDto retrieveByName(@RequestParam
-                                                  @NotNull
-                                                  @Pattern(regexp = "[а-я\\p{Lower}_]{1,50}")
-                                                          String name) {
+                                 @NotNull
+                                 @Pattern(regexp = "[а-я\\p{Lower}_]{1,50}")
+                                         String name) {
         Optional<TagDto> tag = tagService.findByName(name);
         if (tag.isPresent()) {
             Link link = linkTo(methodOn(TagController.class).retrieveByName(name)).withSelfRel();
@@ -144,16 +147,18 @@ public class TagController {
     @ResponseStatus(FOUND)
     public CollectionModel<TagDto> retrieveMostUsedTag(@RequestParam @Min(1) int page) {
         Set<TagDto> tags = tagService.findMostUsedTag(page);
+        int lastPage = tagService.getLastPage();
         if (!tags.isEmpty()) {
             addLinksToTags(tags);
-            Link link = linkTo(methodOn(TagController.class).retrieveMostUsedTag(page)).withSelfRel();
-            return CollectionModel.of(tags, link);
+            CollectionModel<TagDto> method = methodOn(TagController.class).retrieveMostUsedTag(page);
+            List<Link> links = addPagesLinks(method, page, lastPage);
+            return CollectionModel.of(tags, links);
         } else {
             throw new NoDataFoundException(MOST_USED_TAG, OrderDto.class);
         }
     }
 
-    private void addLinksToTags(Set<TagDto> tags) {
+    protected void addLinksToTags(Set<TagDto> tags) {
         tags.forEach(t -> {
             Link selfLink = linkTo(methodOn(TagController.class).retrieveById(t.getId())).withSelfRel();
             t.add(selfLink);

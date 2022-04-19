@@ -10,6 +10,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.constraints.Min;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -29,7 +30,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 @RestController
 @Validated
 @RequestMapping("/users")
-public class UserController {
+public class UserController extends AbstractController<UserDto> {
     private final UserService userService;
 
     /**
@@ -66,10 +67,12 @@ public class UserController {
     @ResponseStatus(FOUND)
     public CollectionModel<UserDto> retrieveAll(@RequestParam @Min(1) int page) {
         Set<UserDto> users = userService.findAll(page);
+        int lastPage = userService.getLastPage();
         if (!users.isEmpty()) {
             addLinksToUsers(users);
-            Link link = linkTo(methodOn(UserController.class).retrieveAll(page)).withSelfRel();
-            return CollectionModel.of(users, link);
+            CollectionModel<UserDto> method = methodOn(UserController.class).retrieveAll(page);
+            List<Link> links = addPagesLinks(method, page, lastPage);
+            return CollectionModel.of(users, links);
         } else {
             throw new NoDataFoundException(USERS, UserDto.class);
         }
@@ -85,10 +88,12 @@ public class UserController {
     @ResponseStatus(FOUND)
     public CollectionModel<UserDto> retrieveAllWithOrders(@RequestParam @Min(1) int page) {
         Set<UserDto> users = userService.findAllWithOrders(page);
+        int lastPage = userService.getLastPage();
         if (!users.isEmpty()) {
             addLinksToUsers(users);
-            Link link = linkTo(methodOn(UserController.class).retrieveAllWithOrders(page)).withSelfRel();
-            return CollectionModel.of(users, link);
+            CollectionModel<UserDto> method = methodOn(UserController.class).retrieveAllWithOrders(page);
+            List<Link> links = addPagesLinks(method, page, lastPage);
+            return CollectionModel.of(users, links);
         } else {
             throw new NoDataFoundException(USERS, UserDto.class);
         }
@@ -123,10 +128,13 @@ public class UserController {
     @ResponseStatus(FOUND)
     public CollectionModel<UserDto> retrieveWithHighestOrderCost(@RequestParam @Min(1) int page) {
         Set<UserDto> users = userService.findWithHighestOrderCost(page);
+        int lastPage = userService.getLastPage();
         if (!users.isEmpty()) {
             addLinksToUsers(users);
-            Link link = linkTo(methodOn(UserController.class).retrieveWithHighestOrderCost(page)).withSelfRel();
-            return CollectionModel.of(users, link);
+            CollectionModel<UserDto> method = methodOn(UserController.class)
+                    .retrieveWithHighestOrderCost(page);
+            List<Link> links = addPagesLinks(method, page, lastPage);
+            return CollectionModel.of(users, links);
         } else {
             throw new NoDataFoundException(HIGHEST_ORDER_COST, UserDto.class);
         }

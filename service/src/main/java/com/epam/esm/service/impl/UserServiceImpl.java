@@ -22,6 +22,7 @@ import java.util.stream.Collectors;
  */
 @Service
 public class UserServiceImpl implements UserService {
+    private int lastPage;
     private final UserRepository repository;
     private final UserMapper mapper;
 
@@ -53,6 +54,7 @@ public class UserServiceImpl implements UserService {
     public Set<UserDto> findAll(int page) {
         int firstElementNumber = getFirstElementNumber(page);
         Set<User> users = repository.findAll(firstElementNumber);
+        lastPage = repository.getLastPage();
         return users.stream()
                 .map(mapper::mapToDto)
                 .collect(Collectors.toSet());
@@ -62,6 +64,7 @@ public class UserServiceImpl implements UserService {
     public Set<UserDto> findAllWithOrders(int page) {
         int firstElementNumber = getFirstElementNumber(page);
         Set<User> users = repository.findAllWithOrders(firstElementNumber);
+        lastPage = repository.getLastPage();
         return users.stream()
                 .map(mapper::mapToDto)
                 .collect(Collectors.toSet());
@@ -82,8 +85,14 @@ public class UserServiceImpl implements UserService {
     public Set<UserDto> findWithHighestOrderCost(int page) {
         int firstElementNumber = getFirstElementNumber(page);
         Set<User> orders = repository.findWithHighestOrderCost(firstElementNumber);
+        lastPage = repository.getLastPage();
         return orders.stream()
                 .map(mapper::mapToDto)
                 .collect(Collectors.toSet());
+    }
+
+    @Override
+    public int getLastPage() {
+        return lastPage;
     }
 }
