@@ -14,8 +14,6 @@ dependencies {
     implementation 'mysql:mysql-connector-java:8.0.28'
     compileOnly 'org.projectlombok:lombok:1.18.22'
     annotationProcessor 'org.projectlombok:lombok:1.18.22'
-
-    testFixturesApi 'com.h2database:h2:2.1.210'
     testFixturesApi 'org.junit.jupiter:junit-jupiter-engine:5.8.2'
     testFixturesApi 'org.junit.jupiter:junit-jupiter-api:5.8.2'
     testFixturesApi 'org.junit.jupiter:junit-jupiter-params:5.8.2'

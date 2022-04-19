@@ -12,6 +12,5 @@ repositories {
 
 dependencies {
     implementation 'com.fasterxml.jackson.core:jackson-databind:2.13.2.2'
-    implementation 'commons-dbcp:commons-dbcp:1.4'
-    implementation project(":service")
+    implementation project(':service')
 }
