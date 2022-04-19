@@ -7,6 +7,8 @@ import com.epam.esm.service.GiftCertificateService;
 import com.epam.esm.validation.OnCreateGroup;
 import com.epam.esm.validation.OnUpdateGroup;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.hateoas.CollectionModel;
+import org.springframework.hateoas.Link;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,6 +21,8 @@ import java.util.Set;
 
 import static com.epam.esm.util.ParameterName.CERTIFICATES;
 import static com.epam.esm.util.ParameterName.ID;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 import static org.springframework.http.HttpStatus.*;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
@@ -96,17 +100,19 @@ public class GiftCertificateController {
      */
     @GetMapping(value = "/all", produces = APPLICATION_JSON_VALUE)
     @ResponseStatus(FOUND)
-    public Set<GiftCertificateDto> retrieveAll(@RequestParam @Min(1) int page) {
+    public CollectionModel<GiftCertificateDto> retrieveAll(@RequestParam @Min(1) int page) {
         Set<GiftCertificateDto> certificates = certificateService.findAll(page);
         if (!certificates.isEmpty()) {
-            return certificates;
+            addLinksToCertificates(certificates);
+            Link link = linkTo(methodOn(GiftCertificateController.class).retrieveAll(page)).withSelfRel();
+            return CollectionModel.of(certificates, link);
         } else {
             throw new NoDataFoundException(CERTIFICATES, GiftCertificateDto.class);
         }
     }
 
     /**
-     * Find by id gift certificate dto.
+     * Retrieve by id gift certificate dto.
      *
      * @param id the id
      * @return the gift certificate dto
@@ -116,6 +122,8 @@ public class GiftCertificateController {
     public GiftCertificateDto retrieveById(@PathVariable @Min(1) long id) {
         Optional<GiftCertificateDto> giftCertificate = certificateService.findById(id);
         if (giftCertificate.isPresent()) {
+            Link link = linkTo(methodOn(GiftCertificateController.class).retrieveById(id)).withSelfRel();
+            giftCertificate.get().add(link);
             return giftCertificate.get();
         } else {
             throw new NoDataFoundException(ID, id, GiftCertificateDto.class);
@@ -123,7 +131,7 @@ public class GiftCertificateController {
     }
 
     /**
-     * Find by several parameters set.
+     * Retrieve by several parameters set.
      *
      * @param page           the page
      * @param certificateDto the certificate dto
@@ -133,7 +141,7 @@ public class GiftCertificateController {
      */
     @GetMapping(produces = APPLICATION_JSON_VALUE)
     @ResponseStatus(FOUND)
-    public Set<GiftCertificateDto> retrieveBySeveralParameters(
+    public CollectionModel<GiftCertificateDto> retrieveBySeveralParameters(
             @RequestParam(value = "page") @Min(1) int page,
             @RequestParam GiftCertificateDto certificateDto,
             @RequestParam(value = "tag", required = false)
@@ -144,9 +152,19 @@ public class GiftCertificateController {
         Set<GiftCertificateDto> certificates = certificateService.findBySeveralParameters(
                 page, certificateDto, tagNames, sortTypes);
         if (!certificates.isEmpty()) {
-            return certificates;
+            addLinksToCertificates(certificates);
+            Link link = linkTo(methodOn(GiftCertificateController.class)
+                    .retrieveBySeveralParameters(page, certificateDto, tagNames, sortTypes)).withSelfRel();
+            return CollectionModel.of(certificates, link);
         } else {
             throw new NoDataFoundException(certificateDto.toString(), GiftCertificateDto.class);
         }
+    }
+
+    private void addLinksToCertificates(Set<GiftCertificateDto> certificates) {
+        certificates.forEach(c -> {
+            Link selfLink = linkTo(methodOn(GiftCertificateController.class).retrieveById(c.getId())).withSelfRel();
+            c.add(selfLink);
+        });
     }
 }

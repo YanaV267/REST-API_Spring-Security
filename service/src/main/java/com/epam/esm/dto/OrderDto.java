@@ -4,8 +4,10 @@ import com.epam.esm.validation.OnCreateGroup;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.hateoas.RepresentationModel;
 
 import javax.validation.Valid;
 import javax.validation.constraints.DecimalMin;
@@ -20,8 +22,9 @@ import java.time.LocalDateTime;
  * @project GiftCertificate
  */
 @Data
+@EqualsAndHashCode(callSuper = false)
 @NoArgsConstructor
-public class OrderDto {
+public class OrderDto extends RepresentationModel<OrderDto> {
     private long id;
 
     @NotNull(groups = OnCreateGroup.class)

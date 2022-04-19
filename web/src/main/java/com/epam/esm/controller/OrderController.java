@@ -7,6 +7,8 @@ import com.epam.esm.service.OrderService;
 import com.epam.esm.validation.OnAggregationCreateGroup;
 import com.epam.esm.validation.OnUpdateGroup;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.hateoas.CollectionModel;
+import org.springframework.hateoas.Link;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,6 +18,8 @@ import java.util.Optional;
 import java.util.Set;
 
 import static com.epam.esm.util.ParameterName.*;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 import static org.springframework.http.HttpStatus.*;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
@@ -93,17 +97,19 @@ public class OrderController {
      */
     @GetMapping(value = "/all", produces = APPLICATION_JSON_VALUE)
     @ResponseStatus(FOUND)
-    public Set<OrderDto> retrieveAll(@RequestParam @Min(1) int page) {
+    public CollectionModel<OrderDto> retrieveAll(@RequestParam @Min(1) int page) {
         Set<OrderDto> orders = orderService.findAll(page);
         if (!orders.isEmpty()) {
-            return orders;
+            addLinksToOrders(orders);
+            Link link = linkTo(methodOn(OrderController.class).retrieveAll(page)).withSelfRel();
+            return CollectionModel.of(orders, link);
         } else {
             throw new NoDataFoundException(ORDERS, OrderDto.class);
         }
     }
 
     /**
-     * Find by id order dto.
+     * Retrieve by id order dto.
      *
      * @param id the id
      * @return the order dto
@@ -113,6 +119,8 @@ public class OrderController {
     public OrderDto retrieveById(@PathVariable @Min(1) long id) {
         Optional<OrderDto> order = orderService.findById(id);
         if (order.isPresent()) {
+            Link link = linkTo(methodOn(OrderController.class).retrieveById(id)).withSelfRel();
+            order.get().add(link);
             return order.get();
         } else {
             throw new NoDataFoundException(ID, id, OrderDto.class);
@@ -120,7 +128,7 @@ public class OrderController {
     }
 
     /**
-     * Find all by user set.
+     * Retrieve all by user set.
      *
      * @param userId the user id
      * @param page   the page
@@ -128,18 +136,20 @@ public class OrderController {
      */
     @GetMapping(value = "/user/{userId}", produces = APPLICATION_JSON_VALUE)
     @ResponseStatus(FOUND)
-    public Set<OrderDto> retrieveAllByUser(@PathVariable @Min(1) long userId,
-                                           @RequestParam @Min(1) int page) {
+    public CollectionModel<OrderDto> retrieveAllByUser(@PathVariable @Min(1) long userId,
+                                                       @RequestParam @Min(1) int page) {
         Set<OrderDto> orders = orderService.findAllByUser(page, userId);
         if (!orders.isEmpty()) {
-            return orders;
+            addLinksToOrders(orders);
+            Link link = linkTo(methodOn(OrderController.class).retrieveAllByUser(userId, page)).withSelfRel();
+            return CollectionModel.of(orders, link);
         } else {
             throw new NoDataFoundException(ID_USER, userId, OrderDto.class);
         }
     }
 
     /**
-     * Find by several parameters set.
+     * Retrieve by several parameters set.
      *
      * @param page     the page
      * @param orderDto the certificate dto
@@ -147,13 +157,23 @@ public class OrderController {
      */
     @GetMapping(produces = APPLICATION_JSON_VALUE)
     @ResponseStatus(FOUND)
-    public Set<OrderDto> retrieveBySeveralParameters(@RequestParam @Min(1) int page,
-                                                     @RequestParam @Valid OrderDto orderDto) {
+    public CollectionModel<OrderDto> retrieveBySeveralParameters(@RequestParam @Min(1) int page,
+                                                                 @RequestParam @Valid OrderDto orderDto) {
         Set<OrderDto> orders = orderService.findBySeveralParameters(page, orderDto);
         if (!orders.isEmpty()) {
-            return orders;
+            addLinksToOrders(orders);
+            Link link = linkTo(methodOn(OrderController.class)
+                    .retrieveBySeveralParameters(page, orderDto)).withSelfRel();
+            return CollectionModel.of(orders, link);
         } else {
             throw new NoDataFoundException(orderDto.toString(), OrderDto.class);
         }
+    }
+
+    private void addLinksToOrders(Set<OrderDto> orders) {
+        orders.forEach(o -> {
+            Link selfLink = linkTo(methodOn(OrderController.class).retrieveById(o.getId())).withSelfRel();
+            o.add(selfLink);
+        });
     }
 }

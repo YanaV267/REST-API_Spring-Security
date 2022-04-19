@@ -3,7 +3,9 @@ package com.epam.esm.dto;
 import com.epam.esm.validation.OnAggregationCreateGroup;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import org.springframework.hateoas.RepresentationModel;
 
 import javax.validation.Valid;
 import javax.validation.constraints.DecimalMin;
@@ -19,8 +21,9 @@ import java.util.Set;
  * @project GiftCertificate
  */
 @Data
+@EqualsAndHashCode(callSuper = false)
 @NoArgsConstructor
-public class UserDto {
+public class UserDto extends RepresentationModel<UserDto> {
     @Min(value = 1, groups = OnAggregationCreateGroup.class)
     private long id;
 

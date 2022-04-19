@@ -6,6 +6,8 @@ import com.epam.esm.exception.BadRequestException;
 import com.epam.esm.exception.NoDataFoundException;
 import com.epam.esm.service.TagService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.hateoas.CollectionModel;
+import org.springframework.hateoas.Link;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,6 +19,8 @@ import java.util.Optional;
 import java.util.Set;
 
 import static com.epam.esm.util.ParameterName.*;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 import static org.springframework.http.HttpStatus.*;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
@@ -78,17 +82,19 @@ public class TagController {
      */
     @GetMapping(produces = APPLICATION_JSON_VALUE)
     @ResponseStatus(FOUND)
-    public Set<TagDto> retrieveAll(@RequestParam @Min(1) int page) {
+    public CollectionModel<TagDto> retrieveAll(@RequestParam @Min(1) int page) {
         Set<TagDto> tags = tagService.findAll(page);
         if (!tags.isEmpty()) {
-            return tags;
+            addLinksToTags(tags);
+            Link link = linkTo(methodOn(TagController.class).retrieveAll(page)).withSelfRel();
+            return CollectionModel.of(tags, link);
         } else {
             throw new NoDataFoundException(TAGS, TagDto.class);
         }
     }
 
     /**
-     * Find by id tag dto.
+     * Retrieve by id tag dto.
      *
      * @param id the id
      * @return the tag dto0
@@ -98,6 +104,8 @@ public class TagController {
     public TagDto retrieveById(@PathVariable @Min(value = 1) long id) {
         Optional<TagDto> tag = tagService.findById(id);
         if (tag.isPresent()) {
+            Link link = linkTo(methodOn(TagController.class).retrieveById(id)).withSelfRel();
+            tag.get().add(link);
             return tag.get();
         } else {
             throw new NoDataFoundException(ID, id, TagDto.class);
@@ -105,7 +113,7 @@ public class TagController {
     }
 
     /**
-     * Find by name tag dto.
+     * Retrieve by name tag dto.
      *
      * @param name the name
      * @return the tag dto
@@ -113,11 +121,13 @@ public class TagController {
     @GetMapping(params = "name", produces = APPLICATION_JSON_VALUE)
     @ResponseStatus(FOUND)
     public TagDto retrieveByName(@RequestParam
-                                 @NotNull
-                                 @Pattern(regexp = "[а-я\\p{Lower}_]{1,50}")
-                                         String name) {
+                                                  @NotNull
+                                                  @Pattern(regexp = "[а-я\\p{Lower}_]{1,50}")
+                                                          String name) {
         Optional<TagDto> tag = tagService.findByName(name);
         if (tag.isPresent()) {
+            Link link = linkTo(methodOn(TagController.class).retrieveByName(name)).withSelfRel();
+            tag.get().add(link);
             return tag.get();
         } else {
             throw new NoDataFoundException(NAME, name, TagDto.class);
@@ -125,19 +135,28 @@ public class TagController {
     }
 
     /**
-     * Find most used tag set.
+     * Retrieve most used tag set.
      *
      * @param page the page
      * @return the set
      */
     @GetMapping(value = "/most-used-tag", produces = APPLICATION_JSON_VALUE)
     @ResponseStatus(FOUND)
-    public Set<TagDto> retrieveMostUsedTag(@RequestParam @Min(1) int page) {
-        Set<TagDto> orders = tagService.findMostUsedTag(page);
-        if (!orders.isEmpty()) {
-            return orders;
+    public CollectionModel<TagDto> retrieveMostUsedTag(@RequestParam @Min(1) int page) {
+        Set<TagDto> tags = tagService.findMostUsedTag(page);
+        if (!tags.isEmpty()) {
+            addLinksToTags(tags);
+            Link link = linkTo(methodOn(TagController.class).retrieveMostUsedTag(page)).withSelfRel();
+            return CollectionModel.of(tags, link);
         } else {
             throw new NoDataFoundException(MOST_USED_TAG, OrderDto.class);
         }
+    }
+
+    private void addLinksToTags(Set<TagDto> tags) {
+        tags.forEach(t -> {
+            Link selfLink = linkTo(methodOn(TagController.class).retrieveById(t.getId())).withSelfRel();
+            t.add(selfLink);
+        });
     }
 }

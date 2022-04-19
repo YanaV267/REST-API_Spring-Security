@@ -6,6 +6,8 @@ import com.epam.esm.validation.OnUpdateGroup;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import org.springframework.hateoas.RepresentationModel;
 
 import javax.validation.Valid;
 import javax.validation.constraints.*;
@@ -20,8 +22,9 @@ import java.util.Set;
  * @author YanaV
  * @project GiftCertificate
  */
+@EqualsAndHashCode(callSuper = false)
 @Data
-public class GiftCertificateDto {
+public class GiftCertificateDto extends RepresentationModel<GiftCertificateDto> {
     @Min(value = 1, groups = OnAggregationCreateGroup.class)
     private long id;
 

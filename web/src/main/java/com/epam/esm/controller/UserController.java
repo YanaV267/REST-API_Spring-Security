@@ -4,6 +4,8 @@ import com.epam.esm.dto.UserDto;
 import com.epam.esm.exception.NoDataFoundException;
 import com.epam.esm.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.hateoas.CollectionModel;
+import org.springframework.hateoas.Link;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,6 +14,8 @@ import java.util.Optional;
 import java.util.Set;
 
 import static com.epam.esm.util.ParameterName.*;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 import static org.springframework.http.HttpStatus.FOUND;
 import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
@@ -60,10 +64,12 @@ public class UserController {
      */
     @GetMapping(produces = APPLICATION_JSON_VALUE)
     @ResponseStatus(FOUND)
-    public Set<UserDto> retrieveAll(@RequestParam @Min(1) int page) {
+    public CollectionModel<UserDto> retrieveAll(@RequestParam @Min(1) int page) {
         Set<UserDto> users = userService.findAll(page);
         if (!users.isEmpty()) {
-            return users;
+            addLinksToUsers(users);
+            Link link = linkTo(methodOn(UserController.class).retrieveAll(page)).withSelfRel();
+            return CollectionModel.of(users, link);
         } else {
             throw new NoDataFoundException(USERS, UserDto.class);
         }
@@ -77,17 +83,19 @@ public class UserController {
      */
     @GetMapping(value = "/orders", produces = APPLICATION_JSON_VALUE)
     @ResponseStatus(FOUND)
-    public Set<UserDto> retrieveAllWithOrders(@RequestParam @Min(1) int page) {
+    public CollectionModel<UserDto> retrieveAllWithOrders(@RequestParam @Min(1) int page) {
         Set<UserDto> users = userService.findAllWithOrders(page);
         if (!users.isEmpty()) {
-            return users;
+            addLinksToUsers(users);
+            Link link = linkTo(methodOn(UserController.class).retrieveAllWithOrders(page)).withSelfRel();
+            return CollectionModel.of(users, link);
         } else {
             throw new NoDataFoundException(USERS, UserDto.class);
         }
     }
 
     /**
-     * Find by id user dto.
+     * Retrieve by id user dto.
      *
      * @param id the id
      * @return the user dto
@@ -97,6 +105,8 @@ public class UserController {
     public UserDto retrieveById(@PathVariable @Min(1) long id) {
         Optional<UserDto> user = userService.findById(id);
         if (user.isPresent()) {
+            Link link = linkTo(methodOn(UserController.class).retrieveById(id)).withSelfRel();
+            user.get().add(link);
             return user.get();
         } else {
             throw new NoDataFoundException(ID, id, UserDto.class);
@@ -104,19 +114,28 @@ public class UserController {
     }
 
     /**
-     * Find with highest order cost set.
+     * Retrieve with highest order cost set.
      *
      * @param page the page
      * @return the set
      */
     @GetMapping(value = "/highest-order-cost", produces = APPLICATION_JSON_VALUE)
     @ResponseStatus(FOUND)
-    public Set<UserDto> retrieveWithHighestOrderCost(@RequestParam @Min(1) int page) {
-        Set<UserDto> orders = userService.findWithHighestOrderCost(page);
-        if (!orders.isEmpty()) {
-            return orders;
+    public CollectionModel<UserDto> retrieveWithHighestOrderCost(@RequestParam @Min(1) int page) {
+        Set<UserDto> users = userService.findWithHighestOrderCost(page);
+        if (!users.isEmpty()) {
+            addLinksToUsers(users);
+            Link link = linkTo(methodOn(UserController.class).retrieveWithHighestOrderCost(page)).withSelfRel();
+            return CollectionModel.of(users, link);
         } else {
             throw new NoDataFoundException(HIGHEST_ORDER_COST, UserDto.class);
         }
+    }
+
+    private void addLinksToUsers(Set<UserDto> users) {
+        users.forEach(u -> {
+            Link selfLink = linkTo(methodOn(UserController.class).retrieveById(u.getId())).withSelfRel();
+            u.add(selfLink);
+        });
     }
 }
