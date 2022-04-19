@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
@@ -48,7 +49,7 @@ public class TagController {
      */
     @PostMapping(consumes = APPLICATION_JSON_VALUE)
     @ResponseStatus(CREATED)
-    public void create(@RequestBody TagDto tagDto) {
+    public void create(@RequestBody @Valid TagDto tagDto) {
         boolean isCreated = tagService.create(tagDto);
         if (!isCreated) {
             throw new BadRequestException(TagDto.class);
@@ -94,7 +95,7 @@ public class TagController {
      */
     @GetMapping(value = "/{id}", produces = APPLICATION_JSON_VALUE)
     @ResponseStatus(FOUND)
-    public TagDto findById(@PathVariable @Min(1) long id) {
+    public TagDto retrieveById(@PathVariable @Min(value = 1) long id) {
         Optional<TagDto> tag = tagService.findById(id);
         if (tag.isPresent()) {
             return tag.get();
@@ -111,10 +112,10 @@ public class TagController {
      */
     @GetMapping(params = "name", produces = APPLICATION_JSON_VALUE)
     @ResponseStatus(FOUND)
-    public TagDto findByName(@RequestParam
-                             @NotNull
-                             @Pattern(regexp = "[а-я\\p{Lower} _]{2,50}")
-                                     String name) {
+    public TagDto retrieveByName(@RequestParam
+                                 @NotNull
+                                 @Pattern(regexp = "[а-я\\p{Lower}_]{1,50}")
+                                         String name) {
         Optional<TagDto> tag = tagService.findByName(name);
         if (tag.isPresent()) {
             return tag.get();
@@ -131,7 +132,7 @@ public class TagController {
      */
     @GetMapping(value = "/most-used-tag", produces = APPLICATION_JSON_VALUE)
     @ResponseStatus(FOUND)
-    public Set<TagDto> findMostUsedTag(@RequestParam @Min(1) int page) {
+    public Set<TagDto> retrieveMostUsedTag(@RequestParam @Min(1) int page) {
         Set<TagDto> orders = tagService.findMostUsedTag(page);
         if (!orders.isEmpty()) {
             return orders;

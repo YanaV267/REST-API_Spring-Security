@@ -5,7 +5,6 @@ import com.epam.esm.entity.Tag;
 import com.epam.esm.mapper.impl.TagMapper;
 import com.epam.esm.repository.TagRepository;
 import com.epam.esm.service.impl.TagServiceImpl;
-import com.epam.esm.validator.TagValidator;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -17,7 +16,10 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.LinkedHashSet;
+import java.util.Optional;
+import java.util.Set;
 
 import static com.epam.esm.util.ParameterName.NAME;
 import static org.mockito.ArgumentMatchers.*;
@@ -28,8 +30,6 @@ import static org.mockito.Mockito.when;
 class TagServiceTest {
     @Mock
     private TagRepository repository;
-    @Mock
-    private TagValidator validator;
     @Mock
     private TagMapper mapper;
     @InjectMocks
@@ -42,11 +42,10 @@ class TagServiceTest {
 
     @ParameterizedTest
     @MethodSource("provideTagData")
-    void create(Map<String, Object> tagData) {
-        when(validator.checkName(anyString())).thenReturn(true);
+    void create(TagDto tag) {
         when(repository.create(any(Tag.class))).thenReturn(Long.valueOf(7));
 
-        boolean actual = service.create(tagData);
+        boolean actual = service.create(tag);
         Assertions.assertTrue(actual);
     }
 

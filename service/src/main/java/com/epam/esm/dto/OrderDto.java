@@ -1,12 +1,14 @@
 package com.epam.esm.dto;
 
+import com.epam.esm.validation.OnCreateGroup;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.validation.Valid;
 import javax.validation.constraints.DecimalMin;
-import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -20,20 +22,23 @@ import java.time.LocalDateTime;
 @Data
 @NoArgsConstructor
 public class OrderDto {
-    @Min(1)
     private long id;
 
-    @NotNull
+    @NotNull(groups = OnCreateGroup.class)
     @Valid
-    private UserDto userDto;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private UserDto user;
 
-    @DecimalMin("0.0")
+    @NotNull(groups = OnCreateGroup.class)
+    @DecimalMin(value = "0.0")
     private BigDecimal cost;
 
     @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS")
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS")
     private LocalDateTime createDate;
 
-    @NotNull
+    @NotNull(groups = OnCreateGroup.class)
     @Valid
-    private GiftCertificateDto certificateDto;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private GiftCertificateDto certificate;
 }

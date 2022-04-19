@@ -4,10 +4,13 @@ import com.epam.esm.dto.GiftCertificateDto;
 import com.epam.esm.exception.BadRequestException;
 import com.epam.esm.exception.NoDataFoundException;
 import com.epam.esm.service.GiftCertificateService;
+import com.epam.esm.validation.OnCreateGroup;
+import com.epam.esm.validation.OnUpdateGroup;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.Pattern;
 import java.util.List;
@@ -46,9 +49,10 @@ public class GiftCertificateController {
      *
      * @param certificateDto the certificate dto
      */
+    @Validated(OnCreateGroup.class)
     @PostMapping(consumes = APPLICATION_JSON_VALUE)
     @ResponseStatus(CREATED)
-    public void create(@RequestBody GiftCertificateDto certificateDto) {
+    public void create(@RequestBody @Valid GiftCertificateDto certificateDto) {
         boolean isCreated = certificateService.create(certificateDto);
         if (!isCreated) {
             throw new BadRequestException(GiftCertificateDto.class);
@@ -60,9 +64,10 @@ public class GiftCertificateController {
      *
      * @param certificateDto the certificate dto
      */
+    @Validated(OnUpdateGroup.class)
     @PutMapping(consumes = APPLICATION_JSON_VALUE)
     @ResponseStatus(OK)
-    public void update(@RequestBody GiftCertificateDto certificateDto) {
+    public void update(@RequestBody @Valid GiftCertificateDto certificateDto) {
         boolean isUpdated = certificateService.update(certificateDto);
         if (!isUpdated) {
             throw new BadRequestException(GiftCertificateDto.class);
@@ -108,7 +113,7 @@ public class GiftCertificateController {
      */
     @GetMapping(value = "/{id}", produces = APPLICATION_JSON_VALUE)
     @ResponseStatus(FOUND)
-    public GiftCertificateDto findById(@PathVariable @Min(1) long id) {
+    public GiftCertificateDto retrieveById(@PathVariable @Min(1) long id) {
         Optional<GiftCertificateDto> giftCertificate = certificateService.findById(id);
         if (giftCertificate.isPresent()) {
             return giftCertificate.get();
@@ -128,7 +133,7 @@ public class GiftCertificateController {
      */
     @GetMapping(produces = APPLICATION_JSON_VALUE)
     @ResponseStatus(FOUND)
-    public Set<GiftCertificateDto> findBySeveralParameters(
+    public Set<GiftCertificateDto> retrieveBySeveralParameters(
             @RequestParam(value = "page") @Min(1) int page,
             @RequestParam GiftCertificateDto certificateDto,
             @RequestParam(value = "tag", required = false)

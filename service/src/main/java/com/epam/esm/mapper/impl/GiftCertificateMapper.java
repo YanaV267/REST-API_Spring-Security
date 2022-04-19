@@ -5,12 +5,10 @@ import com.epam.esm.dto.TagDto;
 import com.epam.esm.entity.GiftCertificate;
 import com.epam.esm.entity.Tag;
 import com.epam.esm.mapper.Mapper;
-import com.epam.esm.util.CertificateDateFormatter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -23,18 +21,15 @@ import java.util.stream.Collectors;
 @Service("certificateServiceMapper")
 public class GiftCertificateMapper implements Mapper<GiftCertificate, GiftCertificateDto> {
     private final TagMapper tagMapper;
-    private final CertificateDateFormatter dateFormatter;
 
     /**
      * Instantiates a new Gift certificate mapper.
      *
-     * @param tagMapper     the tag mapper
-     * @param dateFormatter the date formatter
+     * @param tagMapper the tag mapper
      */
     @Autowired
-    public GiftCertificateMapper(@Qualifier("tagServiceMapper") TagMapper tagMapper, CertificateDateFormatter dateFormatter) {
+    public GiftCertificateMapper(@Qualifier("tagServiceMapper") TagMapper tagMapper) {
         this.tagMapper = tagMapper;
-        this.dateFormatter = dateFormatter;
     }
 
     @Override
@@ -62,10 +57,8 @@ public class GiftCertificateMapper implements Mapper<GiftCertificate, GiftCertif
         giftCertificate.setDescription(certificateDto.getDescription());
         giftCertificate.setDuration(certificateDto.getDuration());
         giftCertificate.setPrice(certificateDto.getPrice());
-        LocalDateTime formattedDate = dateFormatter.format(certificateDto.getCreateDate());
-        giftCertificate.setCreateDate(formattedDate);
-        formattedDate = dateFormatter.format(certificateDto.getLastUpdateDate());
-        giftCertificate.setLastUpdateDate(formattedDate);
+        giftCertificate.setCreateDate(certificateDto.getCreateDate());
+        giftCertificate.setLastUpdateDate(certificateDto.getLastUpdateDate());
         Set<Tag> tags = certificateDto.getTags().stream()
                 .map(tagMapper::mapToEntity)
                 .collect(Collectors.toSet());

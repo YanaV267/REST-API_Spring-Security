@@ -1,15 +1,17 @@
 package com.epam.esm.dto;
 
+import com.epam.esm.validation.OnAggregationCreateGroup;
+import com.epam.esm.validation.OnCreateGroup;
+import com.epam.esm.validation.OnUpdateGroup;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
-import lombok.NoArgsConstructor;
-import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.validation.Valid;
-import javax.validation.constraints.DecimalMin;
-import javax.validation.constraints.Min;
-import javax.validation.constraints.Pattern;
+import javax.validation.constraints.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 /**
@@ -19,28 +21,38 @@ import java.util.Set;
  * @project GiftCertificate
  */
 @Data
-@NoArgsConstructor
 public class GiftCertificateDto {
-    @Min(1)
+    @Min(value = 1, groups = OnAggregationCreateGroup.class)
     private long id;
 
-    @Pattern(regexp = "[А-Яа-я\\p{Alnum} _]{1,25}")
+    @Pattern(regexp = "[А-Яа-я\\p{Alnum} _]{2,25}", groups = OnCreateGroup.class)
+    @Pattern(regexp = "[А-Яа-я\\p{Alnum} _]{0,25}", groups = OnUpdateGroup.class)
     private String name;
 
-    @Pattern(regexp = "[\\p{Graph} ]{3,200}")
+    @Pattern(regexp = "[А-Яа-я\\p{Graph} ]{3,200}", groups = OnCreateGroup.class)
+    @Pattern(regexp = "[А-Яа-я\\p{Graph} ]{0,200}", groups = OnUpdateGroup.class)
     private String description;
 
-    @DecimalMin("0.0")
+    @NotNull(groups = OnCreateGroup.class)
+    @DecimalMin(value = "0.0")
     private BigDecimal price;
 
-    @Min(3)
+    @Min(value = 3, groups = OnCreateGroup.class)
     private int duration;
 
-    @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS")
+    @Null
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS")
     private LocalDateTime createDate;
 
-    @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS")
+    @Null
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS")
     private LocalDateTime lastUpdateDate;
 
+    @NotEmpty(groups = OnCreateGroup.class)
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private Set<@Valid TagDto> tags;
+
+    public GiftCertificateDto() {
+        tags = new LinkedHashSet<>();
+    }
 }

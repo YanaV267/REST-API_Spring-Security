@@ -5,6 +5,7 @@ import com.epam.esm.entity.GiftCertificate;
 import com.epam.esm.entity.Order;
 import com.epam.esm.entity.User;
 import com.epam.esm.mapper.impl.OrderMapper;
+import com.epam.esm.mapper.impl.UserMapper;
 import com.epam.esm.repository.GiftCertificateRepository;
 import com.epam.esm.repository.OrderRepository;
 import com.epam.esm.repository.UserRepository;
@@ -14,8 +15,8 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 /**
@@ -30,6 +31,7 @@ public class OrderServiceImpl implements OrderService {
     private final GiftCertificateRepository certificateRepository;
     private final UserRepository userRepository;
     private final OrderMapper mapper;
+    private final UserMapper userMapper;
 
     /**
      * Instantiates a new Order service.
@@ -38,23 +40,26 @@ public class OrderServiceImpl implements OrderService {
      * @param certificateRepository the certificate repository
      * @param userRepository        the user repository
      * @param mapper                the mapper
+     * @param userMapper            the user mapper
      */
     @Autowired
     public OrderServiceImpl(OrderRepository repository,
                             GiftCertificateRepository certificateRepository,
                             UserRepository userRepository,
-                            @Qualifier("orderServiceMapper") OrderMapper mapper) {
+                            @Qualifier("orderServiceMapper") OrderMapper mapper,
+                            @Qualifier("userServiceMapper") UserMapper userMapper) {
         this.repository = repository;
         this.certificateRepository = certificateRepository;
         this.userRepository = userRepository;
         this.mapper = mapper;
+        this.userMapper = userMapper;
     }
 
     @Override
     @Transactional
     public boolean create(OrderDto orderDto) {
-        long certificateId = orderDto.getCertificateDto().getId();
-        long userId = orderDto.getUserDto().getId();
+        long certificateId = orderDto.getCertificate().getId();
+        long userId = orderDto.getUser().getId();
         Optional<GiftCertificate> certificate = certificateRepository.findById(certificateId);
         Optional<User> user = userRepository.findById(userId);
         if (certificate.isPresent() && user.isPresent()) {
@@ -91,10 +96,11 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public Set<OrderDto> findAll(int page) {
         int firstElementNumber = getFirstElementNumber(page);
-        Set<Order> orders = repository.findAll(firstElementNumber);
-        return orders.stream()
+        Set<Order> foundOrders = repository.findAll(firstElementNumber);
+        Set<OrderDto> orders = foundOrders.stream()
                 .map(mapper::mapToDto)
                 .collect(Collectors.toSet());
+        return includeUserToOrder(new ArrayList<>(foundOrders), orders);
     }
 
     @Override
@@ -102,6 +108,7 @@ public class OrderServiceImpl implements OrderService {
         Optional<Order> order = repository.findById(id);
         if (order.isPresent()) {
             OrderDto orderDto = mapper.mapToDto(order.get());
+            orderDto.setUser(userMapper.mapToDto(order.get().getUser()));
             return Optional.of(orderDto);
         } else {
             return Optional.empty();
@@ -111,19 +118,32 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public Set<OrderDto> findAllByUser(int page, long userId) {
         int firstElementNumber = getFirstElementNumber(page);
-        Set<Order> orders = repository.findAllByUser(firstElementNumber, userId);
-        return orders.stream()
+        Set<Order> foundOrders = repository.findAllByUser(firstElementNumber, userId);
+        foundOrders.forEach(o -> o.setCertificate(null));
+        Set<OrderDto> orders = foundOrders.stream()
                 .map(mapper::mapToDto)
                 .collect(Collectors.toSet());
+        return includeUserToOrder(new ArrayList<>(foundOrders), orders);
     }
 
     @Override
     public Set<OrderDto> findBySeveralParameters(int page, OrderDto orderDto) {
         Order order = mapper.mapToEntity(orderDto);
         int firstElementNumber = getFirstElementNumber(page);
-        Set<Order> orders = repository.findBySeveralParameters(firstElementNumber, order);
-        return orders.stream()
+        Set<Order> foundOrders = repository.findBySeveralParameters(firstElementNumber, order);
+        Set<OrderDto> orders = foundOrders.stream()
                 .map(mapper::mapToDto)
                 .collect(Collectors.toSet());
+        return includeUserToOrder(new ArrayList<>(foundOrders), orders);
+    }
+
+    private Set<OrderDto> includeUserToOrder(List<Order> foundOrders, Set<OrderDto> orders) {
+        AtomicInteger index = new AtomicInteger();
+        orders.forEach(o -> {
+            User user = foundOrders.get(index.getAndIncrement()).getUser();
+            o.setUser(userMapper.mapToDto(user));
+            o.getUser().setOrders(null);
+        });
+        return orders;
     }
 }

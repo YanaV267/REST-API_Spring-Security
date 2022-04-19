@@ -5,8 +5,6 @@ import com.epam.esm.entity.GiftCertificate;
 import com.epam.esm.mapper.impl.GiftCertificateMapper;
 import com.epam.esm.repository.GiftCertificateRepository;
 import com.epam.esm.service.GiftCertificateService;
-import com.epam.esm.util.CertificateDateFormatter;
-import com.epam.esm.validator.GiftCertificateValidator;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -18,7 +16,6 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.time.LocalDateTime;
 import java.util.*;
 
 import static com.epam.esm.util.ParameterName.*;
@@ -31,11 +28,7 @@ class GiftCertificateServiceTest {
     @Mock
     private GiftCertificateRepository repository;
     @Mock
-    private GiftCertificateValidator validator;
-    @Mock
     private GiftCertificateMapper mapper;
-    @Mock
-    private CertificateDateFormatter dateFormatter;
     @InjectMocks
     private GiftCertificateService service;
 
@@ -46,23 +39,19 @@ class GiftCertificateServiceTest {
 
     @ParameterizedTest
     @MethodSource("provideCertificateData")
-    void create(Map<String, Object> certificateData) {
-        when(validator.checkAllCertificateData(anyMap())).thenReturn(false);
-        when(dateFormatter.format(anyString())).thenReturn(LocalDateTime.now());
+    void create(GiftCertificateDto certificate) {
         when(repository.create(any(GiftCertificate.class))).thenReturn(anyLong());
 
-        boolean actual = service.create(certificateData);
+        boolean actual = service.create(certificate);
         Assertions.assertFalse(actual);
     }
 
     @ParameterizedTest
     @MethodSource("provideCertificateData")
-    void update(Map<String, Object> certificateData) {
-        when(validator.checkCertificateData(anyMap())).thenReturn(false);
-        when(dateFormatter.format(anyString())).thenReturn(LocalDateTime.now());
+    void update(GiftCertificateDto certificate) {
         doNothing().when(repository).update(any(GiftCertificate.class));
 
-        boolean actual = service.update(certificateData);
+        boolean actual = service.update(certificate);
         Assertions.assertTrue(actual);
     }
 
@@ -100,17 +89,15 @@ class GiftCertificateServiceTest {
 
     @ParameterizedTest
     @MethodSource("provideSearchParameters")
-    void findBySeveralParameters(int startElementNumber, Map<String, Object> certificateData,
+    void findBySeveralParameters(int startElementNumber, GiftCertificateDto certificate,
                                  List<String> tagNames, List<String> sortTypes) {
-        when(validator.checkCertificateData(anyMap())).thenReturn(true);
-        when(dateFormatter.format(anyString())).thenReturn(LocalDateTime.now());
-        when(repository.findBySeveralParameters(anyInt(), any(GiftCertificate.class), anyList(), anyList()))
+        when(repository.findBySeveralParameters(anyInt(), any(GiftCertificate.class), anySet(), anyList()))
                 .thenReturn(new LinkedHashSet<>());
         when(mapper.mapToDto(any(GiftCertificate.class))).thenReturn(new GiftCertificateDto());
 
         int expected = 1;
         Set<GiftCertificateDto> certificates = service.findBySeveralParameters(startElementNumber,
-                certificateData, tagNames, sortTypes);
+                certificate, tagNames, sortTypes);
         int actual = certificates.size();
         Assertions.assertEquals(expected, actual);
     }

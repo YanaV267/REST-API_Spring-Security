@@ -9,7 +9,6 @@ import com.epam.esm.repository.GiftCertificateRepository;
 import com.epam.esm.repository.OrderRepository;
 import com.epam.esm.repository.UserRepository;
 import com.epam.esm.service.OrderService;
-import com.epam.esm.validator.OrderValidator;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -21,7 +20,10 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.LinkedHashSet;
+import java.util.Optional;
+import java.util.Set;
 
 import static com.epam.esm.util.ParameterName.*;
 import static org.mockito.ArgumentMatchers.*;
@@ -37,8 +39,6 @@ class OrderServiceTest {
     @Mock
     private UserRepository userRepository;
     @Mock
-    private OrderValidator validator;
-    @Mock
     private OrderMapper mapper;
     @InjectMocks
     private OrderService service;
@@ -50,24 +50,21 @@ class OrderServiceTest {
 
     @ParameterizedTest
     @MethodSource("provideOrderData")
-    void create(Map<String, Object> orderData) {
-        when(validator.checkAllOrderData(anyMap())).thenReturn(false);
+    void create(OrderDto order) {
         when(certificateRepository.findById(anyLong())).thenReturn(Optional.empty());
         when(userRepository.findById(anyLong())).thenReturn(Optional.of(new User(7)));
         when(repository.create(any(Order.class))).thenReturn(anyLong());
 
-        boolean actual = service.create(orderData);
+        boolean actual = service.create(order);
         Assertions.assertFalse(actual);
     }
 
     @ParameterizedTest
     @MethodSource("provideOrderData")
-    void update(Map<String, Object> orderData) {
-        when(validator.checkId(anyString())).thenReturn(false);
-        when(validator.checkOrderData(anyMap())).thenReturn(false);
+    void update(OrderDto order) {
         doNothing().when(repository).update(any(Order.class));
 
-        boolean actual = service.update(orderData);
+        boolean actual = service.update(order);
         Assertions.assertTrue(actual);
     }
 
@@ -118,14 +115,13 @@ class OrderServiceTest {
 
     @ParameterizedTest
     @MethodSource("provideSearchParameters")
-    void findBySeveralParameters(int startElementNumber, Map<String, Object> orderData) {
-        when(validator.checkOrderData(anyMap())).thenReturn(true);
+    void findBySeveralParameters(int startElementNumber, OrderDto order) {
         when(repository.findBySeveralParameters(anyInt(), any(Order.class)))
                 .thenReturn(new LinkedHashSet<>());
         when(mapper.mapToDto(any(Order.class))).thenReturn(new OrderDto());
 
         int expected = 1;
-        Set<OrderDto> orders = service.findBySeveralParameters(startElementNumber, orderData);
+        Set<OrderDto> orders = service.findBySeveralParameters(startElementNumber, order);
         int actual = orders.size();
         Assertions.assertEquals(expected, actual);
     }

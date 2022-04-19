@@ -1,12 +1,17 @@
 package com.epam.esm.exception;
 
-import org.hibernate.exception.ConstraintViolationException;
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.databind.exc.MismatchedInputException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingRequestValueException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.servlet.NoHandlerFoundException;
+
+import javax.validation.ConstraintViolationException;
 
 import static org.springframework.http.HttpStatus.*;
 
@@ -20,8 +25,10 @@ import static org.springframework.http.HttpStatus.*;
 public class BaseExceptionHandler {
     private static final String NOT_FOUND_MESSAGE = "Requested resource not found (";
     private static final String NO_DATA_FOUND_MESSAGE = "No data was provided (";
+    private static final String REQUEST_FAILED = "Request has failed (";
     private static final String CLOSING_BRACE = ")";
-    private static final String BAD_REQUEST_MESSAGE = "Request has failed (provided data was incorrect)";
+    private static final String BAD_REQUEST_MESSAGE = "provided data was incorrect)";
+    private static final String MISSING_REQUEST_PARAMETERS_MESSAGE = "required parameters are missing)";
 
     /**
      * Resource not found response entity.
@@ -31,7 +38,7 @@ public class BaseExceptionHandler {
      */
     @ExceptionHandler({NoHandlerFoundException.class, HttpClientErrorException.NotFound.class})
     public ResponseEntity<ResponseErrorEntity> resourceNotFound(NoHandlerFoundException exception) {
-        return new ResponseEntity<>(new ResponseErrorEntity(NOT_FOUND.value(), Exception.class,
+        return new ResponseEntity<>(new ResponseErrorEntity(NOT_FOUND.value(), HttpClientErrorException.NotFound.class,
                 NOT_FOUND_MESSAGE + exception.getMessage() + CLOSING_BRACE), NOT_FOUND);
     }
 
@@ -53,9 +60,36 @@ public class BaseExceptionHandler {
      * @param exception the exception
      * @return the response error entity
      */
-    @ExceptionHandler({BadRequestException.class, HttpClientErrorException.BadRequest.class,
-            MethodArgumentNotValidException.class, ConstraintViolationException.class})
-    public ResponseErrorEntity requestFailed(BadRequestException exception) {
-        return new ResponseErrorEntity(BAD_REQUEST.value(), exception.getResourceClass(), BAD_REQUEST_MESSAGE);
+    @ExceptionHandler({BadRequestException.class, HttpClientErrorException.BadRequest.class})
+    public ResponseEntity<ResponseErrorEntity> requestFailed(BadRequestException exception) {
+        return new ResponseEntity<>(new ResponseErrorEntity(BAD_REQUEST.value(), exception.getResourceClass(),
+                REQUEST_FAILED + BAD_REQUEST_MESSAGE), BAD_REQUEST);
+    }
+
+    /**
+     * Request not valid response entity.
+     *
+     * @param exception the exception
+     * @return the response entity
+     */
+    @ExceptionHandler({MethodArgumentNotValidException.class, ConstraintViolationException.class,
+            MismatchedInputException.class, JsonParseException.class})
+    public ResponseEntity<ResponseErrorEntity> requestNotValid(Exception exception) {
+        return new ResponseEntity<>(new ResponseErrorEntity(BAD_REQUEST.value(),
+                MethodArgumentNotValidException.class, REQUEST_FAILED + BAD_REQUEST_MESSAGE,
+                exception.getMessage()), BAD_REQUEST);
+    }
+
+    /**
+     * Request missing parameters response entity.
+     *
+     * @param exception the exception
+     * @return the response entity
+     */
+    @ExceptionHandler({MissingServletRequestParameterException.class})
+    public ResponseEntity<ResponseErrorEntity> requestMissingParameters(MissingRequestValueException exception) {
+        return new ResponseEntity<>(new ResponseErrorEntity(BAD_REQUEST.value(),
+                exception.getClass(), REQUEST_FAILED + MISSING_REQUEST_PARAMETERS_MESSAGE,
+                exception.getMessage()), BAD_REQUEST);
     }
 }

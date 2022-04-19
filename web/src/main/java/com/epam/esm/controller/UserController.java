@@ -94,7 +94,7 @@ public class UserController {
      */
     @GetMapping(value = "/{id}", produces = APPLICATION_JSON_VALUE)
     @ResponseStatus(FOUND)
-    public UserDto findById(@PathVariable @Min(1) long id) {
+    public UserDto retrieveById(@PathVariable @Min(1) long id) {
         Optional<UserDto> user = userService.findById(id);
         if (user.isPresent()) {
             return user.get();
@@ -111,7 +111,7 @@ public class UserController {
      */
     @GetMapping(value = "/highest-order-cost", produces = APPLICATION_JSON_VALUE)
     @ResponseStatus(FOUND)
-    public Set<UserDto> findWithHighestOrderCost(@RequestParam @Min(1) int page) {
+    public Set<UserDto> retrieveWithHighestOrderCost(@RequestParam @Min(1) int page) {
         Set<UserDto> orders = userService.findWithHighestOrderCost(page);
         if (!orders.isEmpty()) {
             return orders;

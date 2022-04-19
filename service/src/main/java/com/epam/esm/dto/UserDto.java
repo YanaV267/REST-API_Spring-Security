@@ -1,6 +1,9 @@
 package com.epam.esm.dto;
 
-import lombok.*;
+import com.epam.esm.validation.OnAggregationCreateGroup;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.validation.Valid;
 import javax.validation.constraints.DecimalMin;
@@ -18,7 +21,7 @@ import java.util.Set;
 @Data
 @NoArgsConstructor
 public class UserDto {
-    @Min(1)
+    @Min(value = 1, groups = OnAggregationCreateGroup.class)
     private long id;
 
     @Pattern(regexp = "[\\p{Alnum}_]{1,30}")
@@ -33,5 +36,6 @@ public class UserDto {
     @DecimalMin("0.0")
     private BigDecimal balance;
 
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private Set<@Valid OrderDto> orders;
 }

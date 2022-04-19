@@ -4,10 +4,13 @@ import com.epam.esm.dto.OrderDto;
 import com.epam.esm.exception.BadRequestException;
 import com.epam.esm.exception.NoDataFoundException;
 import com.epam.esm.service.OrderService;
+import com.epam.esm.validation.OnAggregationCreateGroup;
+import com.epam.esm.validation.OnUpdateGroup;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import javax.validation.constraints.Min;
 import java.util.Optional;
 import java.util.Set;
@@ -43,9 +46,10 @@ public class OrderController {
      *
      * @param orderDto the order dto
      */
+    @Validated(OnAggregationCreateGroup.class)
     @PostMapping(consumes = APPLICATION_JSON_VALUE)
     @ResponseStatus(CREATED)
-    public void create(@RequestBody OrderDto orderDto) {
+    public void create(@RequestBody @Valid OrderDto orderDto) {
         boolean isCreated = orderService.create(orderDto);
         if (!isCreated) {
             throw new BadRequestException(OrderDto.class);
@@ -57,9 +61,10 @@ public class OrderController {
      *
      * @param orderDto the order dto
      */
+    @Validated(OnUpdateGroup.class)
     @PutMapping(consumes = APPLICATION_JSON_VALUE)
     @ResponseStatus(OK)
-    public void update(@RequestBody OrderDto orderDto) {
+    public void update(@RequestBody @Valid OrderDto orderDto) {
         boolean isUpdated = orderService.update(orderDto);
         if (!isUpdated) {
             throw new BadRequestException(OrderDto.class);
@@ -105,7 +110,7 @@ public class OrderController {
      */
     @GetMapping(value = "/{id}", produces = APPLICATION_JSON_VALUE)
     @ResponseStatus(FOUND)
-    public OrderDto findById(@PathVariable @Min(1) long id) {
+    public OrderDto retrieveById(@PathVariable @Min(1) long id) {
         Optional<OrderDto> order = orderService.findById(id);
         if (order.isPresent()) {
             return order.get();
@@ -123,7 +128,8 @@ public class OrderController {
      */
     @GetMapping(value = "/user/{userId}", produces = APPLICATION_JSON_VALUE)
     @ResponseStatus(FOUND)
-    public Set<OrderDto> findAllByUser(@PathVariable long userId, @RequestParam @Min(1) int page) {
+    public Set<OrderDto> retrieveAllByUser(@PathVariable @Min(1) long userId,
+                                           @RequestParam @Min(1) int page) {
         Set<OrderDto> orders = orderService.findAllByUser(page, userId);
         if (!orders.isEmpty()) {
             return orders;
@@ -141,8 +147,8 @@ public class OrderController {
      */
     @GetMapping(produces = APPLICATION_JSON_VALUE)
     @ResponseStatus(FOUND)
-    public Set<OrderDto> findBySeveralParameters(@RequestParam @Min(1) int page,
-                                                 @RequestParam OrderDto orderDto) {
+    public Set<OrderDto> retrieveBySeveralParameters(@RequestParam @Min(1) int page,
+                                                     @RequestParam @Valid OrderDto orderDto) {
         Set<OrderDto> orders = orderService.findBySeveralParameters(page, orderDto);
         if (!orders.isEmpty()) {
             return orders;
