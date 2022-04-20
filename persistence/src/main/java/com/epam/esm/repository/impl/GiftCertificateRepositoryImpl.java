@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.criteria.*;
+import java.time.LocalDateTime;
 import java.util.*;
 
 import static com.epam.esm.repository.ColumnName.*;
@@ -51,6 +52,7 @@ public class GiftCertificateRepositoryImpl implements GiftCertificateRepository 
         if (certificate.getDuration() != 0) {
             query = query.set(root.get(DURATION), certificate.getDuration());
         }
+        query = query.set(root.get(LAST_UPDATE_DATE), LocalDateTime.now());
         query.where(builder.equal(root.get(ID), certificate.getId()));
         entityManager.createQuery(query)
                 .executeUpdate();

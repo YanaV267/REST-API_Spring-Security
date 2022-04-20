@@ -9,6 +9,8 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
+import static com.epam.esm.entity.AuditListener.*;
+
 /**
  * The type Order.
  *
@@ -16,6 +18,7 @@ import java.time.LocalDateTime;
  * @project GiftCertificate
  */
 @Entity
+@EntityListeners(AuditListener.class)
 @Table(name = "orders")
 @Data
 @Builder
@@ -40,5 +43,11 @@ public class Order implements Serializable {
     public Order() {
         user = new User();
         certificate = new GiftCertificate();
+    }
+
+    @PrePersist()
+    public void onPrePersist() {
+        createDate = auditDateTime;
+        audit(this, INSERT_OPERATION);
     }
 }

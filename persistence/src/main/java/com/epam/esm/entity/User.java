@@ -17,6 +17,7 @@ import java.util.Set;
  * @project GiftCertificate
  */
 @Entity
+@EntityListeners(AuditListener.class)
 @Table(name = "users")
 @Getter
 @EqualsAndHashCode

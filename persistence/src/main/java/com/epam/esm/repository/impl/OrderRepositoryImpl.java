@@ -1,6 +1,5 @@
 package com.epam.esm.repository.impl;
 
-import com.epam.esm.entity.GiftCertificate;
 import com.epam.esm.entity.Order;
 import com.epam.esm.repository.OrderRepository;
 import org.springframework.stereotype.Repository;
@@ -33,16 +32,14 @@ public class OrderRepositoryImpl implements OrderRepository {
     @Override
     public void update(Order order) {
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
-        CriteriaUpdate<GiftCertificate> query = entityManager.getCriteriaBuilder()
-                .createCriteriaUpdate(GiftCertificate.class);
-        Root<GiftCertificate> root = query.from(GiftCertificate.class);
+        CriteriaUpdate<Order> query = entityManager.getCriteriaBuilder()
+                .createCriteriaUpdate(Order.class);
+        Root<Order> root = query.from(Order.class);
         if (order.getUser().getId() != 0) {
-            query = query.set(root.get(USER).get(ID),
-                    String.valueOf(order.getUser().getId()));
+            query = query.set(root.get(USER).get(ID), order.getUser().getId());
         }
         if (order.getCertificate().getId() != 0) {
-            query = query.set(root.get(CERTIFICATE).get(ID),
-                    String.valueOf(order.getCertificate().getId()));
+            query = query.set(root.get(CERTIFICATE).get(ID), order.getCertificate().getId());
         }
         if (order.getCost() != null) {
             query = query.set(root.get(COST), order.getCost());

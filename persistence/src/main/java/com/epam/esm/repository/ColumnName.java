@@ -48,11 +48,11 @@ public final class ColumnName {
     /**
      * The constant CREATE_DATE.
      */
-    public static final String CREATE_DATE = "create_date";
+    public static final String CREATE_DATE = "createDate";
     /**
      * The constant LAST_UPDATE_DATE.
      */
-    public static final String LAST_UPDATE_DATE = "last_update_date";
+    public static final String LAST_UPDATE_DATE = "lastUpdateDate";
 
     /**
      * The constant LOGIN.

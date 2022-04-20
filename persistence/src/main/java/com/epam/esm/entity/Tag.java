@@ -13,6 +13,7 @@ import java.io.Serializable;
  * @project GiftCertificate
  */
 @Entity
+@EntityListeners(AuditListener.class)
 @Table(name = "tags")
 @Data
 @NoArgsConstructor
