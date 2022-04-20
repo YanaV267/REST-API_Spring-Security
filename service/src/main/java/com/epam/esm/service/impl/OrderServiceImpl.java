@@ -79,6 +79,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    @Transactional
     public boolean update(OrderDto orderDto) {
         Order order = mapper.mapToEntity(orderDto);
         repository.update(order);

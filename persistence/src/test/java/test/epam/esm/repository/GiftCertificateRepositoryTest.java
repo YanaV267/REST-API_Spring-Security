@@ -5,27 +5,20 @@ import com.epam.esm.entity.Tag;
 import com.epam.esm.repository.GiftCertificateRepository;
 import com.epam.esm.repository.impl.GiftCertificateRepositoryImpl;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import javax.persistence.EntityManager;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
         classes = {GiftCertificateRepositoryImpl.class, EntityManager.class})
 @EnableAutoConfiguration
-@EntityScan(basePackages = "com.epam.esm")
 class GiftCertificateRepositoryTest {
     @Autowired
     private GiftCertificateRepository repository;
@@ -82,7 +75,7 @@ class GiftCertificateRepositoryTest {
     @ParameterizedTest
     @MethodSource("provideSearchParameters")
     void findBySeveralParameters(int firstElementNumber, GiftCertificate certificate,
-                                 List<Tag> tags, List<String> sortTypes) {
+                                 Set<Tag> tags, List<String> sortTypes) {
         long expected = 2;
         Set<GiftCertificate> certificates = repository.findBySeveralParameters(firstElementNumber,
                 certificate, tags, sortTypes);
@@ -122,7 +115,7 @@ class GiftCertificateRepositoryTest {
                         .id(2)
                         .name("discount")
                         .duration(90)
-                        .build(), "travelling", new ArrayList<Tag>() {
+                        .build(), "travelling", new LinkedHashSet<Tag>() {
                     {
                         add(new Tag("travelling"));
                     }
