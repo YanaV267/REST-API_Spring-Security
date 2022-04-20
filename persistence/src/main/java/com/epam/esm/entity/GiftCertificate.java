@@ -65,18 +65,27 @@ public class GiftCertificate implements Serializable {
         tags = new LinkedHashSet<>();
     }
 
+    /**
+     * On pre persist.
+     */
     @PrePersist
     public void onPrePersist() {
         createDate = auditDateTime;
         audit(this, INSERT_OPERATION);
     }
 
+    /**
+     * On pre update.
+     */
     @PreUpdate
     public void onPreUpdate() {
         lastUpdateDate = auditDateTime;
         audit(this, UPDATE_OPERATION);
     }
 
+    /**
+     * On pre remove.
+     */
     @PreRemove
     public void onPreRemove() {
         lastUpdateDate = auditDateTime;

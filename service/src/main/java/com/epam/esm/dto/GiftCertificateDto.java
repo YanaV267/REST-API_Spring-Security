@@ -55,6 +55,9 @@ public class GiftCertificateDto extends RepresentationModel<GiftCertificateDto> 
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private Set<@Valid TagDto> tags;
 
+    /**
+     * Instantiates a new Gift certificate dto.
+     */
     public GiftCertificateDto() {
         tags = new LinkedHashSet<>();
     }

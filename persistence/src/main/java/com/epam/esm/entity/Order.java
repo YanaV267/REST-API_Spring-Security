@@ -45,6 +45,9 @@ public class Order implements Serializable {
         certificate = new GiftCertificate();
     }
 
+    /**
+     * On pre persist.
+     */
     @PrePersist()
     public void onPrePersist() {
         createDate = auditDateTime;

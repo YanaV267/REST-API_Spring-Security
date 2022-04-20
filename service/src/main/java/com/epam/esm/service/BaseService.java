@@ -50,5 +50,10 @@ public interface BaseService<T> {
         return (page - 1) * MAX_RESULT_AMOUNT;
     }
 
+    /**
+     * Gets last page.
+     *
+     * @return the last page
+     */
     int getLastPage();
 }

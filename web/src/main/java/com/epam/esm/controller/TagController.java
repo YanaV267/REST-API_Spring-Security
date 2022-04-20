@@ -158,6 +158,11 @@ public class TagController extends AbstractController<TagDto> {
         }
     }
 
+    /**
+     * Add links to tags.
+     *
+     * @param tags the tags
+     */
     protected void addLinksToTags(Set<TagDto> tags) {
         tags.forEach(t -> {
             Link selfLink = linkTo(methodOn(TagController.class).retrieveById(t.getId())).withSelfRel();

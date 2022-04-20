@@ -1,6 +1,4 @@
 com.epam.esm
-com.epam.esm.builder
-com.epam.esm.config
 com.epam.esm.controller
 com.epam.esm.dto
 com.epam.esm.entity
@@ -12,5 +10,4 @@ com.epam.esm.repository.impl
 com.epam.esm.service
 com.epam.esm.service.impl
 com.epam.esm.util
-com.epam.esm.validator
-com.epam.esm.validator.impl
+com.epam.esm.validation

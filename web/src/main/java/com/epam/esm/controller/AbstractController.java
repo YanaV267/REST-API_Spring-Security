@@ -9,6 +9,9 @@ import java.util.List;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 
 /**
+ * The type Abstract controller.
+ *
+ * @param <T> the type parameter
  * @author YanaV
  * @project GiftCertificate
  */
@@ -19,6 +22,14 @@ public abstract class AbstractController<T> {
     private static final String PREV_PAGE = "prev";
     private static final String LAST_PAGE = "last";
 
+    /**
+     * Add pages links list.
+     *
+     * @param tagMethod the tag method
+     * @param page      the page
+     * @param lastPage  the last page
+     * @return the list
+     */
     protected List<Link> addPagesLinks(CollectionModel<T> tagMethod, int page, int lastPage) {
         List<Link> links = new ArrayList<>();
         Link link = linkTo(tagMethod).withSelfRel();
