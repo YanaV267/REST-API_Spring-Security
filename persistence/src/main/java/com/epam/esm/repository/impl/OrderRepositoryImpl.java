@@ -1,5 +1,6 @@
 package com.epam.esm.repository.impl;
 
+import com.epam.esm.entity.GiftCertificate;
 import com.epam.esm.entity.Order;
 import com.epam.esm.repository.OrderRepository;
 import org.springframework.stereotype.Repository;
@@ -38,8 +39,8 @@ public class OrderRepositoryImpl implements OrderRepository {
         if (order.getUser().getId() != 0) {
             query = query.set(root.get(USER).get(ID), order.getUser().getId());
         }
-        if (order.getCertificate().getId() != 0) {
-            query = query.set(root.get(CERTIFICATE).get(ID), order.getCertificate().getId());
+        for (GiftCertificate certificate : order.getCertificates()) {
+            query = query.set(root.get(CERTIFICATE).get(ID), certificate.getId());
         }
         if (order.getCost() != null) {
             query = query.set(root.get(COST), order.getCost());
@@ -125,12 +126,11 @@ public class OrderRepositoryImpl implements OrderRepository {
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
         List<Predicate> predicates = new ArrayList<>();
         if (order.getUser().getId() != 0) {
-            predicates.add(builder.like(root.get(USER).get(ID),
-                    String.valueOf(order.getUser().getId())));
+            predicates.add(builder.equal(root.get(USER).get(ID),
+                    order.getUser().getId()));
         }
-        if (order.getCertificate().getId() != 0) {
-            predicates.add(builder.like(root.get(CERTIFICATE).get(ID),
-                    String.valueOf(order.getCertificate().getId())));
+        for (GiftCertificate certificate : order.getCertificates()) {
+            predicates.add(builder.equal(root.get(CERTIFICATE).get(ID), certificate.getId()));
         }
         if (order.getCost() != null) {
             predicates.add(builder.equal(root.get(COST), order.getCost()));

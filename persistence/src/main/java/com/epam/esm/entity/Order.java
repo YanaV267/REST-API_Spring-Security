@@ -8,6 +8,8 @@ import javax.persistence.*;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 import static com.epam.esm.entity.AuditListener.*;
 
@@ -32,9 +34,11 @@ public class Order implements Serializable {
     private BigDecimal cost;
     @Column(name = "create_date", insertable = false)
     private LocalDateTime createDate;
-    @OneToOne
-    @JoinColumn(name = "id_certificate")
-    private GiftCertificate certificate;
+    @ManyToMany(cascade = CascadeType.ALL)
+    @JoinTable(name = "order_purchase",
+            joinColumns = {@JoinColumn(name = "id_order")},
+            inverseJoinColumns = {@JoinColumn(name = "id_certificate")})
+    private Set<GiftCertificate> certificates;
 
     /**
      * Instantiates a new Order.
@@ -42,7 +46,7 @@ public class Order implements Serializable {
     @Tolerate
     public Order() {
         user = new User();
-        certificate = new GiftCertificate();
+        certificates = new LinkedHashSet<>();
     }
 
     /**

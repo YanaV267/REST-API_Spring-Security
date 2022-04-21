@@ -11,9 +11,11 @@ import org.springframework.hateoas.RepresentationModel;
 
 import javax.validation.Valid;
 import javax.validation.constraints.DecimalMin;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Set;
 
 /**
  * The type Order dto.
@@ -40,8 +42,8 @@ public class OrderDto extends RepresentationModel<OrderDto> {
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS")
     private LocalDateTime createDate;
 
-    @NotNull(groups = OnCreateGroup.class)
+    @NotEmpty(groups = OnCreateGroup.class)
     @Valid
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    private GiftCertificateDto certificate;
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    private Set<GiftCertificateDto> certificates;
 }

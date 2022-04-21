@@ -8,6 +8,9 @@ import com.epam.esm.mapper.Mapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Set;
+import java.util.stream.Collectors;
+
 /**
  * The type Order mapper.
  *
@@ -34,10 +37,11 @@ public class OrderMapper implements Mapper<Order, OrderDto> {
         orderDto.setId(order.getId());
         orderDto.setCost(order.getCost());
         orderDto.setCreateDate(order.getCreateDate());
-        if (order.getCertificate() != null) {
-            GiftCertificateDto certificateDto = certificateMapper.mapToDto(order.getCertificate());
-            orderDto.setCertificate(certificateDto);
-        }
+        Set<GiftCertificateDto> certificates = order.getCertificates()
+                .stream()
+                .map(certificateMapper::mapToDto)
+                .collect(Collectors.toSet());
+        orderDto.setCertificates(certificates);
         return orderDto;
     }
 
@@ -47,8 +51,11 @@ public class OrderMapper implements Mapper<Order, OrderDto> {
         order.setId(orderDto.getId());
         order.setCost(orderDto.getCost());
         order.setCreateDate(orderDto.getCreateDate());
-        GiftCertificate certificate = certificateMapper.mapToEntity(orderDto.getCertificate());
-        order.setCertificate(certificate);
+        Set<GiftCertificate> certificates = orderDto.getCertificates()
+                .stream()
+                .map(certificateMapper::mapToEntity)
+                .collect(Collectors.toSet());
+        order.setCertificates(certificates);
         return order;
     }
 }

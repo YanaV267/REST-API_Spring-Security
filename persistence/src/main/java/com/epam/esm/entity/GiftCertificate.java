@@ -40,7 +40,7 @@ public class GiftCertificate implements Serializable {
     @Column(name = "last_update_date", insertable = false)
     private LocalDateTime lastUpdateDate;
 
-    @OneToMany(cascade = CascadeType.ALL)
+    @ManyToMany(cascade = CascadeType.ALL)
     @JoinTable(name = "certificate_purchase",
             joinColumns = {@JoinColumn(name = "id_certificate")},
             inverseJoinColumns = {@JoinColumn(name = "id_tag")})

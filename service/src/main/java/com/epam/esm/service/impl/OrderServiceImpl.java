@@ -4,6 +4,7 @@ import com.epam.esm.dto.OrderDto;
 import com.epam.esm.entity.GiftCertificate;
 import com.epam.esm.entity.Order;
 import com.epam.esm.entity.User;
+import com.epam.esm.mapper.impl.GiftCertificateMapper;
 import com.epam.esm.mapper.impl.OrderMapper;
 import com.epam.esm.mapper.impl.UserMapper;
 import com.epam.esm.repository.GiftCertificateRepository;
@@ -13,12 +14,10 @@ import com.epam.esm.service.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
-
 import org.springframework.transaction.annotation.Transactional;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+
+import java.math.BigDecimal;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
@@ -35,6 +34,7 @@ public class OrderServiceImpl implements OrderService {
     private final GiftCertificateRepository certificateRepository;
     private final UserRepository userRepository;
     private final OrderMapper mapper;
+    private final GiftCertificateMapper certificateMapper;
     private final UserMapper userMapper;
 
     /**
@@ -44,6 +44,7 @@ public class OrderServiceImpl implements OrderService {
      * @param certificateRepository the certificate repository
      * @param userRepository        the user repository
      * @param mapper                the mapper
+     * @param certificateMapper     the certificate mapper
      * @param userMapper            the user mapper
      */
     @Autowired
@@ -51,26 +52,38 @@ public class OrderServiceImpl implements OrderService {
                             GiftCertificateRepository certificateRepository,
                             UserRepository userRepository,
                             @Qualifier("orderServiceMapper") OrderMapper mapper,
+                            @Qualifier("certificateServiceMapper") GiftCertificateMapper certificateMapper,
                             @Qualifier("userServiceMapper") UserMapper userMapper) {
         this.repository = repository;
         this.certificateRepository = certificateRepository;
         this.userRepository = userRepository;
         this.mapper = mapper;
+        this.certificateMapper = certificateMapper;
         this.userMapper = userMapper;
     }
 
     @Override
     @Transactional
     public boolean create(OrderDto orderDto) {
-        long certificateId = orderDto.getCertificate().getId();
+        boolean allCertificatesExist = orderDto.getCertificates()
+                .stream()
+                .allMatch(c -> certificateRepository.findById(c.getId()).isPresent());
         long userId = orderDto.getUser().getId();
-        Optional<GiftCertificate> certificate = certificateRepository.findById(certificateId);
         Optional<User> user = userRepository.findById(userId);
-        if (certificate.isPresent() && user.isPresent()) {
+        if (allCertificatesExist && user.isPresent()) {
+            Set<GiftCertificate> certificates = orderDto.getCertificates()
+                    .stream()
+                    .map(c -> certificateRepository.findById(c.getId()).get())
+                    .collect(Collectors.toSet());
+            BigDecimal orderCost = BigDecimal.valueOf(certificates
+                    .stream()
+                    .map(GiftCertificate::getPrice)
+                    .mapToLong(BigDecimal::longValue)
+                    .sum());
             Order order = Order.builder()
                     .user(new User(userId))
-                    .certificate(new GiftCertificate(certificateId))
-                    .cost(certificate.get().getPrice())
+                    .certificates(certificates)
+                    .cost(orderCost)
                     .build();
             repository.create(order);
             return true;
@@ -125,7 +138,7 @@ public class OrderServiceImpl implements OrderService {
     public Set<OrderDto> findAllByUser(int page, long userId) {
         int firstElementNumber = getFirstElementNumber(page);
         Set<Order> foundOrders = repository.findAllByUser(firstElementNumber, userId);
-        foundOrders.forEach(o -> o.setCertificate(null));
+        foundOrders.forEach(o -> o.setCertificates(new LinkedHashSet<>()));
         lastPage = repository.getLastPage();
         Set<OrderDto> orders = foundOrders.stream()
                 .map(mapper::mapToDto)
