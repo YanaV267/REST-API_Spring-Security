@@ -1,10 +1,12 @@
 package com.epam.esm.controller;
 
+import com.epam.esm.dto.GiftCertificateDto;
 import com.epam.esm.dto.OrderDto;
 import com.epam.esm.exception.BadRequestException;
 import com.epam.esm.exception.NoDataFoundException;
 import com.epam.esm.service.OrderService;
 import com.epam.esm.validation.OnAggregationCreateGroup;
+import com.epam.esm.validation.OnSearchGroup;
 import com.epam.esm.validation.OnUpdateGroup;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.CollectionModel;
@@ -160,16 +162,22 @@ public class OrderController extends AbstractController<OrderDto> {
      * @param orderDto the certificate dto
      * @return the set
      */
+    @Validated(OnSearchGroup.class)
     @GetMapping(produces = APPLICATION_JSON_VALUE)
     @ResponseStatus(FOUND)
-    public CollectionModel<OrderDto> retrieveBySeveralParameters(@RequestParam @Min(1) int page,
-                                                                 @RequestParam @Valid OrderDto orderDto) {
-        Set<OrderDto> orders = orderService.findBySeveralParameters(page, orderDto);
+    public CollectionModel<OrderDto> retrieveBySeveralParameters(
+            @RequestParam @Min(1) int page,
+            @Valid OrderDto orderDto,
+            @RequestParam(value = "user_id", required = false)
+                    List<@Min(1) Integer> userIds,
+            @RequestParam(value = "certificate", required = false)
+                    List<@Min(1) Integer> certificateIds) {
+        Set<OrderDto> orders = orderService.findBySeveralParameters(page, orderDto, userIds, certificateIds);
         int lastPage = orderService.getLastPage();
         if (!orders.isEmpty()) {
             addLinksToOrders(orders);
             CollectionModel<OrderDto> method = methodOn(OrderController.class)
-                    .retrieveBySeveralParameters(page, orderDto);
+                    .retrieveBySeveralParameters(page, orderDto, userIds, certificateIds);
             List<Link> links = addPagesLinks(method, page, lastPage);
             return CollectionModel.of(orders, links);
         } else {

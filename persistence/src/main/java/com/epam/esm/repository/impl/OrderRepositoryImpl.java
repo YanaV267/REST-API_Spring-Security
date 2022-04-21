@@ -40,7 +40,7 @@ public class OrderRepositoryImpl implements OrderRepository {
             query = query.set(root.get(USER).get(ID), order.getUser().getId());
         }
         for (GiftCertificate certificate : order.getCertificates()) {
-            query = query.set(root.get(CERTIFICATE).get(ID), certificate.getId());
+            query = query.set(root.get(CERTIFICATES).get(ID), certificate.getId());
         }
         if (order.getCost() != null) {
             query = query.set(root.get(COST), order.getCost());
@@ -100,21 +100,20 @@ public class OrderRepositoryImpl implements OrderRepository {
     }
 
     @Override
-    public Set<Order> findBySeveralParameters(int firstElementNumber, Order order) {
+    public Set<Order> findBySeveralParameters(int firstElementNumber, Order order, List<Integer> userIds) {
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
         CriteriaQuery<Order> query = builder.createQuery(Order.class);
         CriteriaQuery<Long> pageQuery = builder.createQuery(Long.class);
         Root<Order> root = query.from(Order.class);
         Root<Order> pageRoot = pageQuery.from(Order.class);
 
-        Predicate[] predicates = createPredicates(root, order).toArray(new Predicate[0]);
-        Predicate[] queryPredicates = createPredicates(pageRoot, order).toArray(new Predicate[0]);
-        query.select(root.join(USER).join(CERTIFICATE))
-                .where(predicates);
-        pageQuery.select(builder.count(root.join(USER).join(CERTIFICATE)))
-                .where(queryPredicates);
+        Predicate[] predicates = createPredicates(root, order, userIds).toArray(new Predicate[0]);
+        Predicate[] pagePredicates = createPredicates(pageRoot, order, userIds).toArray(new Predicate[0]);
+        query.select(root).where(predicates);
+        pageQuery.select(builder.count(pageRoot)).where(pagePredicates);
 
-        long amount = entityManager.createQuery(pageQuery).getSingleResult();
+        long amount = entityManager.createQuery(pageQuery)
+                .getSingleResult();
         lastPage = (int) Math.ceil((double) amount / MAX_RESULT_AMOUNT);
         return new LinkedHashSet<>(entityManager.createQuery(query)
                 .setFirstResult(firstElementNumber)
@@ -122,15 +121,18 @@ public class OrderRepositoryImpl implements OrderRepository {
                 .getResultList());
     }
 
-    private List<Predicate> createPredicates(Root<Order> root, Order order) {
+    private List<Predicate> createPredicates(Root<Order> root, Order order, List<Integer> userIds) {
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
         List<Predicate> predicates = new ArrayList<>();
-        if (order.getUser().getId() != 0) {
-            predicates.add(builder.equal(root.get(USER).get(ID),
-                    order.getUser().getId()));
+        if (order.getCertificates() != null) {
+            for (GiftCertificate certificate : order.getCertificates()) {
+                predicates.add(builder.equal(root.join(CERTIFICATES).get(ID), certificate.getId()));
+            }
         }
-        for (GiftCertificate certificate : order.getCertificates()) {
-            predicates.add(builder.equal(root.get(CERTIFICATE).get(ID), certificate.getId()));
+        if (userIds != null) {
+            for (Integer userId : userIds) {
+                predicates.add(builder.equal(root.join(USER).get(ID), userId));
+            }
         }
         if (order.getCost() != null) {
             predicates.add(builder.equal(root.get(COST), order.getCost()));

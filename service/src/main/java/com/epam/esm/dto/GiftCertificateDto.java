@@ -2,6 +2,7 @@ package com.epam.esm.dto;
 
 import com.epam.esm.validation.OnAggregationCreateGroup;
 import com.epam.esm.validation.OnCreateGroup;
+import com.epam.esm.validation.OnSearchGroup;
 import com.epam.esm.validation.OnUpdateGroup;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -25,15 +26,15 @@ import java.util.Set;
 @EqualsAndHashCode(callSuper = false)
 @Data
 public class GiftCertificateDto extends RepresentationModel<GiftCertificateDto> {
-    @Min(value = 1, groups = OnAggregationCreateGroup.class)
+    @Min(value = 1, groups = {OnAggregationCreateGroup.class, OnUpdateGroup.class})
     private long id;
 
     @Pattern(regexp = "[А-Яа-я\\p{Alnum} _]{2,25}", groups = OnCreateGroup.class)
     @Pattern(regexp = "[А-Яа-я\\p{Alnum} _]{0,25}", groups = OnUpdateGroup.class)
     private String name;
 
-    @Pattern(regexp = "[А-Яа-я\\p{Graph} ]{3,200}", groups = OnCreateGroup.class)
-    @Pattern(regexp = "[А-Яа-я\\p{Graph} ]{0,200}", groups = OnUpdateGroup.class)
+    @Pattern(regexp = "[А-Яа-я\\p{Graph} ]{3,200}", groups = {OnCreateGroup.class, OnSearchGroup.class})
+    @Pattern(regexp = "[А-Яа-я\\p{Graph} ]{0,200}", groups = {OnUpdateGroup.class, OnSearchGroup.class})
     private String description;
 
     @NotNull(groups = OnCreateGroup.class)
@@ -41,6 +42,7 @@ public class GiftCertificateDto extends RepresentationModel<GiftCertificateDto> 
     private BigDecimal price;
 
     @Min(value = 3, groups = OnCreateGroup.class)
+    @Min(value = 0, groups = {OnUpdateGroup.class, OnSearchGroup.class})
     private int duration;
 
     @Null

@@ -9,11 +9,16 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.CriteriaUpdate;
+import javax.persistence.criteria.Root;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.LinkedHashSet;
 import java.util.Optional;
 import java.util.Set;
 
-import static com.epam.esm.repository.ColumnName.ORDERS;
+import static com.epam.esm.repository.ColumnName.BALANCE;
+import static com.epam.esm.repository.ColumnName.ID;
 
 /**
  * The type User repository.
@@ -48,23 +53,6 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     @Override
-    public Set<User> findAllWithOrders(int firstElementNumber) {
-        CriteriaBuilder builder = entityManager.getCriteriaBuilder();
-        CriteriaQuery<User> query = builder.createQuery(User.class);
-        CriteriaQuery<Long> pageQuery = builder.createQuery(Long.class);
-
-        query.select(query.from(User.class).join(ORDERS));
-        pageQuery.select(builder.count(pageQuery.from(User.class)));
-
-        long amount = entityManager.createQuery(pageQuery).getSingleResult();
-        lastPage = (int) Math.ceil((double) amount / MAX_RESULT_AMOUNT);
-        return new LinkedHashSet<>(entityManager.createQuery(query)
-                .setFirstResult(firstElementNumber)
-                .setMaxResults(MAX_RESULT_AMOUNT)
-                .getResultList());
-    }
-
-    @Override
     public Optional<User> findById(long id) {
         User user = entityManager.find(User.class, id);
         return Optional.ofNullable(user);
@@ -79,13 +67,24 @@ public class UserRepositoryImpl implements UserRepository {
                 "ORDER BY max_summary DESC) AS max_sum";
         Query query = entityManager.createNativeQuery("SELECT id, login, surname, name, balance, max_summary "
                 + querySql, User.class);
-        Query pageQuery = entityManager.createNativeQuery("SELECT COUNT(id) " + querySql, User.class);
-        long amount = (Long) pageQuery.getSingleResult();
-        lastPage = (int) Math.ceil((double) amount / MAX_RESULT_AMOUNT);
+        Query pageQuery = entityManager.createNativeQuery("SELECT COUNT(id) " + querySql);
+        BigInteger amount = (BigInteger) pageQuery.getSingleResult();
+        lastPage = (int) Math.ceil((double) amount.longValue() / MAX_RESULT_AMOUNT);
         return new LinkedHashSet<>(query
                 .setFirstResult(firstElementNumber)
                 .setMaxResults(MAX_RESULT_AMOUNT)
                 .getResultList());
+    }
+
+    @Override
+    public void updateBalance(long userId, BigDecimal newBalance) {
+        CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+        CriteriaUpdate<User> query = builder.createCriteriaUpdate(User.class);
+        Root<User> root = query.from(User.class);
+        query.set(root.get(BALANCE), newBalance)
+                .where(builder.equal(root.get(ID), userId));
+        entityManager.createQuery(query)
+                .executeUpdate();
     }
 
     @Override

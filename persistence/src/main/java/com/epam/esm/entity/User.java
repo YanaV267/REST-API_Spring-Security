@@ -36,6 +36,7 @@ public class User implements Serializable {
     private BigDecimal balance;
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     @EqualsAndHashCode.Exclude
+    @ToString.Exclude
     private Set<Order> orders;
 
     /**

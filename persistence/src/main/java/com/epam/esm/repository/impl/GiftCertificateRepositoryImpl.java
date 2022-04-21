@@ -30,7 +30,7 @@ public class GiftCertificateRepositoryImpl implements GiftCertificateRepository 
 
     @Override
     public long create(GiftCertificate certificate) {
-        entityManager.persist(certificate);
+        entityManager.merge(certificate);
         return certificate.getId();
     }
 
@@ -87,7 +87,7 @@ public class GiftCertificateRepositoryImpl implements GiftCertificateRepository 
     }
 
     @Override
-    public Set<GiftCertificate> findBySeveralParameters(int firstElementNumber, GiftCertificate certificate, Set<Tag> tags,
+    public Set<GiftCertificate> findBySeveralParameters(int firstElementNumber, GiftCertificate certificate,
                                                         List<String> sortTypes) {
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
         CriteriaQuery<GiftCertificate> query = builder.createQuery(GiftCertificate.class);
@@ -95,8 +95,8 @@ public class GiftCertificateRepositoryImpl implements GiftCertificateRepository 
         Root<GiftCertificate> root = query.from(GiftCertificate.class);
         Root<GiftCertificate> pageRoot = pageQuery.from(GiftCertificate.class);
 
-        Predicate[] predicates = createPredicates(root, certificate, tags).toArray(new Predicate[0]);
-        Predicate[] pagePredicates = createPredicates(pageRoot, certificate, tags).toArray(new Predicate[0]);
+        Predicate[] predicates = createPredicates(root, certificate).toArray(new Predicate[0]);
+        Predicate[] pagePredicates = createPredicates(pageRoot, certificate).toArray(new Predicate[0]);
         List<Order> orderList = createOrders(root, sortTypes);
         List<Order> pageOrderList = createOrders(pageRoot, sortTypes);
         query.select(root)
@@ -114,8 +114,7 @@ public class GiftCertificateRepositoryImpl implements GiftCertificateRepository 
                 .getResultList());
     }
 
-    private List<Predicate> createPredicates(Root<GiftCertificate> root,
-                                             GiftCertificate certificate, Set<Tag> tags) {
+    private List<Predicate> createPredicates(Root<GiftCertificate> root, GiftCertificate certificate) {
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
         List<Predicate> predicates = new ArrayList<>();
         if (certificate.getName() != null) {
@@ -136,8 +135,8 @@ public class GiftCertificateRepositoryImpl implements GiftCertificateRepository 
         if (certificate.getLastUpdateDate() != null) {
             predicates.add(builder.equal(root.get(LAST_UPDATE_DATE), certificate.getLastUpdateDate()));
         }
-        if (tags != null) {
-            for (Tag tag : tags) {
+        if (certificate.getTags() != null) {
+            for (Tag tag : certificate.getTags()) {
                 predicates.add(builder.like(root.join(TAGS).get(NAME), tag.getName()));
             }
         }

@@ -2,6 +2,7 @@ package com.epam.esm.repository;
 
 import com.epam.esm.entity.Order;
 
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -25,7 +26,8 @@ public interface OrderRepository extends CompleteBaseRepository<Order> {
      *
      * @param firstElementNumber the first element number
      * @param order              the order
+     * @param userIds        the user ids
      * @return the set
      */
-    Set<Order> findBySeveralParameters(int firstElementNumber, Order order);
+    Set<Order> findBySeveralParameters(int firstElementNumber, Order order, List<Integer> userIds);
 }

@@ -1,20 +1,21 @@
 package com.epam.esm.dto;
 
-import com.epam.esm.validation.OnCreateGroup;
+import com.epam.esm.validation.OnAggregationCreateGroup;
+import com.epam.esm.validation.OnUpdateGroup;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.hateoas.RepresentationModel;
 
 import javax.validation.Valid;
 import javax.validation.constraints.DecimalMin;
-import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Null;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 /**
@@ -25,25 +26,32 @@ import java.util.Set;
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
-@NoArgsConstructor
 public class OrderDto extends RepresentationModel<OrderDto> {
+    @Min(value = 1, groups = {OnAggregationCreateGroup.class, OnUpdateGroup.class})
     private long id;
 
-    @NotNull(groups = OnCreateGroup.class)
+    @NotNull(groups = OnAggregationCreateGroup.class)
     @Valid
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private UserDto user;
 
-    @NotNull(groups = OnCreateGroup.class)
+    @NotNull(groups = OnAggregationCreateGroup.class)
     @DecimalMin(value = "0.0")
     private BigDecimal cost;
 
-    @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS")
+    @Null
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS")
     private LocalDateTime createDate;
 
-    @NotEmpty(groups = OnCreateGroup.class)
+    @NotNull(groups = OnAggregationCreateGroup.class)
     @Valid
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private Set<GiftCertificateDto> certificates;
+
+    /**
+     * Instantiates a new Order dto.
+     */
+    public OrderDto() {
+        certificates = new LinkedHashSet<>();
+    }
 }

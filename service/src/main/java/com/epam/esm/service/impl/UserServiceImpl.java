@@ -8,8 +8,8 @@ import com.epam.esm.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
-
 import org.springframework.transaction.annotation.Transactional;
+
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -62,11 +62,9 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Set<UserDto> findAllWithOrders(int page) {
-        int firstElementNumber = getFirstElementNumber(page);
-        Set<User> users = repository.findAllWithOrders(firstElementNumber);
-        lastPage = repository.getLastPage();
+        Set<UserDto> users = findAll(page);
         return users.stream()
-                .map(mapper::mapToDto)
+                .filter(u -> !u.getOrders().isEmpty())
                 .collect(Collectors.toSet());
     }
 

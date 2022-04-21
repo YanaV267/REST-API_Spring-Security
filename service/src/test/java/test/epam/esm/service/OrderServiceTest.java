@@ -1,7 +1,6 @@
 package test.epam.esm.service;
 
 import com.epam.esm.dto.OrderDto;
-import com.epam.esm.entity.GiftCertificate;
 import com.epam.esm.entity.Order;
 import com.epam.esm.entity.User;
 import com.epam.esm.mapper.impl.OrderMapper;
@@ -20,12 +19,8 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.HashMap;
-import java.util.LinkedHashSet;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
-import static com.epam.esm.util.ParameterName.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
@@ -115,13 +110,14 @@ class OrderServiceTest {
 
     @ParameterizedTest
     @MethodSource("provideSearchParameters")
-    void findBySeveralParameters(int startElementNumber, OrderDto order) {
-        when(repository.findBySeveralParameters(anyInt(), any(Order.class)))
+    void findBySeveralParameters(int startElementNumber, OrderDto order, List<Integer> certificateIds,
+                                 List<Integer> userIds) {
+        when(repository.findBySeveralParameters(anyInt(), any(Order.class), anyList()))
                 .thenReturn(new LinkedHashSet<>());
         when(mapper.mapToDto(any(Order.class))).thenReturn(new OrderDto());
 
         int expected = 1;
-        Set<OrderDto> orders = service.findBySeveralParameters(startElementNumber, order);
+        Set<OrderDto> orders = service.findBySeveralParameters(startElementNumber, order, certificateIds, userIds);
         int actual = orders.size();
         Assertions.assertEquals(expected, actual);
     }
@@ -130,24 +126,32 @@ class OrderServiceTest {
         return new Object[][]{
                 {Order.builder()
                         .user(new User(8))
-                        .certificate(new GiftCertificate(20))
+                        .certificates(new LinkedHashSet<>(2))
                         .build()}
         };
     }
 
     private static Object[][] provideSearchParameters() {
         return new Object[][]{
-                {15, new HashMap<String, Object>() {
+                {15, Order.builder()
+                        .user(new User(8))
+                        .certificates(new LinkedHashSet<>(2))
+                        .build(), new ArrayList<Integer>() {
                     {
-                        put(ID_CERTIFICATE, "8");
-                        put(COST, "70");
+                        add(1);
+                    }
+                }, new ArrayList<Integer>() {
+                    {
+                        add(10);
                     }
                 }},
-                {10, new HashMap<String, Object>() {
+                {10, Order.builder()
+                        .user(new User(4))
+                        .build(), new ArrayList<Integer>() {
                     {
-                        put(ID_USER, "2");
+                        add(5);
                     }
-                }},
+                }, new ArrayList<Integer>()},
         };
     }
 }

@@ -18,10 +18,9 @@ public interface GiftCertificateRepository extends CompleteBaseRepository<GiftCe
      *
      * @param firstElementNumber the first element number
      * @param certificate        the certificate
-     * @param tags               the tag name
      * @param sortTypes          the sort types
      * @return the set
      */
-    Set<GiftCertificate> findBySeveralParameters(int firstElementNumber, GiftCertificate certificate, Set<Tag> tags,
+    Set<GiftCertificate> findBySeveralParameters(int firstElementNumber, GiftCertificate certificate,
                                                  List<String> sortTypes);
 }

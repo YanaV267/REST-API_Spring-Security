@@ -2,14 +2,16 @@ package com.epam.esm.service.impl;
 
 import com.epam.esm.dto.GiftCertificateDto;
 import com.epam.esm.entity.GiftCertificate;
+import com.epam.esm.entity.Tag;
 import com.epam.esm.mapper.impl.GiftCertificateMapper;
 import com.epam.esm.repository.GiftCertificateRepository;
+import com.epam.esm.repository.TagRepository;
 import com.epam.esm.service.GiftCertificateService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
-
 import org.springframework.transaction.annotation.Transactional;
+
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
@@ -26,18 +28,21 @@ import java.util.stream.Collectors;
 public class GiftCertificateServiceImpl implements GiftCertificateService {
     private int lastPage;
     private final GiftCertificateRepository repository;
+    private final TagRepository tagRepository;
     private final GiftCertificateMapper mapper;
 
     /**
      * Instantiates a new Gift certificate service.
      *
-     * @param repository the repository
-     * @param mapper     the mapper
+     * @param repository    the repository
+     * @param tagRepository the tag repository
+     * @param mapper        the mapper
      */
     @Autowired
-    public GiftCertificateServiceImpl(GiftCertificateRepository repository,
+    public GiftCertificateServiceImpl(GiftCertificateRepository repository, TagRepository tagRepository,
                                       @Qualifier("certificateServiceMapper") GiftCertificateMapper mapper) {
         this.repository = repository;
+        this.tagRepository = tagRepository;
         this.mapper = mapper;
     }
 
@@ -45,6 +50,10 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
     @Transactional
     public boolean create(GiftCertificateDto giftCertificateDto) {
         GiftCertificate certificate = mapper.mapToEntity(giftCertificateDto);
+        certificate.getTags().forEach(t -> {
+            Optional<Tag> tag = tagRepository.findByName(t.getName());
+            tag.ifPresent(value -> t.setId(value.getId()));
+        });
         repository.create(certificate);
         return true;
     }
@@ -98,9 +107,15 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
     public Set<GiftCertificateDto> findBySeveralParameters(int page, GiftCertificateDto certificateDto,
                                                            List<String> tagNames, List<String> sortTypes) {
         GiftCertificate giftCertificate = mapper.mapToEntity(certificateDto);
+        if (tagNames != null) {
+            Set<Tag> tags = tagNames.stream()
+                    .map(Tag::new)
+                    .collect(Collectors.toSet());
+            giftCertificate.setTags(tags);
+        }
         int firstElementNumber = getFirstElementNumber(page);
         Set<GiftCertificate> certificates = repository.findBySeveralParameters(firstElementNumber,
-                giftCertificate, giftCertificate.getTags(), sortTypes);
+                giftCertificate, sortTypes);
         lastPage = repository.getLastPage();
         return certificates.stream()
                 .map(mapper::mapToDto)

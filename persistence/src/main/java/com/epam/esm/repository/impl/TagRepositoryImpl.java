@@ -11,6 +11,7 @@ import javax.persistence.Query;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
+import java.math.BigInteger;
 import java.util.LinkedHashSet;
 import java.util.Optional;
 import java.util.Set;
@@ -95,9 +96,9 @@ public class TagRepositoryImpl implements TagRepository {
                 "AS max_sum) " +
                 "GROUP BY id_user, name) AS most_used";
         Query query = entityManager.createNativeQuery("SELECT id, name " + querySql, Tag.class);
-        Query pageQuery = entityManager.createNativeQuery("SELECT COUNT(id) " + querySql, Long.class);
-        long amount = (Long) pageQuery.getSingleResult();
-        lastPage = (int) Math.ceil((double) amount / MAX_RESULT_AMOUNT);
+        Query pageQuery = entityManager.createNativeQuery("SELECT COUNT(id) " + querySql);
+        BigInteger amount = (BigInteger) pageQuery.getSingleResult();
+        lastPage = (int) Math.ceil((double) amount.longValue() / MAX_RESULT_AMOUNT);
         return new LinkedHashSet<>(query
                 .setFirstResult(firstElementNumber)
                 .setMaxResults(MAX_RESULT_AMOUNT)

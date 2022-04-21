@@ -2,6 +2,7 @@ package test.epam.esm.service;
 
 import com.epam.esm.dto.GiftCertificateDto;
 import com.epam.esm.entity.GiftCertificate;
+import com.epam.esm.entity.Tag;
 import com.epam.esm.mapper.impl.GiftCertificateMapper;
 import com.epam.esm.repository.GiftCertificateRepository;
 import com.epam.esm.service.GiftCertificateService;
@@ -16,9 +17,9 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.math.BigDecimal;
 import java.util.*;
 
-import static com.epam.esm.util.ParameterName.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
@@ -89,14 +90,14 @@ class GiftCertificateServiceTest {
 
     @ParameterizedTest
     @MethodSource("provideSearchParameters")
-    void findBySeveralParameters(int startElementNumber, GiftCertificateDto certificate,
+    void findBySeveralParameters(int page, GiftCertificateDto certificate,
                                  List<String> tagNames, List<String> sortTypes) {
-        when(repository.findBySeveralParameters(anyInt(), any(GiftCertificate.class), anySet(), anyList()))
+        when(repository.findBySeveralParameters(anyInt(), any(GiftCertificate.class), anyList()))
                 .thenReturn(new LinkedHashSet<>());
         when(mapper.mapToDto(any(GiftCertificate.class))).thenReturn(new GiftCertificateDto());
 
         int expected = 1;
-        Set<GiftCertificateDto> certificates = service.findBySeveralParameters(startElementNumber,
+        Set<GiftCertificateDto> certificates = service.findBySeveralParameters(page,
                 certificate, tagNames, sortTypes);
         int actual = certificates.size();
         Assertions.assertEquals(expected, actual);
@@ -104,37 +105,23 @@ class GiftCertificateServiceTest {
 
     private static Object[][] provideCertificateData() {
         return new Object[][]{
-                {30, new HashMap<String, Object>() {
-                    {
-                        put(ID, "4");
-                        put(NAME, "european countries tours");
-                        put(DESCRIPTION, "provides 17% discount for any 1 chosen tour");
-                        put(PRICE, "70");
-                        put(DURATION, "15");
-                        put(LAST_UPDATE_DATE, "2022-03-31T19:04:55");
-                        put(TAGS, "{'cars', 'food'}");
-                    }
-                }},
-                {24, new HashMap<String, Object>() {
-                    {
-                        put(NAME, "furniture purchase");
-                        put(DESCRIPTION, "7% discount on all goods");
-                        put(PRICE, "10");
-                        put(DURATION, "365");
-                        put(LAST_UPDATE_DATE, "2022-04-02 19:04:55");
-                    }
-                }}
+                {GiftCertificate.builder()
+                        .id(4)
+                        .name("european countries tours")
+                        .description("provides 17% discount for any 1 chosen tour")
+                        .price(BigDecimal.valueOf(70))
+                        .duration(15)
+                        .tags(new LinkedHashSet<Tag>() {{
+                    add(new Tag("cars"));
+                }})}
         };
     }
 
     private static Object[][] provideSearchParameters() {
         return new Object[][]{
-                {new HashMap<String, Object>() {
-                    {
-                        put(PRICE, "100");
-                        put(LAST_UPDATE_DATE, "2022-03-31T19:04:55");
-                    }
-                }, new ArrayList<String>() {
+                {3, GiftCertificate.builder()
+                        .name("european countries tours")
+                        .duration(15), new ArrayList<String>() {
                     {
                         add("car");
                     }
@@ -144,13 +131,8 @@ class GiftCertificateServiceTest {
                         add("price_desc");
                     }
                 }},
-                {new HashMap<String, Object>() {
-                    {
-                        put(NAME, "european countries tours");
-                        put(PRICE, "70");
-                        put(DURATION, "15");
-                    }
-                }, new ArrayList<String>() {
+                {5, GiftCertificate.builder()
+                        .price(BigDecimal.valueOf(100)), new ArrayList<String>() {
                     {
                         add("travelling");
                         add("car");

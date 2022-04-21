@@ -4,7 +4,6 @@ import com.epam.esm.dto.OrderDto;
 import com.epam.esm.entity.GiftCertificate;
 import com.epam.esm.entity.Order;
 import com.epam.esm.entity.User;
-import com.epam.esm.mapper.impl.GiftCertificateMapper;
 import com.epam.esm.mapper.impl.OrderMapper;
 import com.epam.esm.mapper.impl.UserMapper;
 import com.epam.esm.repository.GiftCertificateRepository;
@@ -34,7 +33,6 @@ public class OrderServiceImpl implements OrderService {
     private final GiftCertificateRepository certificateRepository;
     private final UserRepository userRepository;
     private final OrderMapper mapper;
-    private final GiftCertificateMapper certificateMapper;
     private final UserMapper userMapper;
 
     /**
@@ -44,7 +42,6 @@ public class OrderServiceImpl implements OrderService {
      * @param certificateRepository the certificate repository
      * @param userRepository        the user repository
      * @param mapper                the mapper
-     * @param certificateMapper     the certificate mapper
      * @param userMapper            the user mapper
      */
     @Autowired
@@ -52,13 +49,11 @@ public class OrderServiceImpl implements OrderService {
                             GiftCertificateRepository certificateRepository,
                             UserRepository userRepository,
                             @Qualifier("orderServiceMapper") OrderMapper mapper,
-                            @Qualifier("certificateServiceMapper") GiftCertificateMapper certificateMapper,
                             @Qualifier("userServiceMapper") UserMapper userMapper) {
         this.repository = repository;
         this.certificateRepository = certificateRepository;
         this.userRepository = userRepository;
         this.mapper = mapper;
-        this.certificateMapper = certificateMapper;
         this.userMapper = userMapper;
     }
 
@@ -75,18 +70,21 @@ public class OrderServiceImpl implements OrderService {
                     .stream()
                     .map(c -> certificateRepository.findById(c.getId()).get())
                     .collect(Collectors.toSet());
-            BigDecimal orderCost = BigDecimal.valueOf(certificates
-                    .stream()
+            BigDecimal orderCost = BigDecimal.valueOf(certificates.stream()
                     .map(GiftCertificate::getPrice)
                     .mapToLong(BigDecimal::longValue)
                     .sum());
-            Order order = Order.builder()
-                    .user(new User(userId))
-                    .certificates(certificates)
-                    .cost(orderCost)
-                    .build();
-            repository.create(order);
-            return true;
+            if (orderCost.compareTo(user.get().getBalance()) <= 0) {
+                Order order = Order.builder()
+                        .user(new User(userId))
+                        .certificates(certificates)
+                        .cost(orderCost)
+                        .build();
+                BigDecimal newBalance = user.get().getBalance().subtract(orderCost);
+                repository.create(order);
+                userRepository.updateBalance(user.get().getId(), newBalance);
+                return true;
+            }
         }
         return false;
     }
@@ -147,10 +145,17 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public Set<OrderDto> findBySeveralParameters(int page, OrderDto orderDto) {
+    public Set<OrderDto> findBySeveralParameters(int page, OrderDto orderDto, List<Integer> userIds,
+                                                 List<Integer> certificateIds) {
         Order order = mapper.mapToEntity(orderDto);
+        if (certificateIds != null) {
+            Set<GiftCertificate> certificates = certificateIds.stream()
+                    .map(GiftCertificate::new)
+                    .collect(Collectors.toSet());
+            order.setCertificates(certificates);
+        }
         int firstElementNumber = getFirstElementNumber(page);
-        Set<Order> foundOrders = repository.findBySeveralParameters(firstElementNumber, order);
+        Set<Order> foundOrders = repository.findBySeveralParameters(firstElementNumber, order, userIds);
         lastPage = repository.getLastPage();
         Set<OrderDto> orders = foundOrders.stream()
                 .map(mapper::mapToDto)

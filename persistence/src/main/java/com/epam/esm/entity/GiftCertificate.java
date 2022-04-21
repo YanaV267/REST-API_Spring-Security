@@ -13,6 +13,8 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 import static com.epam.esm.entity.AuditListener.*;
+import static javax.persistence.CascadeType.MERGE;
+import static javax.persistence.CascadeType.PERSIST;
 
 /**
  * The type Gift certificate.
@@ -40,7 +42,7 @@ public class GiftCertificate implements Serializable {
     @Column(name = "last_update_date", insertable = false)
     private LocalDateTime lastUpdateDate;
 
-    @ManyToMany(cascade = CascadeType.ALL)
+    @ManyToMany(cascade = {PERSIST, MERGE})
     @JoinTable(name = "certificate_purchase",
             joinColumns = {@JoinColumn(name = "id_certificate")},
             inverseJoinColumns = {@JoinColumn(name = "id_tag")})

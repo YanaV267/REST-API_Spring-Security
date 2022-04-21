@@ -14,6 +14,10 @@ public final class ColumnName {
     /**
      * The constant CERTIFICATE.
      */
+    public static final String CERTIFICATES = "certificates";
+    /**
+     * The constant CERTIFICATE.
+     */
     public static final String CERTIFICATE = "certificate";
 
     /**
