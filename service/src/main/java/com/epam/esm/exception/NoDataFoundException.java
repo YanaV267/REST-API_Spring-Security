@@ -11,43 +11,8 @@ import static com.epam.esm.util.ParameterName.*;
 public class NoDataFoundException extends RuntimeException {
     private static final String DELIMITER = " = ";
     private static final String ALL_DATA_VALUE = "all";
-    private Class<?> resourceClass;
-    private String parameters;
-
-    /**
-     * Instantiates a new No data found exception.
-     */
-    public NoDataFoundException() {
-        super();
-    }
-
-    /**
-     * Instantiates a new No data found exception.
-     *
-     * @param message the message
-     */
-    public NoDataFoundException(String message) {
-        super(message);
-    }
-
-    /**
-     * Instantiates a new No data found exception.
-     *
-     * @param message the message
-     * @param cause   the cause
-     */
-    public NoDataFoundException(String message, Throwable cause) {
-        super(message, cause);
-    }
-
-    /**
-     * Instantiates a new No data found exception.
-     *
-     * @param cause the cause
-     */
-    public NoDataFoundException(Throwable cause) {
-        super(cause);
-    }
+    private final Class<?> resourceClass;
+    private final String parameters;
 
     /**
      * Instantiates a new No data found exception.

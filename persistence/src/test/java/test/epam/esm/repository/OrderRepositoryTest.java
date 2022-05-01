@@ -6,7 +6,6 @@ import com.epam.esm.entity.User;
 import com.epam.esm.repository.OrderRepository;
 import com.epam.esm.repository.impl.OrderRepositoryImpl;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -14,12 +13,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import javax.persistence.EntityManager;
 import java.math.BigDecimal;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
         classes = {OrderRepositoryImpl.class, EntityManager.class})
@@ -90,9 +87,9 @@ class OrderRepositoryTest {
 
     @ParameterizedTest
     @MethodSource("provideSearchParameters")
-    void findOrdersBySeveralParameters(int firstElementNumber, Order order) {
+    void findOrdersBySeveralParameters(int firstElementNumber, Order order, List<Integer> userIds) {
         long expected = 6;
-        Set<Order> orders = repository.findBySeveralParameters(firstElementNumber, order);
+        Set<Order> orders = repository.findBySeveralParameters(firstElementNumber, order, userIds);
         int actual = orders.size();
         Assertions.assertEquals(expected, actual);
     }
@@ -101,7 +98,11 @@ class OrderRepositoryTest {
         return new Object[][]{
                 {Order.builder()
                         .user(new User(3))
-                        .certificate(new GiftCertificate(12))
+                        .certificates(new LinkedHashSet<GiftCertificate>() {
+                            {
+                                add(new GiftCertificate(4));
+                            }
+                        })
                         .build()}
         };
     }
@@ -114,7 +115,11 @@ class OrderRepositoryTest {
                         .build()},
                 {Order.builder()
                         .id(2)
-                        .certificate(new GiftCertificate(17))
+                        .certificates(new LinkedHashSet<GiftCertificate>() {
+                            {
+                                add(new GiftCertificate(4));
+                            }
+                        })
                         .build()}
         };
     }
@@ -123,12 +128,24 @@ class OrderRepositoryTest {
         return new Object[][]{
                 {15, Order.builder()
                         .cost(BigDecimal.valueOf(150))
-                        .certificate(GiftCertificate.builder()
+                        .certificates(new LinkedHashSet<GiftCertificate>() {
+                            {
+                                add(new GiftCertificate(7));
+                            }
+                        })
                         .id(5)
-                        .build())},
+                        .build(), new ArrayList<Integer>() {
+                    {
+                        add(5);
+                    }
+                }},
                 {0, Order.builder()
                         .id(7)
-                        .cost(BigDecimal.valueOf(80))}
+                        .cost(BigDecimal.valueOf(80)), new ArrayList<Integer>() {
+                    {
+                        add(12);
+                    }
+                }}
         };
     }
 }

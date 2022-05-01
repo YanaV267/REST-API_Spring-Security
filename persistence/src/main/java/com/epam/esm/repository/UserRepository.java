@@ -20,6 +20,8 @@ public interface UserRepository extends BaseRepository<User> {
      */
     Set<User> findWithHighestOrderCost(int firstElementNumber);
 
+    Set<User> findWithHighestOrderCost(int firstElementNumber);
+
     /**
      * Update balance.
      *

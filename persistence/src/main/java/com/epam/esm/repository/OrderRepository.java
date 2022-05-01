@@ -26,7 +26,7 @@ public interface OrderRepository extends CompleteBaseRepository<Order> {
      *
      * @param firstElementNumber the first element number
      * @param order              the order
-     * @param userIds        the user ids
+     * @param userIds            the user ids
      * @return the set
      */
     Set<Order> findBySeveralParameters(int firstElementNumber, Order order, List<Integer> userIds);

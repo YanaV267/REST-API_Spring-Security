@@ -1,17 +1,17 @@
 package com.epam.esm.repository.impl;
 
+import com.epam.esm.builder.GiftCertificatePredicateBuilder;
+import com.epam.esm.builder.GiftCertificateUpdateBuilder;
 import com.epam.esm.entity.GiftCertificate;
-import com.epam.esm.entity.Tag;
 import com.epam.esm.repository.GiftCertificateRepository;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.criteria.*;
-import java.time.LocalDateTime;
 import java.util.*;
 
-import static com.epam.esm.repository.ColumnName.*;
+import static com.epam.esm.repository.ColumnName.ID;
 
 /**
  * The type Gift certificate repository.
@@ -37,22 +37,15 @@ public class GiftCertificateRepositoryImpl implements GiftCertificateRepository 
     @Override
     public void update(GiftCertificate certificate) {
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
-        CriteriaUpdate<GiftCertificate> query = entityManager.getCriteriaBuilder()
-                .createCriteriaUpdate(GiftCertificate.class);
+        CriteriaUpdate<GiftCertificate> query = builder.createCriteriaUpdate(GiftCertificate.class);
         Root<GiftCertificate> root = query.from(GiftCertificate.class);
-        if (certificate.getName() != null) {
-            query = query.set(root.get(NAME), certificate.getName());
-        }
-        if (certificate.getDescription() != null) {
-            query = query.set(root.get(DESCRIPTION), certificate.getDescription());
-        }
-        if (certificate.getPrice() != null) {
-            query = query.set(root.get(PRICE), certificate.getPrice());
-        }
-        if (certificate.getDuration() != 0) {
-            query = query.set(root.get(DURATION), certificate.getDuration());
-        }
-        query = query.set(root.get(LAST_UPDATE_DATE), LocalDateTime.now());
+        query = new GiftCertificateUpdateBuilder(query, root)
+                .setName(certificate.getName())
+                .setDescription(certificate.getDescription())
+                .setDuration(certificate.getDuration())
+                .setPrice(certificate.getPrice())
+                .setLastUpdateDate()
+                .build();
         query.where(builder.equal(root.get(ID), certificate.getId()));
         entityManager.createQuery(query)
                 .executeUpdate();
@@ -95,8 +88,26 @@ public class GiftCertificateRepositoryImpl implements GiftCertificateRepository 
         Root<GiftCertificate> root = query.from(GiftCertificate.class);
         Root<GiftCertificate> pageRoot = pageQuery.from(GiftCertificate.class);
 
-        Predicate[] predicates = createPredicates(root, certificate).toArray(new Predicate[0]);
-        Predicate[] pagePredicates = createPredicates(pageRoot, certificate).toArray(new Predicate[0]);
+        Predicate[] predicates = new GiftCertificatePredicateBuilder(builder, root)
+                .setName(certificate.getName())
+                .setDescription(certificate.getDescription())
+                .setDuration(certificate.getDuration())
+                .setPrice(certificate.getPrice())
+                .setCreateDate(certificate.getCreateDate())
+                .setLastUpdateDate(certificate.getLastUpdateDate())
+                .setTags(certificate.getTags())
+                .build()
+                .toArray(new Predicate[0]);
+        Predicate[] pagePredicates = new GiftCertificatePredicateBuilder(builder, root)
+                .setName(certificate.getName())
+                .setDescription(certificate.getDescription())
+                .setDuration(certificate.getDuration())
+                .setPrice(certificate.getPrice())
+                .setCreateDate(certificate.getCreateDate())
+                .setLastUpdateDate(certificate.getLastUpdateDate())
+                .setTags(certificate.getTags())
+                .build()
+                .toArray(new Predicate[0]);
         List<Order> orderList = createOrders(root, sortTypes);
         List<Order> pageOrderList = createOrders(pageRoot, sortTypes);
         query.select(root)
@@ -112,35 +123,6 @@ public class GiftCertificateRepositoryImpl implements GiftCertificateRepository 
                 .setFirstResult(firstElementNumber)
                 .setMaxResults(MAX_RESULT_AMOUNT)
                 .getResultList());
-    }
-
-    private List<Predicate> createPredicates(Root<GiftCertificate> root, GiftCertificate certificate) {
-        CriteriaBuilder builder = entityManager.getCriteriaBuilder();
-        List<Predicate> predicates = new ArrayList<>();
-        if (certificate.getName() != null) {
-            predicates.add(builder.like(root.get(NAME), certificate.getName()));
-        }
-        if (certificate.getDescription() != null) {
-            predicates.add(builder.like(root.get(DESCRIPTION), certificate.getDescription()));
-        }
-        if (certificate.getPrice() != null) {
-            predicates.add(builder.equal(root.get(PRICE), certificate.getPrice()));
-        }
-        if (certificate.getDuration() != 0) {
-            predicates.add(builder.equal(root.get(DURATION), certificate.getDuration()));
-        }
-        if (certificate.getCreateDate() != null) {
-            predicates.add(builder.equal(root.get(CREATE_DATE), certificate.getCreateDate()));
-        }
-        if (certificate.getLastUpdateDate() != null) {
-            predicates.add(builder.equal(root.get(LAST_UPDATE_DATE), certificate.getLastUpdateDate()));
-        }
-        if (certificate.getTags() != null) {
-            for (Tag tag : certificate.getTags()) {
-                predicates.add(builder.like(root.join(TAGS).get(NAME), tag.getName()));
-            }
-        }
-        return predicates;
     }
 
     private List<Order> createOrders(Root<GiftCertificate> root, List<String> sortTypes) {

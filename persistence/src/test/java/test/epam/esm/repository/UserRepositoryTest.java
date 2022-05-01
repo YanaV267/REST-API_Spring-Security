@@ -4,14 +4,12 @@ import com.epam.esm.entity.User;
 import com.epam.esm.repository.UserRepository;
 import com.epam.esm.repository.impl.UserRepositoryImpl;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import javax.persistence.EntityManager;
 import java.util.Optional;
@@ -45,7 +43,7 @@ class UserRepositoryTest {
     @ValueSource(ints = {14, 22})
     void findAllWithOrders(int firstElementNumber) {
         long expected = 9;
-        Set<User> users = repository.findAllWithOrders(firstElementNumber);
+        Set<User> users = repository.findWithHighestOrderCost(firstElementNumber);
         int actual = users.size();
         Assertions.assertEquals(expected, actual);
     }

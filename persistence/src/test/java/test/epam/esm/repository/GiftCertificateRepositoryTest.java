@@ -75,10 +75,10 @@ class GiftCertificateRepositoryTest {
     @ParameterizedTest
     @MethodSource("provideSearchParameters")
     void findBySeveralParameters(int firstElementNumber, GiftCertificate certificate,
-                                 Set<Tag> tags, List<String> sortTypes) {
+                                 List<String> sortTypes) {
         long expected = 2;
         Set<GiftCertificate> certificates = repository.findBySeveralParameters(firstElementNumber,
-                certificate, tags, sortTypes);
+                certificate, sortTypes);
         int actual = certificates.size();
         Assertions.assertEquals(expected, actual);
     }

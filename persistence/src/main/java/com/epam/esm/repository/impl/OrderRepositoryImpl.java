@@ -1,6 +1,7 @@
 package com.epam.esm.repository.impl;
 
-import com.epam.esm.entity.GiftCertificate;
+import com.epam.esm.builder.OrderPredicateBuilder;
+import com.epam.esm.builder.OrderUpdateBuilder;
 import com.epam.esm.entity.Order;
 import com.epam.esm.repository.OrderRepository;
 import org.springframework.stereotype.Repository;
@@ -8,9 +9,13 @@ import org.springframework.stereotype.Repository;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.criteria.*;
-import java.util.*;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
-import static com.epam.esm.repository.ColumnName.*;
+import static com.epam.esm.repository.ColumnName.ID;
+import static com.epam.esm.repository.ColumnName.USER;
 
 /**
  * The type Order repository.
@@ -36,15 +41,11 @@ public class OrderRepositoryImpl implements OrderRepository {
         CriteriaUpdate<Order> query = entityManager.getCriteriaBuilder()
                 .createCriteriaUpdate(Order.class);
         Root<Order> root = query.from(Order.class);
-        if (order.getUser().getId() != 0) {
-            query = query.set(root.get(USER).get(ID), order.getUser().getId());
-        }
-        for (GiftCertificate certificate : order.getCertificates()) {
-            query = query.set(root.get(CERTIFICATES).get(ID), certificate.getId());
-        }
-        if (order.getCost() != null) {
-            query = query.set(root.get(COST), order.getCost());
-        }
+        query = new OrderUpdateBuilder(query, root)
+                .setUser(order.getUser())
+                .setCertificates(order.getCertificates())
+                .setCost(order.getCost())
+                .build();
         query.where(builder.equal(root.get(ID), order.getId()));
         entityManager.createQuery(query)
                 .executeUpdate();
@@ -107,8 +108,20 @@ public class OrderRepositoryImpl implements OrderRepository {
         Root<Order> root = query.from(Order.class);
         Root<Order> pageRoot = pageQuery.from(Order.class);
 
-        Predicate[] predicates = createPredicates(root, order, userIds).toArray(new Predicate[0]);
-        Predicate[] pagePredicates = createPredicates(pageRoot, order, userIds).toArray(new Predicate[0]);
+        Predicate[] predicates = new OrderPredicateBuilder(builder, root)
+                .setUser(userIds)
+                .setCertificates(order.getCertificates())
+                .setCost(order.getCost())
+                .setCreateDate(order.getCreateDate())
+                .build()
+                .toArray(new Predicate[0]);
+        Predicate[] pagePredicates = new OrderPredicateBuilder(builder, pageRoot)
+                .setUser(userIds)
+                .setCertificates(order.getCertificates())
+                .setCost(order.getCost())
+                .setCreateDate(order.getCreateDate())
+                .build()
+                .toArray(new Predicate[0]);
         query.select(root).where(predicates);
         pageQuery.select(builder.count(pageRoot)).where(pagePredicates);
 
@@ -119,28 +132,6 @@ public class OrderRepositoryImpl implements OrderRepository {
                 .setFirstResult(firstElementNumber)
                 .setMaxResults(MAX_RESULT_AMOUNT)
                 .getResultList());
-    }
-
-    private List<Predicate> createPredicates(Root<Order> root, Order order, List<Integer> userIds) {
-        CriteriaBuilder builder = entityManager.getCriteriaBuilder();
-        List<Predicate> predicates = new ArrayList<>();
-        if (order.getCertificates() != null) {
-            for (GiftCertificate certificate : order.getCertificates()) {
-                predicates.add(builder.equal(root.join(CERTIFICATES).get(ID), certificate.getId()));
-            }
-        }
-        if (userIds != null) {
-            for (Integer userId : userIds) {
-                predicates.add(builder.equal(root.join(USER).get(ID), userId));
-            }
-        }
-        if (order.getCost() != null) {
-            predicates.add(builder.equal(root.get(COST), order.getCost()));
-        }
-        if (order.getCreateDate() != null) {
-            predicates.add(builder.equal(root.get(CREATE_DATE), order.getCreateDate()));
-        }
-        return predicates;
     }
 
     @Override

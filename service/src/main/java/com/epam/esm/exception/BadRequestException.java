@@ -7,42 +7,7 @@ package com.epam.esm.exception;
  * @project GiftCertificate
  */
 public class BadRequestException extends RuntimeException {
-    private Class<?> resourceClass;
-
-    /**
-     * Instantiates a new Bad request exception.
-     */
-    public BadRequestException() {
-        super();
-    }
-
-    /**
-     * Instantiates a new Bad request exception.
-     *
-     * @param message the message
-     */
-    public BadRequestException(String message) {
-        super(message);
-    }
-
-    /**
-     * Instantiates a new Bad request exception.
-     *
-     * @param message the message
-     * @param cause   the cause
-     */
-    public BadRequestException(String message, Throwable cause) {
-        super(message, cause);
-    }
-
-    /**
-     * Instantiates a new Bad request exception.
-     *
-     * @param cause the cause
-     */
-    public BadRequestException(Throwable cause) {
-        super(cause);
-    }
+    private final Class<?> resourceClass;
 
     /**
      * Instantiates a new Bad request exception.

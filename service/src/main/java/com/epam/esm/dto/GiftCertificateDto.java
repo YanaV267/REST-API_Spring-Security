@@ -29,8 +29,8 @@ public class GiftCertificateDto extends RepresentationModel<GiftCertificateDto> 
     @Min(value = 1, groups = {OnAggregationCreateGroup.class, OnUpdateGroup.class})
     private long id;
 
-    @Pattern(regexp = "[А-Яа-я\\p{Alnum} _]{2,25}", groups = OnCreateGroup.class)
-    @Pattern(regexp = "[А-Яа-я\\p{Alnum} _]{0,25}", groups = OnUpdateGroup.class)
+    @Pattern(regexp = "[А-Яа-я\\p{Alnum} _&]{2,25}", groups = OnCreateGroup.class)
+    @Pattern(regexp = "[А-Яа-я\\p{Alnum} _&]{0,25}", groups = OnUpdateGroup.class)
     private String name;
 
     @Pattern(regexp = "[А-Яа-я\\p{Graph} ]{3,200}", groups = {OnCreateGroup.class, OnSearchGroup.class})

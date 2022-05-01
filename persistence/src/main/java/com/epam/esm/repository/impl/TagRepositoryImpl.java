@@ -86,7 +86,8 @@ public class TagRepositoryImpl implements TagRepository {
                 "(SELECT o.id_user, count(*) AS amount, t.id AS id, t.name as name FROM tags t " +
                 "JOIN certificate_purchase cp ON t.id = cp.id_tag " +
                 "JOIN gift_certificates gc ON gc.id = cp.id_certificate " +
-                "JOIN orders o ON o.id_certificate = gc.id " +
+                "JOIN order_purchase op ON op.id_certificate = gc.id " +
+                "JOIN orders o ON op.id_order = o.id " +
                 "GROUP BY id_user, t.name ORDER BY amount DESC) AS tag_amount " +
                 "WHERE id_user = " +
                 "(SELECT id_user FROM " +
