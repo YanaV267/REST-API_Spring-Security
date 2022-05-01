@@ -140,6 +140,22 @@ public class UserController extends AbstractController<UserDto> {
         }
     }
 
+    @GetMapping(value = "/most-used-tag", produces = APPLICATION_JSON_VALUE)
+    @ResponseStatus(FOUND)
+    public CollectionModel<UserDto> retrieveWithHighestOrderCostMostUsedTag(@RequestParam @Min(1) int page) {
+        Set<UserDto> users = userService.findWithHighestOrderCostMostUsedTag(page);
+        int lastPage = userService.getLastPage();
+        if (!users.isEmpty()) {
+            addLinksToUsers(users);
+            CollectionModel<UserDto> method = methodOn(UserController.class)
+                    .retrieveWithHighestOrderCost(page);
+            List<Link> links = addPagesLinks(method, page, lastPage);
+            return CollectionModel.of(users, links);
+        } else {
+            throw new NoDataFoundException(MOST_USED_TAG, UserDto.class);
+        }
+    }
+
     private void addLinksToUsers(Set<UserDto> users) {
         users.forEach(u -> {
             Link selfLink = linkTo(methodOn(UserController.class).retrieveById(u.getId())).withSelfRel();

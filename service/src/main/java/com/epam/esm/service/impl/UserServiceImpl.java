@@ -90,6 +90,16 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public Set<UserDto> findWithHighestOrderCostMostUsedTag(int page) {
+        int firstElementNumber = getFirstElementNumber(page);
+        Set<User> orders = repository.findWithHighestOrderCostMostUsedTag(firstElementNumber);
+        lastPage = repository.getLastPage();
+        return orders.stream()
+                .map(mapper::mapToDto)
+                .collect(Collectors.toSet());
+    }
+
+    @Override
     public int getLastPage() {
         return lastPage;
     }

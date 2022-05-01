@@ -20,7 +20,13 @@ public interface UserRepository extends BaseRepository<User> {
      */
     Set<User> findWithHighestOrderCost(int firstElementNumber);
 
-    Set<User> findWithHighestOrderCost(int firstElementNumber);
+    /**
+     * Find with highest order cost most used tag set.
+     *
+     * @param firstElementNumber the first element number
+     * @return the set
+     */
+    Set<User> findWithHighestOrderCostMostUsedTag(int firstElementNumber);
 
     /**
      * Update balance.

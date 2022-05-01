@@ -26,4 +26,12 @@ public interface UserService extends BaseService<UserDto> {
      * @return the set
      */
     Set<UserDto> findWithHighestOrderCost(int page);
+
+    /**
+     * Find with highest order cost most used tag set.
+     *
+     * @param page the page
+     * @return the set
+     */
+    Set<UserDto> findWithHighestOrderCostMostUsedTag(int page);
 }
