@@ -81,10 +81,10 @@ public class UserRepositoryImpl implements UserRepository {
         String querySql = "FROM (SELECT id_user as id, login, surname, name, balance, id_tag, max(summary) " +
                 "FROM (SELECT id_user, login, surname, u.name as name, balance, t.id as id_tag, sum(cost) AS summary " +
                 "FROM orders " +
-                "JOIN order_purchase p on orders.id = p.id_order " +
+                "JOIN certificate_purchase p on orders.id = p.id_order " +
                 "JOIN users u on u.id = orders.id_user " +
                 "JOIN gift_certificates g on g.id = p.id_certificate " +
-                "JOIN certificate_purchase c on g.id = c.id_certificate " +
+                "JOIN tag_reference c on g.id = c.id_certificate " +
                 "JOIN tags t on t.id = c.id_tag " +
                 "GROUP BY id_user) AS order_sum " +
                 "WHERE id_tag = " +
@@ -92,9 +92,9 @@ public class UserRepositoryImpl implements UserRepository {
                 "FROM (SELECT max(amount), id " +
                 "FROM (SELECT count(*) AS amount, t.id AS id " +
                 "FROM tags t " +
-                "JOIN certificate_purchase cp ON t.id = cp.id_tag " +
+                "JOIN tag_reference cp ON t.id = cp.id_tag " +
                 "JOIN gift_certificates gc ON gc.id = cp.id_certificate " +
-                "JOIN order_purchase op ON op.id_certificate = gc.id " +
+                "JOIN certificate_purchase op ON op.id_certificate = gc.id " +
                 "JOIN orders o ON op.id_order = o.id " +
                 "GROUP BY t.name " +
                 "ORDER BY amount DESC) AS tag_amount) " +

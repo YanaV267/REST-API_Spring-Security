@@ -140,6 +140,12 @@ public class UserController extends AbstractController<UserDto> {
         }
     }
 
+    /**
+     * Retrieve with highest order cost most used tag collection model.
+     *
+     * @param page the page
+     * @return the collection model
+     */
     @GetMapping(value = "/most-used-tag", produces = APPLICATION_JSON_VALUE)
     @ResponseStatus(FOUND)
     public CollectionModel<UserDto> retrieveWithHighestOrderCostMostUsedTag(@RequestParam @Min(1) int page) {

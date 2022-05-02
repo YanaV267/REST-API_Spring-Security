@@ -1,6 +1,5 @@
 package com.epam.esm.controller;
 
-import com.epam.esm.dto.GiftCertificateDto;
 import com.epam.esm.dto.OrderDto;
 import com.epam.esm.exception.BadRequestException;
 import com.epam.esm.exception.NoDataFoundException;
@@ -158,8 +157,10 @@ public class OrderController extends AbstractController<OrderDto> {
     /**
      * Retrieve by several parameters set.
      *
-     * @param page     the page
-     * @param orderDto the certificate dto
+     * @param page           the page
+     * @param orderDto       the certificate dto
+     * @param userIds        the user ids
+     * @param certificateIds the certificate ids
      * @return the set
      */
     @Validated(OnSearchGroup.class)

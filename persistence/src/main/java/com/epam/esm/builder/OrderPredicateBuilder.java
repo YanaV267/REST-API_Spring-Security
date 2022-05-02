@@ -1,6 +1,6 @@
 package com.epam.esm.builder;
 
-import com.epam.esm.entity.GiftCertificate;
+import com.epam.esm.entity.GiftCertificatePurchase;
 import com.epam.esm.entity.Order;
 
 import javax.persistence.criteria.CriteriaBuilder;
@@ -55,15 +55,15 @@ public class OrderPredicateBuilder {
     }
 
     /**
-     * Sets certificates.
+     * Sets certificatePurchase.
      *
-     * @param certificates the certificates
-     * @return the certificates
+     * @param certificatePurchase the certificatePurchase
+     * @return the certificatePurchase
      */
-    public OrderPredicateBuilder setCertificates(Set<GiftCertificate> certificates) {
-        if (certificates != null) {
-            for (GiftCertificate certificate : certificates) {
-                predicates.add(builder.equal(root.join(CERTIFICATES).get(ID), certificate.getId()));
+    public OrderPredicateBuilder setCertificates(Set<GiftCertificatePurchase> certificatePurchase) {
+        if (certificatePurchase != null) {
+            for (GiftCertificatePurchase certificate : certificatePurchase) {
+                predicates.add(builder.equal(root.join(CERTIFICATES).get(ID), certificate.getCertificate().getId()));
             }
         }
         return this;

@@ -2,7 +2,6 @@ package com.epam.esm.entity;
 
 import lombok.Builder;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.experimental.Tolerate;
 
 import javax.persistence.*;
@@ -25,7 +24,6 @@ import static javax.persistence.CascadeType.PERSIST;
 @Entity
 @Table(name = "gift_certificates")
 @Data
-@EqualsAndHashCode(callSuper = false)
 @Builder
 public class GiftCertificate implements Serializable {
     @Id
@@ -43,7 +41,7 @@ public class GiftCertificate implements Serializable {
     private LocalDateTime lastUpdateDate;
 
     @ManyToMany(cascade = {PERSIST, MERGE})
-    @JoinTable(name = "certificate_purchase",
+    @JoinTable(name = "tag_reference",
             joinColumns = {@JoinColumn(name = "id_certificate")},
             inverseJoinColumns = {@JoinColumn(name = "id_tag")})
     private Set<Tag> tags;

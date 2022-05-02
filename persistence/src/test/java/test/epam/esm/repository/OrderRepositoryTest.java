@@ -1,6 +1,7 @@
 package test.epam.esm.repository;
 
 import com.epam.esm.entity.GiftCertificate;
+import com.epam.esm.entity.GiftCertificatePurchase;
 import com.epam.esm.entity.Order;
 import com.epam.esm.entity.User;
 import com.epam.esm.repository.OrderRepository;
@@ -98,9 +99,9 @@ class OrderRepositoryTest {
         return new Object[][]{
                 {Order.builder()
                         .user(new User(3))
-                        .certificates(new LinkedHashSet<GiftCertificate>() {
+                        .certificates(new LinkedHashSet<GiftCertificatePurchase>() {
                             {
-                                add(new GiftCertificate(4));
+                                add(new GiftCertificatePurchase(new GiftCertificate(3), 2));
                             }
                         })
                         .build()}
@@ -115,9 +116,9 @@ class OrderRepositoryTest {
                         .build()},
                 {Order.builder()
                         .id(2)
-                        .certificates(new LinkedHashSet<GiftCertificate>() {
+                        .certificates(new LinkedHashSet<GiftCertificatePurchase>() {
                             {
-                                add(new GiftCertificate(4));
+                                add(new GiftCertificatePurchase(new GiftCertificate(14), 2));
                             }
                         })
                         .build()}
@@ -128,9 +129,9 @@ class OrderRepositoryTest {
         return new Object[][]{
                 {15, Order.builder()
                         .cost(BigDecimal.valueOf(150))
-                        .certificates(new LinkedHashSet<GiftCertificate>() {
+                        .certificates(new LinkedHashSet<GiftCertificatePurchase>() {
                             {
-                                add(new GiftCertificate(7));
+                                add(new GiftCertificatePurchase(new GiftCertificate(7), 1));
                             }
                         })
                         .id(5)

@@ -34,11 +34,8 @@ public class Order implements Serializable {
     private BigDecimal cost;
     @Column(name = "create_date", insertable = false)
     private LocalDateTime createDate;
-    @ManyToMany(cascade = CascadeType.ALL)
-    @JoinTable(name = "order_purchase",
-            joinColumns = {@JoinColumn(name = "id_order")},
-            inverseJoinColumns = {@JoinColumn(name = "id_certificate")})
-    private Set<GiftCertificate> certificates;
+    @OneToMany(mappedBy = "order", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    private Set<GiftCertificatePurchase> certificates;
 
     /**
      * Instantiates a new Order.

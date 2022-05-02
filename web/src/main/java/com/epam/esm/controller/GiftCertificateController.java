@@ -1,7 +1,6 @@
 package com.epam.esm.controller;
 
 import com.epam.esm.dto.GiftCertificateDto;
-import com.epam.esm.dto.TagDto;
 import com.epam.esm.exception.BadRequestException;
 import com.epam.esm.exception.NoDataFoundException;
 import com.epam.esm.service.GiftCertificateService;
@@ -139,6 +138,7 @@ public class GiftCertificateController extends AbstractController<GiftCertificat
      *
      * @param page           the page
      * @param certificateDto the certificate dto
+     * @param tagNames       the tag names
      * @param sortTypes      the sort types
      * @return the set
      */

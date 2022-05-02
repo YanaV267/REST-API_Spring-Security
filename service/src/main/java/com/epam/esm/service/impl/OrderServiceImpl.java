@@ -1,7 +1,7 @@
 package com.epam.esm.service.impl;
 
 import com.epam.esm.dto.OrderDto;
-import com.epam.esm.entity.GiftCertificate;
+import com.epam.esm.entity.GiftCertificatePurchase;
 import com.epam.esm.entity.Order;
 import com.epam.esm.entity.User;
 import com.epam.esm.mapper.impl.OrderMapper;
@@ -62,27 +62,28 @@ public class OrderServiceImpl implements OrderService {
     public boolean create(OrderDto orderDto) {
         boolean allCertificatesExist = orderDto.getCertificates()
                 .stream()
-                .allMatch(c -> certificateRepository.findById(c.getId()).isPresent());
+                .allMatch(c -> certificateRepository.findById(c.getCertificate().getId()).isPresent());
         long userId = orderDto.getUser().getId();
         Optional<User> user = userRepository.findById(userId);
         if (allCertificatesExist && user.isPresent()) {
-            Set<GiftCertificate> certificates = orderDto.getCertificates()
+            Set<GiftCertificatePurchase> certificates = orderDto.getCertificates()
                     .stream()
-                    .map(c -> certificateRepository.findById(c.getId()).get())
+                    .map(c -> new GiftCertificatePurchase(certificateRepository.findById(c.getCertificate().getId()).get(), c.getAmount()))
                     .collect(Collectors.toSet());
             BigDecimal orderCost = BigDecimal.valueOf(certificates.stream()
-                    .map(GiftCertificate::getPrice)
+                    .map(c -> c.getCertificate().getPrice().multiply(BigDecimal.valueOf(c.getAmount())))
                     .mapToLong(BigDecimal::longValue)
                     .sum());
             if (orderCost.compareTo(user.get().getBalance()) <= 0) {
                 Order order = Order.builder()
-                        .user(new User(userId))
+                        .user(user.get())
                         .certificates(certificates)
                         .cost(orderCost)
                         .build();
+                order.getCertificates().forEach(c -> c.setOrder(order));
                 BigDecimal newBalance = user.get().getBalance().subtract(orderCost);
-                repository.create(order);
                 userRepository.updateBalance(user.get().getId(), newBalance);
+                repository.create(order);
                 return true;
             }
         }
@@ -149,8 +150,8 @@ public class OrderServiceImpl implements OrderService {
                                                  List<Integer> certificateIds) {
         Order order = mapper.mapToEntity(orderDto);
         if (certificateIds != null) {
-            Set<GiftCertificate> certificates = certificateIds.stream()
-                    .map(GiftCertificate::new)
+            Set<GiftCertificatePurchase> certificates = certificateIds.stream()
+                    .map(GiftCertificatePurchase::new)
                     .collect(Collectors.toSet());
             order.setCertificates(certificates);
         }

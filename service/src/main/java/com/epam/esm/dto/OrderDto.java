@@ -27,7 +27,7 @@ import java.util.Set;
 @Data
 @EqualsAndHashCode(callSuper = false)
 public class OrderDto extends RepresentationModel<OrderDto> {
-    @Min(value = 1, groups = {OnAggregationCreateGroup.class, OnUpdateGroup.class})
+    @Min(value = 1, groups = OnUpdateGroup.class)
     private long id;
 
     @NotNull(groups = OnAggregationCreateGroup.class)
@@ -35,7 +35,7 @@ public class OrderDto extends RepresentationModel<OrderDto> {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private UserDto user;
 
-    @NotNull(groups = OnAggregationCreateGroup.class)
+    @Null(groups = OnAggregationCreateGroup.class)
     @DecimalMin(value = "0.0")
     private BigDecimal cost;
 
@@ -44,9 +44,8 @@ public class OrderDto extends RepresentationModel<OrderDto> {
     private LocalDateTime createDate;
 
     @NotNull(groups = OnAggregationCreateGroup.class)
-    @Valid
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
-    private Set<GiftCertificateDto> certificates;
+    private Set<@Valid GiftCertificatePurchaseDto> certificates;
 
     /**
      * Instantiates a new Order dto.

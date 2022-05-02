@@ -16,15 +16,6 @@ public final class ColumnName {
      */
     public static final String CERTIFICATES = "certificates";
     /**
-     * The constant CERTIFICATE.
-     */
-    public static final String CERTIFICATE = "certificate";
-
-    /**
-     * The constant ORDERS.
-     */
-    public static final String ORDERS = "orders";
-    /**
      * The constant USER.
      */
     public static final String USER = "user";
@@ -58,14 +49,6 @@ public final class ColumnName {
      */
     public static final String LAST_UPDATE_DATE = "lastUpdateDate";
 
-    /**
-     * The constant LOGIN.
-     */
-    public static final String LOGIN = "login";
-    /**
-     * The constant SURNAME.
-     */
-    public static final String SURNAME = "surname";
     /**
      * The constant BALANCE.
      */

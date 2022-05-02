@@ -1,6 +1,6 @@
 package com.epam.esm.builder;
 
-import com.epam.esm.entity.GiftCertificate;
+import com.epam.esm.entity.GiftCertificatePurchase;
 import com.epam.esm.entity.Order;
 import com.epam.esm.entity.User;
 
@@ -51,10 +51,10 @@ public class OrderUpdateBuilder {
      * @param certificates the certificates
      * @return the certificates
      */
-    public OrderUpdateBuilder setCertificates(Set<GiftCertificate> certificates) {
+    public OrderUpdateBuilder setCertificates(Set<GiftCertificatePurchase> certificates) {
         if (certificates != null) {
-            for (GiftCertificate certificate : certificates) {
-                query = query.set(root.get(CERTIFICATES).get(ID), certificate.getId());
+            for (GiftCertificatePurchase certificatePurchase : certificates) {
+                query = query.set(root.get(CERTIFICATES).get(ID), certificatePurchase.getCertificate().getId());
             }
         }
         return this;
