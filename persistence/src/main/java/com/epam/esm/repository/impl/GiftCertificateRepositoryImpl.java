@@ -4,6 +4,8 @@ import com.epam.esm.builder.GiftCertificatePredicateBuilder;
 import com.epam.esm.builder.GiftCertificateUpdateBuilder;
 import com.epam.esm.entity.GiftCertificate;
 import com.epam.esm.repository.GiftCertificateRepository;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
@@ -20,7 +22,10 @@ import static com.epam.esm.repository.ColumnName.ID;
  * @project GiftCertificate
  */
 @Repository
+@PropertySource("classpath:repository.properties")
 public class GiftCertificateRepositoryImpl implements GiftCertificateRepository {
+    @Value("${max.result.amount}")
+    private int maxResultAmount;
     private int lastPage;
     private static final String UNDERSCORE = "_";
     private static final String DESC = "desc";
@@ -66,10 +71,10 @@ public class GiftCertificateRepositoryImpl implements GiftCertificateRepository 
         pageQuery.select(builder.count(pageQuery.from(GiftCertificate.class)));
 
         long amount = entityManager.createQuery(pageQuery).getSingleResult();
-        lastPage = (int) Math.ceil((double) amount / MAX_RESULT_AMOUNT);
+        lastPage = (int) Math.ceil((double) amount / maxResultAmount);
         return new LinkedHashSet<>(entityManager.createQuery(query)
                 .setFirstResult(firstElementNumber)
-                .setMaxResults(MAX_RESULT_AMOUNT)
+                .setMaxResults(maxResultAmount)
                 .getResultList());
     }
 
@@ -118,10 +123,10 @@ public class GiftCertificateRepositoryImpl implements GiftCertificateRepository 
                 .orderBy(pageOrderList);
 
         long amount = entityManager.createQuery(pageQuery).getSingleResult();
-        lastPage = (int) Math.ceil((double) amount / MAX_RESULT_AMOUNT);
+        lastPage = (int) Math.ceil((double) amount / maxResultAmount);
         return new LinkedHashSet<>(entityManager.createQuery(query)
                 .setFirstResult(firstElementNumber)
-                .setMaxResults(MAX_RESULT_AMOUNT)
+                .setMaxResults(maxResultAmount)
                 .getResultList());
     }
 

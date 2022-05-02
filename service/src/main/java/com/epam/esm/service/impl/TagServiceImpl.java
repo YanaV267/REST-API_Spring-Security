@@ -7,6 +7,7 @@ import com.epam.esm.repository.TagRepository;
 import com.epam.esm.service.TagService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import org.springframework.transaction.annotation.Transactional;
@@ -22,6 +23,8 @@ import java.util.stream.Collectors;
  */
 @Service
 public class TagServiceImpl implements TagService {
+    @Value("${max.result.amount}")
+    private int maxResultAmount;
     private int lastPage;
     private final TagRepository repository;
     private final TagMapper mapper;
@@ -65,7 +68,7 @@ public class TagServiceImpl implements TagService {
 
     @Override
     public Set<TagDto> findAll(int page) {
-        int firstElementNumber = getFirstElementNumber(page);
+        int firstElementNumber = getFirstElementNumber(page, maxResultAmount);
         Set<Tag> tags = repository.findAll(firstElementNumber);
         lastPage = repository.getLastPage();
         return tags.stream()
@@ -97,7 +100,7 @@ public class TagServiceImpl implements TagService {
 
     @Override
     public Set<TagDto> findMostUsedTag(int page) {
-        int firstElementNumber = getFirstElementNumber(page);
+        int firstElementNumber = getFirstElementNumber(page, maxResultAmount);
         lastPage = repository.getLastPage();
         return repository.findMostUsedTag(firstElementNumber)
                 .stream()

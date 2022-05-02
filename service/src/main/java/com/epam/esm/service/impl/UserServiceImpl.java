@@ -7,6 +7,7 @@ import com.epam.esm.repository.UserRepository;
 import com.epam.esm.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,6 +23,8 @@ import java.util.stream.Collectors;
  */
 @Service
 public class UserServiceImpl implements UserService {
+    @Value("${max.result.amount}")
+    private int maxResultAmount;
     private int lastPage;
     private final UserRepository repository;
     private final UserMapper mapper;
@@ -52,7 +55,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Set<UserDto> findAll(int page) {
-        int firstElementNumber = getFirstElementNumber(page);
+        int firstElementNumber = getFirstElementNumber(page, maxResultAmount);
         Set<User> users = repository.findAll(firstElementNumber);
         lastPage = repository.getLastPage();
         return users.stream()
@@ -81,7 +84,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Set<UserDto> findWithHighestOrderCost(int page) {
-        int firstElementNumber = getFirstElementNumber(page);
+        int firstElementNumber = getFirstElementNumber(page, maxResultAmount);
         Set<User> orders = repository.findWithHighestOrderCost(firstElementNumber);
         lastPage = repository.getLastPage();
         return orders.stream()
@@ -91,7 +94,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Set<UserDto> findWithHighestOrderCostMostUsedTag(int page) {
-        int firstElementNumber = getFirstElementNumber(page);
+        int firstElementNumber = getFirstElementNumber(page, maxResultAmount);
         Set<User> orders = repository.findWithHighestOrderCostMostUsedTag(firstElementNumber);
         lastPage = repository.getLastPage();
         return orders.stream()

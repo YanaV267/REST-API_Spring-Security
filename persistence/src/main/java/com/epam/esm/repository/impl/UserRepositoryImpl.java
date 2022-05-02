@@ -2,6 +2,8 @@ package com.epam.esm.repository.impl;
 
 import com.epam.esm.entity.User;
 import com.epam.esm.repository.UserRepository;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
@@ -27,7 +29,10 @@ import static com.epam.esm.repository.ColumnName.ID;
  * @project GiftCertificate
  */
 @Repository
+@PropertySource("classpath:repository.properties")
 public class UserRepositoryImpl implements UserRepository {
+    @Value("${max.result.amount}")
+    private int maxResultAmount;
     private int lastPage;
     @PersistenceContext
     private EntityManager entityManager;
@@ -47,7 +52,7 @@ public class UserRepositoryImpl implements UserRepository {
         pageQuery.select(builder.count(pageQuery.from(User.class)));
 
         long amount = entityManager.createQuery(pageQuery).getSingleResult();
-        lastPage = (int) Math.ceil((double) amount / MAX_RESULT_AMOUNT);
+        lastPage = (int) Math.ceil((double) amount / maxResultAmount);
         return new LinkedHashSet<>(entityManager.createQuery(query)
                 .getResultList());
     }
@@ -69,10 +74,10 @@ public class UserRepositoryImpl implements UserRepository {
                 + querySql, User.class);
         Query pageQuery = entityManager.createNativeQuery("SELECT COUNT(id) " + querySql);
         BigInteger amount = (BigInteger) pageQuery.getSingleResult();
-        lastPage = (int) Math.ceil((double) amount.longValue() / MAX_RESULT_AMOUNT);
+        lastPage = (int) Math.ceil((double) amount.longValue() / maxResultAmount);
         return new LinkedHashSet<>(query
                 .setFirstResult(firstElementNumber)
-                .setMaxResults(MAX_RESULT_AMOUNT)
+                .setMaxResults(maxResultAmount)
                 .getResultList());
     }
 
@@ -104,10 +109,10 @@ public class UserRepositoryImpl implements UserRepository {
                 + querySql, User.class);
         Query pageQuery = entityManager.createNativeQuery("SELECT COUNT(id) " + querySql);
         BigInteger amount = (BigInteger) pageQuery.getSingleResult();
-        lastPage = (int) Math.ceil((double) amount.longValue() / MAX_RESULT_AMOUNT);
+        lastPage = (int) Math.ceil((double) amount.longValue() / maxResultAmount);
         return new LinkedHashSet<>(query
                 .setFirstResult(firstElementNumber)
-                .setMaxResults(MAX_RESULT_AMOUNT)
+                .setMaxResults(maxResultAmount)
                 .getResultList());
     }
 

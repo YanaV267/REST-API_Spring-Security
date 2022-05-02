@@ -12,6 +12,7 @@ import com.epam.esm.repository.UserRepository;
 import com.epam.esm.service.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,6 +29,8 @@ import java.util.stream.Collectors;
  */
 @Service
 public class OrderServiceImpl implements OrderService {
+    @Value("${max.result.amount}")
+    private int maxResultAmount;
     private int lastPage;
     private final OrderRepository repository;
     private final GiftCertificateRepository certificateRepository;
@@ -112,7 +115,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public Set<OrderDto> findAll(int page) {
-        int firstElementNumber = getFirstElementNumber(page);
+        int firstElementNumber = getFirstElementNumber(page, maxResultAmount);
         Set<Order> foundOrders = repository.findAll(firstElementNumber);
         lastPage = repository.getLastPage();
         Set<OrderDto> orders = foundOrders.stream()
@@ -135,7 +138,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public Set<OrderDto> findAllByUser(int page, long userId) {
-        int firstElementNumber = getFirstElementNumber(page);
+        int firstElementNumber = getFirstElementNumber(page, maxResultAmount);
         Set<Order> foundOrders = repository.findAllByUser(firstElementNumber, userId);
         foundOrders.forEach(o -> o.setCertificates(new LinkedHashSet<>()));
         lastPage = repository.getLastPage();
@@ -155,7 +158,7 @@ public class OrderServiceImpl implements OrderService {
                     .collect(Collectors.toSet());
             order.setCertificates(certificates);
         }
-        int firstElementNumber = getFirstElementNumber(page);
+        int firstElementNumber = getFirstElementNumber(page, maxResultAmount);
         Set<Order> foundOrders = repository.findBySeveralParameters(firstElementNumber, order, userIds);
         lastPage = repository.getLastPage();
         Set<OrderDto> orders = foundOrders.stream()

@@ -9,6 +9,7 @@ import com.epam.esm.repository.TagRepository;
 import com.epam.esm.service.GiftCertificateService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,6 +27,8 @@ import java.util.stream.Collectors;
  */
 @Service
 public class GiftCertificateServiceImpl implements GiftCertificateService {
+    @Value("${max.result.amount}")
+    private int maxResultAmount;
     private int lastPage;
     private final GiftCertificateRepository repository;
     private final TagRepository tagRepository;
@@ -84,7 +87,7 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
 
     @Override
     public Set<GiftCertificateDto> findAll(int page) {
-        int firstElementNumber = getFirstElementNumber(page);
+        int firstElementNumber = getFirstElementNumber(page, maxResultAmount);
         Set<GiftCertificate> certificates = repository.findAll(firstElementNumber);
         lastPage = repository.getLastPage();
         return certificates.stream()
@@ -113,7 +116,7 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
                     .collect(Collectors.toSet());
             giftCertificate.setTags(tags);
         }
-        int firstElementNumber = getFirstElementNumber(page);
+        int firstElementNumber = getFirstElementNumber(page, maxResultAmount);
         Set<GiftCertificate> certificates = repository.findBySeveralParameters(firstElementNumber,
                 giftCertificate, sortTypes);
         lastPage = repository.getLastPage();

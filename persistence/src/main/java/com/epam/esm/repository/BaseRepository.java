@@ -11,10 +11,6 @@ import java.util.Set;
  * @project GiftCertificate
  */
 public interface BaseRepository<T> {
-    /**
-     * The constant MAX_RESULT_AMOUNT.
-     */
-    int MAX_RESULT_AMOUNT = 15;
 
     /**
      * Delete.

@@ -12,11 +12,6 @@ import java.util.Set;
  */
 public interface BaseService<T> {
     /**
-     * The constant MAX_RESULT_AMOUNT.
-     */
-    int MAX_RESULT_AMOUNT = 15;
-
-    /**
      * Delete boolean.
      *
      * @param id the id
@@ -46,8 +41,8 @@ public interface BaseService<T> {
      * @param page the page
      * @return the first element number
      */
-    default int getFirstElementNumber(int page) {
-        return (page - 1) * MAX_RESULT_AMOUNT;
+    default int getFirstElementNumber(int page, int maxResultAmount) {
+        return (page - 1) * maxResultAmount;
     }
 
     /**
