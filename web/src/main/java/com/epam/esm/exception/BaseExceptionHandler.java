@@ -3,6 +3,7 @@ package com.epam.esm.exception;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.exc.MismatchedInputException;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingRequestValueException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
@@ -29,6 +30,8 @@ public class BaseExceptionHandler {
     private static final String CLOSING_BRACE = ")";
     private static final String BAD_REQUEST_MESSAGE = "provided data was incorrect)";
     private static final String MISSING_REQUEST_PARAMETERS_MESSAGE = "required parameters are missing)";
+    private static final String REQUEST_ACCESS_FORBIDDEN_MESSAGE = "access to page is forbidden)";
+    private static final String UNAUTHORIZED_REQUEST_MESSAGE = "required parameters are missing)";
 
     /**
      * Resource not found response entity.
@@ -76,7 +79,7 @@ public class BaseExceptionHandler {
             MismatchedInputException.class, JsonParseException.class})
     public ResponseEntity<ResponseErrorEntity> requestNotValid(Exception exception) {
         return new ResponseEntity<>(new ResponseErrorEntity(BAD_REQUEST.value(),
-                MethodArgumentNotValidException.class, REQUEST_FAILED + BAD_REQUEST_MESSAGE,
+                exception.getClass(), REQUEST_FAILED + BAD_REQUEST_MESSAGE,
                 exception.getMessage()), BAD_REQUEST);
     }
 
@@ -86,10 +89,24 @@ public class BaseExceptionHandler {
      * @param exception the exception
      * @return the response entity
      */
-    @ExceptionHandler({MissingServletRequestParameterException.class})
+    @ExceptionHandler(MissingServletRequestParameterException.class)
     public ResponseEntity<ResponseErrorEntity> requestMissingParameters(MissingRequestValueException exception) {
         return new ResponseEntity<>(new ResponseErrorEntity(BAD_REQUEST.value(),
-                exception.getClass(), REQUEST_FAILED + MISSING_REQUEST_PARAMETERS_MESSAGE,
+                MissingServletRequestParameterException.class, REQUEST_FAILED + MISSING_REQUEST_PARAMETERS_MESSAGE,
                 exception.getMessage()), BAD_REQUEST);
+    }
+
+    @ExceptionHandler(HttpClientErrorException.Unauthorized.class)
+    public ResponseEntity<ResponseErrorEntity> requestUnauthorized(HttpClientErrorException exception) {
+        return new ResponseEntity<>(new ResponseErrorEntity(UNAUTHORIZED.value(),
+                HttpClientErrorException.Unauthorized.class, REQUEST_FAILED + UNAUTHORIZED_REQUEST_MESSAGE,
+                exception.getMessage()), UNAUTHORIZED);
+    }
+
+    @ExceptionHandler({HttpClientErrorException.Forbidden.class, AccessDeniedException.class})
+    public ResponseEntity<ResponseErrorEntity> requestAccessForbidden(Exception exception) {
+        return new ResponseEntity<>(new ResponseErrorEntity(FORBIDDEN.value(),
+                exception.getClass(), REQUEST_FAILED + REQUEST_ACCESS_FORBIDDEN_MESSAGE,
+                exception.getMessage()), FORBIDDEN);
     }
 }

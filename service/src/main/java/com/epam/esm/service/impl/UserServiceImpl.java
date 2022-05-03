@@ -5,9 +5,13 @@ import com.epam.esm.entity.User;
 import com.epam.esm.mapper.impl.UserMapper;
 import com.epam.esm.repository.UserRepository;
 import com.epam.esm.service.UserService;
+import com.epam.esm.util.CustomUserDetails;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,23 +26,23 @@ import java.util.stream.Collectors;
  * @project GiftCertificate
  */
 @Service
-public class UserServiceImpl implements UserService {
+public class UserServiceImpl implements UserService, UserDetailsService {
     @Value("${max.result.amount}")
     private int maxResultAmount;
     private int lastPage;
-    private final UserRepository repository;
-    private final UserMapper mapper;
-
-    /**
-     * Instantiates a new User service.
-     *
-     * @param repository the repository
-     * @param mapper     the mapper
-     */
     @Autowired
-    public UserServiceImpl(UserRepository repository, @Qualifier("userServiceMapper") UserMapper mapper) {
-        this.repository = repository;
-        this.mapper = mapper;
+    private UserRepository repository;
+    @Autowired
+    @Qualifier("userServiceMapper")
+    private UserMapper mapper;
+
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        Optional<User> user = repository.findUserByLogin(username);
+        if (user.isPresent()) {
+            return new CustomUserDetails(user.get());
+        }
+        throw new UsernameNotFoundException("Couldn't find user with username " + username);
     }
 
     @Override
@@ -65,7 +69,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Set<UserDto> findAllWithOrders(int page) {
-        Set<UserDto> users = findAll(page);
+        int firstElementNumber = getFirstElementNumber(page, maxResultAmount);
+        Set<UserDto> users = findAll(firstElementNumber);
         return users.stream()
                 .filter(u -> !u.getOrders().isEmpty())
                 .collect(Collectors.toSet());

@@ -10,6 +10,7 @@ import com.epam.esm.validation.OnUpdateGroup;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.Link;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -55,6 +56,7 @@ public class OrderController extends AbstractController<OrderDto> {
     @Validated(OnAggregationCreateGroup.class)
     @PostMapping(consumes = APPLICATION_JSON_VALUE)
     @ResponseStatus(CREATED)
+    @Secured("ROLE_USER")
     public void create(@RequestBody @Valid OrderDto orderDto) {
         boolean isCreated = orderService.create(orderDto);
         if (!isCreated) {
@@ -70,6 +72,7 @@ public class OrderController extends AbstractController<OrderDto> {
     @Validated(OnUpdateGroup.class)
     @PutMapping(consumes = APPLICATION_JSON_VALUE)
     @ResponseStatus(OK)
+    @Secured({"ROLE_ADMIN", "ROLE_USER"})
     public void update(@RequestBody @Valid OrderDto orderDto) {
         boolean isUpdated = orderService.update(orderDto);
         if (!isUpdated) {
@@ -84,6 +87,7 @@ public class OrderController extends AbstractController<OrderDto> {
      */
     @DeleteMapping("/{id}")
     @ResponseStatus(OK)
+    @Secured({"ROLE_ADMIN", "ROLE_USER"})
     public void delete(@PathVariable @Min(1) long id) {
         boolean isDeleted = orderService.delete(id);
         if (!isDeleted) {
@@ -99,6 +103,7 @@ public class OrderController extends AbstractController<OrderDto> {
      */
     @GetMapping(value = "/all", produces = APPLICATION_JSON_VALUE)
     @ResponseStatus(FOUND)
+    @Secured("ROLE_ADMIN")
     public CollectionModel<OrderDto> retrieveAll(@RequestParam @Min(1) int page) {
         Set<OrderDto> orders = orderService.findAll(page);
         int lastPage = orderService.getLastPage();
@@ -120,6 +125,7 @@ public class OrderController extends AbstractController<OrderDto> {
      */
     @GetMapping(value = "/{id}", produces = APPLICATION_JSON_VALUE)
     @ResponseStatus(FOUND)
+    @Secured("ROLE_ADMIN")
     public OrderDto retrieveById(@PathVariable @Min(1) long id) {
         Optional<OrderDto> order = orderService.findById(id);
         if (order.isPresent()) {
@@ -140,6 +146,7 @@ public class OrderController extends AbstractController<OrderDto> {
      */
     @GetMapping(value = "/user/{userId}", produces = APPLICATION_JSON_VALUE)
     @ResponseStatus(FOUND)
+    @Secured("ROLE_ADMIN")
     public CollectionModel<OrderDto> retrieveAllByUser(@PathVariable @Min(1) long userId,
                                                        @RequestParam @Min(1) int page) {
         Set<OrderDto> orders = orderService.findAllByUser(page, userId);
@@ -166,6 +173,7 @@ public class OrderController extends AbstractController<OrderDto> {
     @Validated(OnSearchGroup.class)
     @GetMapping(produces = APPLICATION_JSON_VALUE)
     @ResponseStatus(FOUND)
+    @Secured("ROLE_ADMIN")
     public CollectionModel<OrderDto> retrieveBySeveralParameters(
             @RequestParam @Min(1) int page,
             @Valid OrderDto orderDto,

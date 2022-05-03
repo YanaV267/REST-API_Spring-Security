@@ -10,6 +10,7 @@ import com.epam.esm.validation.OnUpdateGroup;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.Link;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -57,6 +58,7 @@ public class GiftCertificateController extends AbstractController<GiftCertificat
     @Validated(OnCreateGroup.class)
     @PostMapping(consumes = APPLICATION_JSON_VALUE)
     @ResponseStatus(CREATED)
+    @Secured("ROLE_ADMIN")
     public void create(@RequestBody @Valid GiftCertificateDto certificateDto) {
         boolean isCreated = certificateService.create(certificateDto);
         if (!isCreated) {
@@ -72,6 +74,7 @@ public class GiftCertificateController extends AbstractController<GiftCertificat
     @Validated(OnUpdateGroup.class)
     @PutMapping(consumes = APPLICATION_JSON_VALUE)
     @ResponseStatus(OK)
+    @Secured("ROLE_ADMIN")
     public void update(@RequestBody @Valid GiftCertificateDto certificateDto) {
         boolean isUpdated = certificateService.update(certificateDto);
         if (!isUpdated) {
@@ -86,6 +89,7 @@ public class GiftCertificateController extends AbstractController<GiftCertificat
      */
     @DeleteMapping("/{id}")
     @ResponseStatus(OK)
+    @Secured("ROLE_ADMIN")
     public void delete(@PathVariable @Min(1) long id) {
         boolean isDeleted = certificateService.delete(id);
         if (!isDeleted) {
@@ -122,6 +126,7 @@ public class GiftCertificateController extends AbstractController<GiftCertificat
      */
     @GetMapping(value = "/{id}", produces = APPLICATION_JSON_VALUE)
     @ResponseStatus(FOUND)
+    @Secured({"ROLE_ADMIN", "ROLE_USER"})
     public GiftCertificateDto retrieveById(@PathVariable @Min(1) long id) {
         Optional<GiftCertificateDto> giftCertificate = certificateService.findById(id);
         if (giftCertificate.isPresent()) {
@@ -145,6 +150,7 @@ public class GiftCertificateController extends AbstractController<GiftCertificat
     @Validated(OnSearchGroup.class)
     @GetMapping(produces = APPLICATION_JSON_VALUE)
     @ResponseStatus(FOUND)
+    @Secured({"ROLE_ADMIN", "ROLE_USER"})
     public CollectionModel<GiftCertificateDto> retrieveBySeveralParameters(
             @RequestParam(value = "page") @Min(1) int page,
             @Valid GiftCertificateDto certificateDto,

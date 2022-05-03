@@ -6,6 +6,7 @@ import com.epam.esm.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.Link;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -50,6 +51,7 @@ public class UserController extends AbstractController<UserDto> {
      */
     @DeleteMapping("/{id}")
     @ResponseStatus(OK)
+    @Secured("ROLE_ADMIN")
     public void delete(@PathVariable @Min(1) long id) {
         boolean isDeleted = userService.delete(id);
         if (!isDeleted) {
@@ -65,6 +67,7 @@ public class UserController extends AbstractController<UserDto> {
      */
     @GetMapping(produces = APPLICATION_JSON_VALUE)
     @ResponseStatus(FOUND)
+    @Secured("ROLE_ADMIN")
     public CollectionModel<UserDto> retrieveAll(@RequestParam @Min(1) int page) {
         Set<UserDto> users = userService.findAll(page);
         int lastPage = userService.getLastPage();
@@ -86,6 +89,7 @@ public class UserController extends AbstractController<UserDto> {
      */
     @GetMapping(value = "/orders", produces = APPLICATION_JSON_VALUE)
     @ResponseStatus(FOUND)
+    @Secured("ROLE_ADMIN")
     public CollectionModel<UserDto> retrieveAllWithOrders(@RequestParam @Min(1) int page) {
         Set<UserDto> users = userService.findAllWithOrders(page);
         int lastPage = userService.getLastPage();
@@ -107,6 +111,7 @@ public class UserController extends AbstractController<UserDto> {
      */
     @GetMapping(value = "/{id}", produces = APPLICATION_JSON_VALUE)
     @ResponseStatus(FOUND)
+    @Secured("ROLE_ADMIN")
     public UserDto retrieveById(@PathVariable @Min(1) long id) {
         Optional<UserDto> user = userService.findById(id);
         if (user.isPresent()) {
@@ -126,6 +131,7 @@ public class UserController extends AbstractController<UserDto> {
      */
     @GetMapping(value = "/highest-order-cost", produces = APPLICATION_JSON_VALUE)
     @ResponseStatus(FOUND)
+    @Secured("ROLE_ADMIN")
     public CollectionModel<UserDto> retrieveWithHighestOrderCost(@RequestParam @Min(1) int page) {
         Set<UserDto> users = userService.findWithHighestOrderCost(page);
         int lastPage = userService.getLastPage();
@@ -148,6 +154,7 @@ public class UserController extends AbstractController<UserDto> {
      */
     @GetMapping(value = "/most-used-tag", produces = APPLICATION_JSON_VALUE)
     @ResponseStatus(FOUND)
+    @Secured("ROLE_ADMIN")
     public CollectionModel<UserDto> retrieveWithHighestOrderCostMostUsedTag(@RequestParam @Min(1) int page) {
         Set<UserDto> users = userService.findWithHighestOrderCostMostUsedTag(page);
         int lastPage = userService.getLastPage();

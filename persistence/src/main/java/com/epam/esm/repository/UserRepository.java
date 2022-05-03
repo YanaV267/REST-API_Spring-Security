@@ -3,6 +3,7 @@ package com.epam.esm.repository;
 import com.epam.esm.entity.User;
 
 import java.math.BigDecimal;
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -12,6 +13,14 @@ import java.util.Set;
  * @project GiftCertificate
  */
 public interface UserRepository extends BaseRepository<User> {
+    /**
+     * Update balance.
+     *
+     * @param userId     the user id
+     * @param newBalance the new balance
+     */
+    void updateBalance(long userId, BigDecimal newBalance);
+
     /**
      * Find with highest order cost set.
      *
@@ -28,11 +37,5 @@ public interface UserRepository extends BaseRepository<User> {
      */
     Set<User> findWithHighestOrderCostMostUsedTag(int firstElementNumber);
 
-    /**
-     * Update balance.
-     *
-     * @param userId     the user id
-     * @param newBalance the new balance
-     */
-    void updateBalance(long userId, BigDecimal newBalance);
+    Optional<User> findUserByLogin(String login);
 }

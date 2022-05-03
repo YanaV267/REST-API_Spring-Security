@@ -1,5 +1,6 @@
 package com.epam.esm.entity;
 
+import com.epam.esm.entity.converter.UserRoleConverter;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
@@ -26,14 +27,13 @@ public class User implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
-    @Column
     private String login;
-    @Column
+    private String password;
     private String surname;
-    @Column
     private String name;
-    @Column
     private BigDecimal balance;
+    @Convert(converter = UserRoleConverter.class)
+    private UserRole role;
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     @EqualsAndHashCode.Exclude
     @ToString.Exclude
@@ -54,5 +54,9 @@ public class User implements Serializable {
     public User(long id) {
         this.id = id;
         orders = new LinkedHashSet<>();
+    }
+
+    public enum UserRole {
+        USER, ADMIN
     }
 }

@@ -19,8 +19,7 @@ import java.util.LinkedHashSet;
 import java.util.Optional;
 import java.util.Set;
 
-import static com.epam.esm.repository.ColumnName.BALANCE;
-import static com.epam.esm.repository.ColumnName.ID;
+import static com.epam.esm.repository.ColumnName.*;
 
 /**
  * The type User repository.
@@ -61,6 +60,16 @@ public class UserRepositoryImpl implements UserRepository {
     public Optional<User> findById(long id) {
         User user = entityManager.find(User.class, id);
         return Optional.ofNullable(user);
+    }
+
+    @Override
+    public Optional<User> findUserByLogin(String login) {
+        CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+        CriteriaQuery<User> query = builder.createQuery(User.class);
+        Root<User> root = query.from(User.class);
+        query.select(root)
+                .where(builder.equal(root.get(LOGIN), login));
+        return Optional.empty();
     }
 
     @Override
