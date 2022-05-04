@@ -4,6 +4,8 @@ import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.exc.MismatchedInputException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.web.authentication.session.SessionAuthenticationException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingRequestValueException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
@@ -92,14 +94,15 @@ public class BaseExceptionHandler {
     @ExceptionHandler(MissingServletRequestParameterException.class)
     public ResponseEntity<ResponseErrorEntity> requestMissingParameters(MissingRequestValueException exception) {
         return new ResponseEntity<>(new ResponseErrorEntity(BAD_REQUEST.value(),
-                MissingServletRequestParameterException.class, REQUEST_FAILED + MISSING_REQUEST_PARAMETERS_MESSAGE,
-                exception.getMessage()), BAD_REQUEST);
+                MissingServletRequestParameterException.class, REQUEST_FAILED +
+                MISSING_REQUEST_PARAMETERS_MESSAGE, exception.getMessage()), BAD_REQUEST);
     }
 
-    @ExceptionHandler(HttpClientErrorException.Unauthorized.class)
-    public ResponseEntity<ResponseErrorEntity> requestUnauthorized(HttpClientErrorException exception) {
+    @ExceptionHandler({HttpClientErrorException.Unauthorized.class, AuthenticationException.class,
+            SessionAuthenticationException.class})
+    public ResponseEntity<ResponseErrorEntity> requestUnauthorized(Exception exception) {
         return new ResponseEntity<>(new ResponseErrorEntity(UNAUTHORIZED.value(),
-                HttpClientErrorException.Unauthorized.class, REQUEST_FAILED + UNAUTHORIZED_REQUEST_MESSAGE,
+                exception.getClass(), REQUEST_FAILED + UNAUTHORIZED_REQUEST_MESSAGE,
                 exception.getMessage()), UNAUTHORIZED);
     }
 

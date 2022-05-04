@@ -146,7 +146,6 @@ public class OrderController extends AbstractController<OrderDto> {
      */
     @GetMapping(value = "/user/{userId}", produces = APPLICATION_JSON_VALUE)
     @ResponseStatus(FOUND)
-    @Secured("ROLE_ADMIN")
     public CollectionModel<OrderDto> retrieveAllByUser(@PathVariable @Min(1) long userId,
                                                        @RequestParam @Min(1) int page) {
         Set<OrderDto> orders = orderService.findAllByUser(page, userId);

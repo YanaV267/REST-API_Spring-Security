@@ -8,7 +8,6 @@ import com.epam.esm.service.TagService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.Link;
-import org.springframework.security.access.annotation.Secured;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -55,7 +54,6 @@ public class TagController extends AbstractController<TagDto> {
      */
     @PostMapping(consumes = APPLICATION_JSON_VALUE)
     @ResponseStatus(CREATED)
-    @Secured("ROLE_ADMIN")
     public void create(@RequestBody @Valid TagDto tagDto) {
         boolean isCreated = tagService.create(tagDto);
         if (!isCreated) {
@@ -70,7 +68,6 @@ public class TagController extends AbstractController<TagDto> {
      */
     @DeleteMapping("/{id}")
     @ResponseStatus(OK)
-    @Secured("ROLE_ADMIN")
     public void delete(@PathVariable @Min(1) long id) {
         boolean isDeleted = tagService.delete(id);
         if (!isDeleted) {
@@ -86,7 +83,6 @@ public class TagController extends AbstractController<TagDto> {
      */
     @GetMapping(produces = APPLICATION_JSON_VALUE)
     @ResponseStatus(FOUND)
-    @Secured("ROLE_ADMIN")
     public CollectionModel<TagDto> retrieveAll(@RequestParam @Min(1) int page) {
         Set<TagDto> tags = tagService.findAll(page);
         int lastPage = tagService.getLastPage();
@@ -108,7 +104,6 @@ public class TagController extends AbstractController<TagDto> {
      */
     @GetMapping(value = "/{id}", produces = APPLICATION_JSON_VALUE)
     @ResponseStatus(FOUND)
-    @Secured("ROLE_ADMIN")
     public TagDto retrieveById(@PathVariable @Min(value = 1) long id) {
         Optional<TagDto> tag = tagService.findById(id);
         if (tag.isPresent()) {
@@ -128,7 +123,6 @@ public class TagController extends AbstractController<TagDto> {
      */
     @GetMapping(params = "name", produces = APPLICATION_JSON_VALUE)
     @ResponseStatus(FOUND)
-    @Secured("ROLE_ADMIN")
     public TagDto retrieveByName(@RequestParam
                                  @NotNull
                                  @Pattern(regexp = "[а-я\\p{Lower}_]{1,50}")
@@ -151,7 +145,6 @@ public class TagController extends AbstractController<TagDto> {
      */
     @GetMapping(value = "/most-used-tag", produces = APPLICATION_JSON_VALUE)
     @ResponseStatus(FOUND)
-    @Secured("ROLE_ADMIN")
     public CollectionModel<TagDto> retrieveMostUsedTag(@RequestParam @Min(1) int page) {
         Set<TagDto> tags = tagService.findMostUsedTag(page);
         int lastPage = tagService.getLastPage();

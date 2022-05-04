@@ -69,7 +69,8 @@ public class UserRepositoryImpl implements UserRepository {
         Root<User> root = query.from(User.class);
         query.select(root)
                 .where(builder.equal(root.get(LOGIN), login));
-        return Optional.empty();
+        return Optional.ofNullable(entityManager.createQuery(query)
+                .getSingleResult());
     }
 
     @Override

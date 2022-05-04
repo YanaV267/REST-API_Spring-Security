@@ -15,6 +15,7 @@ import java.util.Collections;
  * @project GiftCertificate
  */
 public class CustomUserDetails implements UserDetails {
+    private static final String ROLE_PREFIX = "ROLE_";
     private final User user;
 
     /**
@@ -28,7 +29,7 @@ public class CustomUserDetails implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        SimpleGrantedAuthority authority = new SimpleGrantedAuthority(user.getRole().toString());
+        SimpleGrantedAuthority authority = new SimpleGrantedAuthority(ROLE_PREFIX + user.getRole().toString());
         return Collections.singletonList(authority);
     }
 

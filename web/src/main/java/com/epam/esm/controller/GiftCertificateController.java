@@ -126,7 +126,6 @@ public class GiftCertificateController extends AbstractController<GiftCertificat
      */
     @GetMapping(value = "/{id}", produces = APPLICATION_JSON_VALUE)
     @ResponseStatus(FOUND)
-    @Secured({"ROLE_ADMIN", "ROLE_USER"})
     public GiftCertificateDto retrieveById(@PathVariable @Min(1) long id) {
         Optional<GiftCertificateDto> giftCertificate = certificateService.findById(id);
         if (giftCertificate.isPresent()) {
@@ -150,7 +149,6 @@ public class GiftCertificateController extends AbstractController<GiftCertificat
     @Validated(OnSearchGroup.class)
     @GetMapping(produces = APPLICATION_JSON_VALUE)
     @ResponseStatus(FOUND)
-    @Secured({"ROLE_ADMIN", "ROLE_USER"})
     public CollectionModel<GiftCertificateDto> retrieveBySeveralParameters(
             @RequestParam(value = "page") @Min(1) int page,
             @Valid GiftCertificateDto certificateDto,
