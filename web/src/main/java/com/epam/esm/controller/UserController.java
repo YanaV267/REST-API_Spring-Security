@@ -2,10 +2,18 @@ package com.epam.esm.controller;
 
 import com.epam.esm.dto.UserDto;
 import com.epam.esm.exception.NoDataFoundException;
-import com.epam.esm.service.UserService;
+import com.epam.esm.service.impl.UserServiceImpl;
+import com.epam.esm.util.JwtManagingUtil;
+import com.epam.esm.util.JwtResponseModel;
+import com.epam.esm.validation.OnUpdateGroup;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.Link;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -31,7 +39,9 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 @Validated
 @RequestMapping("/users")
 public class UserController extends AbstractController<UserDto> {
-    private final UserService userService;
+    private final UserServiceImpl userService;
+    private final AuthenticationManager authenticationManager;
+    private final JwtManagingUtil jwtManagingUtil;
 
     /**
      * Instantiates a new User controller.
@@ -39,8 +49,23 @@ public class UserController extends AbstractController<UserDto> {
      * @param userService the user service
      */
     @Autowired
-    public UserController(UserService userService) {
+    public UserController(UserServiceImpl userService, AuthenticationManager authenticationManager,
+                          JwtManagingUtil jwtManagingUtil) {
         this.userService = userService;
+        this.authenticationManager = authenticationManager;
+        this.jwtManagingUtil = jwtManagingUtil;
+    }
+
+    @Validated(OnUpdateGroup.class)
+    @PostMapping("/signin")
+    @ResponseStatus(OK)
+    public JwtResponseModel signIn(@RequestBody UserDto user) {
+        Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(user.getLogin(), user.getPassword()));
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+        UserDetails userDetails = userService.loadUserByUsername(user.getLogin());
+        String token = jwtManagingUtil.createToken(userDetails.getUsername());
+        return new JwtResponseModel(token);
     }
 
     /**

@@ -2,6 +2,7 @@ package com.epam.esm.config;
 
 import com.epam.esm.service.impl.UserServiceImpl;
 import org.springframework.context.annotation.Bean;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -12,6 +13,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import static org.springframework.http.HttpMethod.GET;
+import static org.springframework.http.HttpMethod.POST;
 
 /**
  * @author YanaV
@@ -33,6 +35,12 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         return new BCryptPasswordEncoder();
     }
 
+    @Bean
+    @Override
+    public AuthenticationManager authenticationManagerBean() throws Exception {
+        return super.authenticationManagerBean();
+    }
+
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
         auth.userDetailsService(userService())
@@ -44,6 +52,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         http.httpBasic()
                 .and()
                 .authorizeRequests()
+                .antMatchers(POST, "/users/**").anonymous()
                 .antMatchers(GET, "/certificates/**").permitAll()
                 .antMatchers(GET).hasAnyRole(USER_ROLE, ADMIN_ROLE)
                 .antMatchers("/tags/**").hasRole(ADMIN_ROLE)
