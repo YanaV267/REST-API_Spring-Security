@@ -14,6 +14,14 @@ import java.util.Set;
  */
 public interface UserRepository extends BaseRepository<User> {
     /**
+     * Create boolean.
+     *
+     * @param user the user
+     * @return the long
+     */
+    long create(User user);
+
+    /**
      * Update balance.
      *
      * @param userId     the user id

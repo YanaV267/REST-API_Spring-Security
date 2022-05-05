@@ -12,6 +12,14 @@ import java.util.Set;
  */
 public interface UserService extends BaseService<UserDto> {
     /**
+     * Create boolean.
+     *
+     * @param userDto the userDto
+     * @return the boolean
+     */
+    boolean create(UserDto userDto);
+
+    /**
      * Find all with orders set.
      *
      * @param page the page

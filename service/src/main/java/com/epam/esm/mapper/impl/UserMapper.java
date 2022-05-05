@@ -48,6 +48,12 @@ public class UserMapper implements Mapper<User, UserDto> {
 
     @Override
     public User mapToEntity(UserDto userDto) {
-        throw new UnsupportedOperationException("Mapping from DTO to Entity is unsupported for User entity.");
+        User user = new User();
+        user.setId(userDto.getId());
+        user.setLogin(userDto.getLogin());
+        user.setSurname(userDto.getSurname());
+        user.setName(userDto.getName());
+        user.setBalance(userDto.getBalance());
+        return user;
     }
 }

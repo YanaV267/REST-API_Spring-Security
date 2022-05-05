@@ -1,8 +1,8 @@
 package com.epam.esm.entity;
 
 import com.epam.esm.entity.converter.UserRoleConverter;
+import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.Getter;
 import lombok.ToString;
 
 import javax.persistence.*;
@@ -20,9 +20,7 @@ import java.util.Set;
 @Entity
 @EntityListeners(AuditListener.class)
 @Table(name = "users")
-@Getter
-@EqualsAndHashCode
-@ToString
+@Data
 public class User implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -44,6 +42,7 @@ public class User implements Serializable {
      */
     public User() {
         orders = new LinkedHashSet<>();
+        role = UserRole.USER;
     }
 
     /**
@@ -54,6 +53,7 @@ public class User implements Serializable {
     public User(long id) {
         this.id = id;
         orders = new LinkedHashSet<>();
+        role = UserRole.USER;
     }
 
     public enum UserRole {

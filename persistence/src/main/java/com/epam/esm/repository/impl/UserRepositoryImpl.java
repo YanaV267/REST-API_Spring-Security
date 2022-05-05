@@ -35,6 +35,12 @@ public class UserRepositoryImpl implements UserRepository {
     private EntityManager entityManager;
 
     @Override
+    public long create(User user) {
+        entityManager.persist(user);
+        return user.getId();
+    }
+
+    @Override
     public void delete(User user) {
         entityManager.remove(user);
     }

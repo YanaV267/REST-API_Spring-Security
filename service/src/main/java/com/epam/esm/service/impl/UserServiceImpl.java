@@ -47,6 +47,14 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
     @Override
     @Transactional
+    public boolean create(UserDto userDto) {
+        User user = mapper.mapToEntity(userDto);
+        repository.create(user);
+        return true;
+    }
+
+    @Override
+    @Transactional
     public boolean delete(long id) {
         Optional<User> user = repository.findById(id);
         if (user.isPresent()) {
