@@ -3,7 +3,6 @@ package com.epam.esm.repository.impl;
 import com.epam.esm.entity.User;
 import com.epam.esm.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
@@ -28,7 +27,6 @@ import static com.epam.esm.repository.ColumnName.*;
  * @project GiftCertificate
  */
 @Repository
-@PropertySource("classpath:repository.properties")
 public class UserRepositoryImpl implements UserRepository {
     @Value("${max.result.amount}")
     private int maxResultAmount;

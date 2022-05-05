@@ -5,7 +5,6 @@ import com.epam.esm.builder.OrderUpdateBuilder;
 import com.epam.esm.entity.Order;
 import com.epam.esm.repository.OrderRepository;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
@@ -26,7 +25,6 @@ import static com.epam.esm.repository.ColumnName.USER;
  * @project GiftCertificate
  */
 @Repository
-@PropertySource("classpath:repository.properties")
 public class OrderRepositoryImpl implements OrderRepository {
     @Value("${max.result.amount}")
     private int maxResultAmount;
