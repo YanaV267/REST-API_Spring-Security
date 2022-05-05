@@ -1,4 +1,4 @@
-package com.epam.esm.util;
+package com.epam.esm.jwt;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -21,7 +21,7 @@ public class JwtManagingUtil {
     @Value("${jwt.secret.key}")
     private String secretKey;
     @Value("${jwt.expiration.millis}")
-    private int expirationMillis;
+    private long expirationMillis;
 
     public String createToken(String subject) {
         SignatureAlgorithm signatureAlgorithm = SignatureAlgorithm.HS256;

@@ -3,8 +3,9 @@ package com.epam.esm.controller;
 import com.epam.esm.dto.UserDto;
 import com.epam.esm.exception.NoDataFoundException;
 import com.epam.esm.service.impl.UserServiceImpl;
-import com.epam.esm.util.JwtManagingUtil;
-import com.epam.esm.util.JwtResponseModel;
+import com.epam.esm.jwt.JwtResponseModel;
+import com.epam.esm.jwt.JwtManagingUtil;
+import com.epam.esm.validation.OnCreateGroup;
 import com.epam.esm.validation.OnUpdateGroup;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.CollectionModel;
@@ -66,6 +67,17 @@ public class UserController extends AbstractController<UserDto> {
         UserDetails userDetails = userService.loadUserByUsername(user.getLogin());
         String token = jwtManagingUtil.createToken(userDetails.getUsername());
         return new JwtResponseModel(token);
+    }
+
+    @Validated(OnCreateGroup.class)
+    @PostMapping("/signup")
+    @ResponseStatus(OK)
+    public String signUp(@RequestBody UserDto user) {
+        Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(user.getLogin(), user.getPassword()));
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+        UserDetails userDetails = userService.loadUserByUsername(user.getLogin());
+        return jwtManagingUtil.createToken(userDetails.getUsername());
     }
 
     /**
