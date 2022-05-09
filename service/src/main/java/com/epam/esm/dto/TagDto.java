@@ -1,5 +1,6 @@
 package com.epam.esm.dto;
 
+import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -15,6 +16,7 @@ import javax.validation.constraints.Pattern;
  * @project GiftCertificate
  */
 @Data
+@Builder
 @Relation(collectionRelation = "tags")
 @EqualsAndHashCode(callSuper = false)
 @NoArgsConstructor

@@ -15,13 +15,12 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
-import java.util.HashMap;
-import java.util.LinkedHashSet;
 import java.util.Optional;
 import java.util.Set;
 
-import static com.epam.esm.util.ParameterName.NAME;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
@@ -43,7 +42,7 @@ class TagServiceTest {
     @ParameterizedTest
     @MethodSource("provideTagData")
     void create(TagDto tag) {
-        when(repository.create(any(Tag.class))).thenReturn(Long.valueOf(7));
+        when(repository.save(any(Tag.class))).thenReturn(new Tag());
 
         boolean actual = service.create(tag);
         Assertions.assertTrue(actual);
@@ -62,7 +61,7 @@ class TagServiceTest {
     @ParameterizedTest
     @ValueSource(ints = {4, 45})
     void findAll(int page) {
-        when(repository.findAll(anyInt())).thenReturn(new LinkedHashSet<>());
+        when(repository.findAll(any(Pageable.class))).thenReturn(Page.empty());
         when(mapper.mapToDto(any(Tag.class))).thenReturn(new TagDto());
 
         int expected = 4;
@@ -93,16 +92,12 @@ class TagServiceTest {
 
     private static Object[][] provideTagData() {
         return new Object[][]{
-                {new HashMap<String, String>() {
-                    {
-                        put(NAME, "breakfast");
-                    }
-                }},
-                {new HashMap<String, String>() {
-                    {
-                        put(NAME, "car_trip");
-                    }
-                }}
+                {TagDto.builder()
+                        .name("breakfast")
+                        .build()},
+                {TagDto.builder()
+                        .name("car_trip")
+                        .build()}
         };
     }
 }

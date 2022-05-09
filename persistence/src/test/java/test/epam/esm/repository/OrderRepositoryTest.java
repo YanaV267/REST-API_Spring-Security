@@ -5,7 +5,6 @@ import com.epam.esm.entity.GiftCertificatePurchase;
 import com.epam.esm.entity.Order;
 import com.epam.esm.entity.User;
 import com.epam.esm.repository.OrderRepository;
-import com.epam.esm.repository.impl.OrderRepositoryImpl;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -14,13 +13,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Example;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
-import javax.persistence.EntityManager;
 import java.math.BigDecimal;
-import java.util.*;
+import java.util.LinkedHashSet;
+import java.util.Optional;
+import java.util.Set;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
-        classes = {OrderRepositoryImpl.class, EntityManager.class})
+        classes = {OrderRepository.class})
 @EnableAutoConfiguration
 @EntityScan(basePackages = "com.epam.esm")
 class OrderRepositoryTest {
@@ -31,7 +34,7 @@ class OrderRepositoryTest {
     @MethodSource("provideCreateOrderData")
     void create(Order order) {
         long expected = 8;
-        long actual = repository.create(order);
+        long actual = repository.save(order).getId();
         Assertions.assertEquals(expected, actual);
     }
 
@@ -39,7 +42,7 @@ class OrderRepositoryTest {
     @MethodSource("provideUpdateOrderData")
     void update(Order order) {
         BigDecimal expected = order.getCost();
-        repository.update(order);
+        repository.save(order);
         Optional<Order> foundOrder = repository.findById(order.getId());
         if (foundOrder.isPresent()) {
             BigDecimal actual = foundOrder.get().getCost();
@@ -61,10 +64,10 @@ class OrderRepositoryTest {
     }
 
     @ParameterizedTest
-    @ValueSource(ints = {0, 45, 30})
-    void findAll(int firstElementNumber) {
+    @MethodSource("providePageable")
+    void findAll(Pageable pageable) {
         long expected = 2;
-        Set<Order> orders = repository.findAll(firstElementNumber);
+        Set<Order> orders = repository.findAll(pageable).toSet();
         int actual = orders.size();
         Assertions.assertEquals(expected, actual);
     }
@@ -79,18 +82,18 @@ class OrderRepositoryTest {
     @ParameterizedTest
     @ValueSource(longs = {5, 17})
     void findAllOrdersByUser(long userId) {
-        int firstElementNumber = 0;
+        Pageable pageable = PageRequest.of(6, 15);
         long expected = 2;
-        Set<Order> orders = repository.findAllByUser(firstElementNumber, userId);
+        Set<Order> orders = repository.findByUser_Id(userId, pageable).toSet();
         int actual = orders.size();
         Assertions.assertEquals(expected, actual);
     }
 
     @ParameterizedTest
     @MethodSource("provideSearchParameters")
-    void findOrdersBySeveralParameters(int firstElementNumber, Order order, List<Integer> userIds) {
+    void findOrdersBySeveralParameters(Order order, Pageable pageable) {
         long expected = 6;
-        Set<Order> orders = repository.findBySeveralParameters(firstElementNumber, order, userIds);
+        Set<Order> orders = repository.findAll(Example.of(order), pageable).toSet();
         int actual = orders.size();
         Assertions.assertEquals(expected, actual);
     }
@@ -127,7 +130,7 @@ class OrderRepositoryTest {
 
     private static Object[][] provideSearchParameters() {
         return new Object[][]{
-                {15, Order.builder()
+                {Order.builder()
                         .cost(BigDecimal.valueOf(150))
                         .certificates(new LinkedHashSet<GiftCertificatePurchase>() {
                             {
@@ -135,18 +138,19 @@ class OrderRepositoryTest {
                             }
                         })
                         .id(5)
-                        .build(), new ArrayList<Integer>() {
-                    {
-                        add(5);
-                    }
-                }},
-                {0, Order.builder()
+                        .build(), PageRequest.of(19, 30)},
+                {Order.builder()
                         .id(7)
-                        .cost(BigDecimal.valueOf(80)), new ArrayList<Integer>() {
-                    {
-                        add(12);
-                    }
-                }}
+                        .cost(BigDecimal.valueOf(80)), PageRequest.of(3, 10)}
+        };
+    }
+
+    private static Object[][] providePageable() {
+        return new Object[][]{
+                {PageRequest.of(4, 20)},
+                {PageRequest.of(1, 25)},
+                {PageRequest.of(15, 30)},
+                {PageRequest.of(7, 27)}
         };
     }
 }

@@ -4,6 +4,7 @@ import com.epam.esm.validation.OnAggregationCreateGroup;
 import com.epam.esm.validation.OnCreateGroup;
 import com.epam.esm.validation.OnUpdateGroup;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -21,6 +22,7 @@ import java.util.Set;
  * @project GiftCertificate
  */
 @Data
+@Builder
 @EqualsAndHashCode(callSuper = false)
 @NoArgsConstructor
 public class UserDto extends RepresentationModel<UserDto> {

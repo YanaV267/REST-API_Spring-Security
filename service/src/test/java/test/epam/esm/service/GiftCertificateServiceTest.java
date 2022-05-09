@@ -1,8 +1,8 @@
 package test.epam.esm.service;
 
 import com.epam.esm.dto.GiftCertificateDto;
+import com.epam.esm.dto.TagDto;
 import com.epam.esm.entity.GiftCertificate;
-import com.epam.esm.entity.Tag;
 import com.epam.esm.mapper.impl.GiftCertificateMapper;
 import com.epam.esm.repository.GiftCertificateRepository;
 import com.epam.esm.service.GiftCertificateService;
@@ -16,11 +16,15 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Example;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.math.BigDecimal;
 import java.util.*;
 
-import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 
@@ -41,7 +45,7 @@ class GiftCertificateServiceTest {
     @ParameterizedTest
     @MethodSource("provideCertificateData")
     void create(GiftCertificateDto certificate) {
-        when(repository.create(any(GiftCertificate.class))).thenReturn(anyLong());
+        when(repository.save(any(GiftCertificate.class))).thenReturn(new GiftCertificate());
 
         boolean actual = service.create(certificate);
         Assertions.assertFalse(actual);
@@ -50,7 +54,7 @@ class GiftCertificateServiceTest {
     @ParameterizedTest
     @MethodSource("provideCertificateData")
     void update(GiftCertificateDto certificate) {
-        doNothing().when(repository).update(any(GiftCertificate.class));
+        doNothing().when(repository).save(any(GiftCertificate.class));
 
         boolean actual = service.update(certificate);
         Assertions.assertTrue(actual);
@@ -69,7 +73,7 @@ class GiftCertificateServiceTest {
     @ParameterizedTest
     @ValueSource(ints = {7, 30})
     void findAll(int startElementNumber) {
-        when(repository.findAll(startElementNumber)).thenReturn(new LinkedHashSet<>());
+        when(repository.findAll(any(Pageable.class))).thenReturn(Page.empty());
         when(mapper.mapToDto(any(GiftCertificate.class))).thenReturn(new GiftCertificateDto());
 
         int expected = 9;
@@ -92,8 +96,7 @@ class GiftCertificateServiceTest {
     @MethodSource("provideSearchParameters")
     void findBySeveralParameters(int page, GiftCertificateDto certificate,
                                  List<String> tagNames, List<String> sortTypes) {
-        when(repository.findBySeveralParameters(anyInt(), any(GiftCertificate.class), anyList()))
-                .thenReturn(new LinkedHashSet<>());
+        when(repository.findAll(any(Example.class), any(Pageable.class))).thenReturn(Page.empty());
         when(mapper.mapToDto(any(GiftCertificate.class))).thenReturn(new GiftCertificateDto());
 
         int expected = 1;
@@ -105,21 +108,23 @@ class GiftCertificateServiceTest {
 
     private static Object[][] provideCertificateData() {
         return new Object[][]{
-                {GiftCertificate.builder()
+                {GiftCertificateDto.builder()
                         .id(4)
                         .name("european countries tours")
                         .description("provides 17% discount for any 1 chosen tour")
                         .price(BigDecimal.valueOf(70))
                         .duration(15)
-                        .tags(new LinkedHashSet<Tag>() {{
-                    add(new Tag("cars"));
+                        .tags(new LinkedHashSet<TagDto>() {{
+                    add(TagDto.builder()
+                            .name("cars")
+                            .build());
                 }})}
         };
     }
 
     private static Object[][] provideSearchParameters() {
         return new Object[][]{
-                {3, GiftCertificate.builder()
+                {3, GiftCertificateDto.builder()
                         .name("european countries tours")
                         .duration(15), new ArrayList<String>() {
                     {
@@ -131,7 +136,7 @@ class GiftCertificateServiceTest {
                         add("price_desc");
                     }
                 }},
-                {5, GiftCertificate.builder()
+                {5, GiftCertificateDto.builder()
                         .price(BigDecimal.valueOf(100)), new ArrayList<String>() {
                     {
                         add("travelling");

@@ -1,9 +1,7 @@
 package test.epam.esm.repository;
 
 import com.epam.esm.entity.GiftCertificate;
-import com.epam.esm.entity.Tag;
 import com.epam.esm.repository.GiftCertificateRepository;
-import com.epam.esm.repository.impl.GiftCertificateRepositoryImpl;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -11,13 +9,16 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Example;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
-import javax.persistence.EntityManager;
 import java.math.BigDecimal;
-import java.util.*;
+import java.util.Optional;
+import java.util.Set;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
-        classes = {GiftCertificateRepositoryImpl.class, EntityManager.class})
+        classes = {GiftCertificateRepository.class})
 @EnableAutoConfiguration
 class GiftCertificateRepositoryTest {
     @Autowired
@@ -27,7 +28,7 @@ class GiftCertificateRepositoryTest {
     @MethodSource("provideCreateCertificateData")
     void create(GiftCertificate certificate) {
         long expected = 3;
-        long actual = repository.create(certificate);
+        long actual = repository.save(certificate).getId();
         Assertions.assertEquals(expected, actual);
     }
 
@@ -35,7 +36,7 @@ class GiftCertificateRepositoryTest {
     @MethodSource("provideUpdateCertificateData")
     void update(GiftCertificate certificate) {
         BigDecimal expected = certificate.getPrice();
-        repository.update(certificate);
+        repository.save(certificate);
         Optional<GiftCertificate> foundCertificate = repository.findById(certificate.getId());
         if (foundCertificate.isPresent()) {
             BigDecimal actual = foundCertificate.get().getPrice();
@@ -57,10 +58,10 @@ class GiftCertificateRepositoryTest {
     }
 
     @ParameterizedTest
-    @ValueSource(ints = {15, 75})
-    void findAll(int firstElementNumber) {
+    @MethodSource("providePageable")
+    void findAll(Pageable pageable) {
         long expected = 2;
-        Set<GiftCertificate> certificates = repository.findAll(firstElementNumber);
+        Set<GiftCertificate> certificates = repository.findAll(pageable).toSet();
         int actual = certificates.size();
         Assertions.assertEquals(expected, actual);
     }
@@ -74,11 +75,9 @@ class GiftCertificateRepositoryTest {
 
     @ParameterizedTest
     @MethodSource("provideSearchParameters")
-    void findBySeveralParameters(int firstElementNumber, GiftCertificate certificate,
-                                 List<String> sortTypes) {
+    void findBySeveralParameters(GiftCertificate certificate, Pageable pageable) {
         long expected = 2;
-        Set<GiftCertificate> certificates = repository.findBySeveralParameters(firstElementNumber,
-                certificate, sortTypes);
+        Set<GiftCertificate> certificates = repository.findAll(Example.of(certificate), pageable).toSet();
         int actual = certificates.size();
         Assertions.assertEquals(expected, actual);
     }
@@ -110,39 +109,27 @@ class GiftCertificateRepositoryTest {
 
     private static Object[][] provideSearchParameters() {
         return new Object[][]{
-                {30},
                 {GiftCertificate.builder()
                         .id(2)
                         .name("discount")
                         .duration(90)
-                        .build(), "travelling", new LinkedHashSet<Tag>() {
-                    {
-                        add(new Tag("travelling"));
-                    }
-                }},
-                {15},
-                {GiftCertificate.builder()
-                        .id(2)
-                        .description("all")
-                        .duration(100)
-                        .build(), null, null},
+                        .build(), PageRequest.of(16, 30)},
                 {GiftCertificate.builder()
                         .id(1)
                         .price(new BigDecimal("30"))
-                        .build(), "cars", null, new ArrayList<String>() {
-                    {
-                        add("price_desc");
-                    }
-                }},
-                {0},
+                        .build(), PageRequest.of(5, 25)},
                 {GiftCertificate.builder()
                         .id(0)
-                        .build(), null, new ArrayList<String>() {
-                    {
-                        add("name_asc");
-                        add("price_desc");
-                    }
-                }}
+                        .build(), PageRequest.of(23, 20)}
+        };
+    }
+
+    private static Object[][] providePageable() {
+        return new Object[][]{
+                {PageRequest.of(4, 20)},
+                {PageRequest.of(1, 25)},
+                {PageRequest.of(15, 30)},
+                {PageRequest.of(7, 27)}
         };
     }
 }

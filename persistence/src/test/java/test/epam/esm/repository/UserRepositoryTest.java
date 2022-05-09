@@ -2,21 +2,22 @@ package test.epam.esm.repository;
 
 import com.epam.esm.entity.User;
 import com.epam.esm.repository.UserRepository;
-import com.epam.esm.repository.impl.UserRepositoryImpl;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
-import javax.persistence.EntityManager;
 import java.util.Optional;
 import java.util.Set;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
-        classes = {UserRepositoryImpl.class, EntityManager.class})
+        classes = {UserRepository.class})
 @EnableAutoConfiguration
 @EntityScan(basePackages = "com.epam.esm")
 class UserRepositoryTest {
@@ -24,10 +25,10 @@ class UserRepositoryTest {
     private UserRepository repository;
 
     @ParameterizedTest
-    @ValueSource(ints = {15, 75})
-    void findAll(int firstElementNumber) {
+    @MethodSource("providePageable")
+    void findAll(Pageable pageable) {
         long expected = 17;
-        Set<User> users = repository.findAll(firstElementNumber);
+        Set<User> users = repository.findAll(pageable).toSet();
         int actual = users.size();
         Assertions.assertEquals(expected, actual);
     }
@@ -40,20 +41,29 @@ class UserRepositoryTest {
     }
 
     @ParameterizedTest
-    @ValueSource(ints = {14, 22})
-    void findAllWithOrders(int firstElementNumber) {
-        long expected = 9;
-        Set<User> users = repository.findWithHighestOrderCost(firstElementNumber);
+    @MethodSource("providePageable")
+    void findByHighestOrderCost(Pageable pageable) {
+        long expected = 1;
+        Set<User> users = repository.findByHighestOrderCost(pageable).toSet();
         int actual = users.size();
         Assertions.assertEquals(expected, actual);
     }
 
     @ParameterizedTest
-    @ValueSource(ints = {15, 0, 60})
-    void findWithHighestOrderCost(int firstElementNumber) {
+    @MethodSource("providePageable")
+    void findByHighestOrderCostMostUsedTag(Pageable pageable) {
         long expected = 1;
-        Set<User> users = repository.findWithHighestOrderCost(firstElementNumber);
+        Set<User> users = repository.findByHighestOrderCostMostUsedTag(pageable).toSet();
         int actual = users.size();
         Assertions.assertEquals(expected, actual);
+    }
+
+    private static Object[][] providePageable() {
+        return new Object[][]{
+                {PageRequest.of(4, 20)},
+                {PageRequest.of(1, 25)},
+                {PageRequest.of(15, 30)},
+                {PageRequest.of(7, 27)}
+        };
     }
 }

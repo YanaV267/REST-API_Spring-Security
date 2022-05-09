@@ -1,6 +1,7 @@
 package test.epam.esm.service;
 
 import com.epam.esm.dto.OrderDto;
+import com.epam.esm.dto.UserDto;
 import com.epam.esm.entity.Order;
 import com.epam.esm.entity.User;
 import com.epam.esm.mapper.impl.OrderMapper;
@@ -18,10 +19,14 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Example;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.*;
 
-import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 
@@ -48,7 +53,7 @@ class OrderServiceTest {
     void create(OrderDto order) {
         when(certificateRepository.findById(anyLong())).thenReturn(Optional.empty());
         when(userRepository.findById(anyLong())).thenReturn(Optional.of(new User(7)));
-        when(repository.create(any(Order.class))).thenReturn(anyLong());
+        when(repository.save(any(Order.class))).thenReturn(new Order());
 
         boolean actual = service.create(order);
         Assertions.assertFalse(actual);
@@ -57,7 +62,7 @@ class OrderServiceTest {
     @ParameterizedTest
     @MethodSource("provideOrderData")
     void update(OrderDto order) {
-        doNothing().when(repository).update(any(Order.class));
+        doNothing().when(repository).save(any(Order.class));
 
         boolean actual = service.update(order);
         Assertions.assertTrue(actual);
@@ -76,7 +81,7 @@ class OrderServiceTest {
     @ParameterizedTest
     @ValueSource(ints = {7, 30})
     void findAll(int startElementNumber) {
-        when(repository.findAll(startElementNumber)).thenReturn(new LinkedHashSet<>());
+        when(repository.findAll(any(Pageable.class))).thenReturn(Page.empty());
         when(mapper.mapToDto(any(Order.class))).thenReturn(new OrderDto());
 
         int expected = 9;
@@ -98,7 +103,7 @@ class OrderServiceTest {
     @ParameterizedTest
     @ValueSource(longs = {8, 25, 14})
     void findAllByUser(long userId) {
-        when(repository.findAllByUser(anyInt(), anyLong())).thenReturn(new LinkedHashSet<>());
+        when(repository.findByUser_Id(anyLong(), any(Pageable.class))).thenReturn(Page.empty());
         when(mapper.mapToDto(any(Order.class))).thenReturn(new OrderDto());
 
         int expected = 9;
@@ -110,14 +115,12 @@ class OrderServiceTest {
 
     @ParameterizedTest
     @MethodSource("provideSearchParameters")
-    void findBySeveralParameters(int startElementNumber, OrderDto order, List<Integer> certificateIds,
-                                 List<Integer> userIds) {
-        when(repository.findBySeveralParameters(anyInt(), any(Order.class), anyList()))
-                .thenReturn(new LinkedHashSet<>());
+    void findBySeveralParameters(int startElementNumber, OrderDto order, long userId, List<Integer> certificateIds) {
+        when(repository.findAll(any(Example.class), any(Pageable.class))).thenReturn(Page.empty());
         when(mapper.mapToDto(any(Order.class))).thenReturn(new OrderDto());
 
         int expected = 1;
-        Set<OrderDto> orders = service.findBySeveralParameters(startElementNumber, order, certificateIds, userIds);
+        Set<OrderDto> orders = service.findBySeveralParameters(startElementNumber, order, userId, certificateIds);
         int actual = orders.size();
         Assertions.assertEquals(expected, actual);
     }
@@ -133,8 +136,10 @@ class OrderServiceTest {
 
     private static Object[][] provideSearchParameters() {
         return new Object[][]{
-                {15, Order.builder()
-                        .user(new User(8))
+                {15, OrderDto.builder()
+                        .user(UserDto.builder()
+                                .id(8)
+                                .build())
                         .certificates(new LinkedHashSet<>(2))
                         .build(), new ArrayList<Integer>() {
                     {
@@ -145,8 +150,10 @@ class OrderServiceTest {
                         add(10);
                     }
                 }},
-                {10, Order.builder()
-                        .user(new User(4))
+                {10, OrderDto.builder()
+                        .user(UserDto.builder()
+                                .id(14)
+                                .build())
                         .build(), new ArrayList<Integer>() {
                     {
                         add(5);

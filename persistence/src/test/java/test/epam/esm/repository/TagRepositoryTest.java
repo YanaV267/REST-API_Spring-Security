@@ -2,29 +2,21 @@ package test.epam.esm.repository;
 
 import com.epam.esm.entity.Tag;
 import com.epam.esm.repository.TagRepository;
-import com.epam.esm.repository.impl.TagRepositoryImpl;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
-import javax.persistence.EntityManager;
 import java.util.Optional;
 import java.util.Set;
 
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.when;
-
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
-        classes = {TagRepositoryImpl.class, EntityManager.class})
+        classes = {TagRepository.class})
 @EnableAutoConfiguration
 class TagRepositoryTest {
     @Autowired
@@ -34,7 +26,7 @@ class TagRepositoryTest {
     @MethodSource("provideTagData")
     void create(Tag tag) {
         long expected = 5;
-        long actual = repository.create(tag);
+        long actual = repository.save(tag).getId();
         Assertions.assertEquals(expected, actual);
     }
 
@@ -50,10 +42,10 @@ class TagRepositoryTest {
     }
 
     @ParameterizedTest
-    @ValueSource(ints = {15})
-    void findAll(int startElementNumber) {
+    @MethodSource("providePageable")
+    void findAll(Pageable pageable) {
         long expected = 4;
-        Set<Tag> tags = repository.findAll(startElementNumber);
+        Set<Tag> tags = repository.findAll(pageable).toSet();
         int actual = tags.size();
         Assertions.assertEquals(expected, actual);
     }
@@ -76,6 +68,15 @@ class TagRepositoryTest {
         return new Object[][]{
                 {new Tag("clock")},
                 {new Tag("glass")}
+        };
+    }
+
+    private static Object[][] providePageable() {
+        return new Object[][]{
+                {PageRequest.of(4, 20)},
+                {PageRequest.of(1, 25)},
+                {PageRequest.of(15, 30)},
+                {PageRequest.of(7, 27)}
         };
     }
 }
