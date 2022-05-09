@@ -13,6 +13,7 @@ import com.epam.esm.service.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Example;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -99,7 +100,7 @@ public class OrderServiceImpl implements OrderService {
     @Transactional
     public boolean update(OrderDto orderDto) {
         Order order = mapper.mapToEntity(orderDto);
-        repository.update(order);
+        repository.save(order);
         return true;
     }
 
@@ -140,10 +141,10 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public Set<OrderDto> findAllByUser(int page, long userId) {
-        int firstElementNumber = getFirstElementNumber(page, maxResultAmount);
-        Set<Order> foundOrders = repository.findAllByUser(firstElementNumber, userId);
+        Pageable pageable = PageRequest.of(page, maxResultAmount);
+        Set<Order> foundOrders = repository.findByUser_Id(userId, pageable).toSet();
+        lastPage = repository.findByUser_Id(userId, pageable).getTotalPages();
         foundOrders.forEach(o -> o.setCertificates(new LinkedHashSet<>()));
-        lastPage = repository.getLastPage();
         Set<OrderDto> orders = foundOrders.stream()
                 .map(mapper::mapToDto)
                 .collect(Collectors.toSet());
@@ -151,8 +152,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public Set<OrderDto> findBySeveralParameters(int page, OrderDto orderDto, List<Integer> userIds,
-                                                 List<Integer> certificateIds) {
+    public Set<OrderDto> findBySeveralParameters(int page, OrderDto orderDto, long userId, List<Integer> certificateIds) {
         Order order = mapper.mapToEntity(orderDto);
         if (certificateIds != null) {
             Set<GiftCertificatePurchase> certificates = certificateIds.stream()
@@ -160,9 +160,10 @@ public class OrderServiceImpl implements OrderService {
                     .collect(Collectors.toSet());
             order.setCertificates(certificates);
         }
-        int firstElementNumber = getFirstElementNumber(page, maxResultAmount);
-        Set<Order> foundOrders = repository.findBySeveralParameters(firstElementNumber, order, userIds);
-        lastPage = repository.getLastPage();
+        order.getUser().setId(userId);
+        Pageable pageable = PageRequest.of(page, maxResultAmount);
+        Set<Order> foundOrders = repository.findAll(Example.of(order), pageable).toSet();
+        lastPage = repository.findAll(Example.of(order), pageable).getTotalPages();
         Set<OrderDto> orders = foundOrders.stream()
                 .map(mapper::mapToDto)
                 .collect(Collectors.toSet());

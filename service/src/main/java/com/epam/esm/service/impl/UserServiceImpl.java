@@ -98,9 +98,9 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
     @Override
     public Set<UserDto> findWithHighestOrderCost(int page) {
-        int firstElementNumber = getFirstElementNumber(page, maxResultAmount);
-        Set<User> orders = repository.findWithHighestOrderCost(firstElementNumber);
-        lastPage = repository.getLastPage();
+        Pageable pageable = PageRequest.of(page, maxResultAmount);
+        Set<User> orders = repository.findByHighestOrderCost(pageable).toSet();
+        lastPage = repository.findByHighestOrderCost(pageable).getTotalPages();
         return orders.stream()
                 .map(mapper::mapToDto)
                 .collect(Collectors.toSet());
@@ -108,9 +108,9 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
     @Override
     public Set<UserDto> findWithHighestOrderCostMostUsedTag(int page) {
-        int firstElementNumber = getFirstElementNumber(page, maxResultAmount);
-        Set<User> orders = repository.findWithHighestOrderCostMostUsedTag(firstElementNumber);
-        lastPage = repository.getLastPage();
+        Pageable pageable = PageRequest.of(page, maxResultAmount);
+        Set<User> orders = repository.findByHighestOrderCostMostUsedTag(pageable).toSet();
+        lastPage = repository.findByHighestOrderCostMostUsedTag(pageable).getTotalPages();
         return orders.stream()
                 .map(mapper::mapToDto)
                 .collect(Collectors.toSet());

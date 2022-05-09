@@ -102,9 +102,9 @@ public class TagServiceImpl implements TagService {
 
     @Override
     public Set<TagDto> findMostUsedTag(int page) {
-        int firstElementNumber = getFirstElementNumber(page, maxResultAmount);
-        lastPage = repository.getLastPage();
-        return repository.findMostUsedTag(firstElementNumber)
+        Pageable pageable = PageRequest.of(page, maxResultAmount);
+        lastPage = repository.findMostUsedTag(pageable).getTotalPages();
+        return repository.findMostUsedTag(pageable)
                 .stream()
                 .map(mapper::mapToDto)
                 .collect(Collectors.toSet());

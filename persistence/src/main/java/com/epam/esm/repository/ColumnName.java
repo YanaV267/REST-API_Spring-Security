@@ -2,9 +2,6 @@ package com.epam.esm.repository;
 
 /**
  * The type Column name.
- *
- * @author YanaV
- * @project GiftCertificate
  */
 public final class ColumnName {
     /**
@@ -12,7 +9,7 @@ public final class ColumnName {
      */
     public static final String TAGS = "tags";
     /**
-     * The constant CERTIFICATE.
+     * The constant CERTIFICATES.
      */
     public static final String CERTIFICATES = "certificates";
     /**
@@ -23,10 +20,6 @@ public final class ColumnName {
      * The constant ID.
      */
     public static final String ID = "id";
-    /**
-     * The constant LOGIN.
-     */
-    public static final String LOGIN = "login";
     /**
      * The constant NAME.
      */
@@ -52,11 +45,6 @@ public final class ColumnName {
      * The constant LAST_UPDATE_DATE.
      */
     public static final String LAST_UPDATE_DATE = "lastUpdateDate";
-
-    /**
-     * The constant BALANCE.
-     */
-    public static final String BALANCE = "balance";
 
     /**
      * The constant COST.

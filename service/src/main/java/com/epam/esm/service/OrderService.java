@@ -26,10 +26,9 @@ public interface OrderService extends CompleteBaseService<OrderDto> {
      *
      * @param page           the page
      * @param orderDto       the order dto
-     * @param userIds        the user ids
+     * @param userId         the user id
      * @param certificateIds the certificate ids
      * @return the set
      */
-    Set<OrderDto> findBySeveralParameters(int page, OrderDto orderDto, List<Integer> userIds,
-                                          List<Integer> certificateIds);
+    Set<OrderDto> findBySeveralParameters(int page, OrderDto orderDto, long userId, List<Integer> certificateIds);
 }

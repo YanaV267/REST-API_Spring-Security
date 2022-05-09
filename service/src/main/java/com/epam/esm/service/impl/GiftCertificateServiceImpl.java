@@ -10,15 +10,14 @@ import com.epam.esm.service.GiftCertificateService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Example;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -29,12 +28,14 @@ import java.util.stream.Collectors;
  */
 @Service
 public class GiftCertificateServiceImpl implements GiftCertificateService {
-    @Value("${max.result.amount}")
-    private int maxResultAmount;
-    private int lastPage;
+    private static final String UNDERSCORE = "_";
+    private static final String DESC = "desc";
     private final GiftCertificateRepository repository;
     private final TagRepository tagRepository;
     private final GiftCertificateMapper mapper;
+    @Value("${max.result.amount}")
+    private int maxResultAmount;
+    private int lastPage;
 
     /**
      * Instantiates a new Gift certificate service.
@@ -69,7 +70,7 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
         Optional<GiftCertificate> foundCertificate = repository.findById(giftCertificateDto.getId());
         if (foundCertificate.isPresent()) {
             GiftCertificate certificate = mapper.mapToEntity(giftCertificateDto);
-            repository.update(certificate);
+            repository.save(certificate);
             return true;
         }
         return false;
@@ -118,13 +119,28 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
                     .collect(Collectors.toSet());
             giftCertificate.setTags(tags);
         }
-        int firstElementNumber = getFirstElementNumber(page, maxResultAmount);
-        Set<GiftCertificate> certificates = repository.findBySeveralParameters(firstElementNumber,
-                giftCertificate, sortTypes);
-        lastPage = repository.getLastPage();
+        Pageable pageable = PageRequest.of(page, maxResultAmount, Sort.by(createOrders(sortTypes)));
+        Set<GiftCertificate> certificates = repository.findAll(Example.of(giftCertificate), pageable).toSet();
+        lastPage = repository.findAll(Example.of(giftCertificate), pageable).getTotalPages();
         return certificates.stream()
                 .map(mapper::mapToDto)
                 .collect(Collectors.toCollection(LinkedHashSet::new));
+    }
+
+    private List<Sort.Order> createOrders(List<String> sortTypes) {
+        List<Sort.Order> orders = new ArrayList<>();
+        if (sortTypes != null) {
+            for (String sortType : sortTypes) {
+                String type = sortType.substring(sortType.indexOf(UNDERSCORE));
+                String column = sortType.substring(0, sortType.indexOf(UNDERSCORE));
+                if (type.equals(DESC)) {
+                    orders.add(Sort.Order.desc(column));
+                } else {
+                    orders.add(Sort.Order.asc(column));
+                }
+            }
+        }
+        return orders;
     }
 
     @Override
