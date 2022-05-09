@@ -1,24 +1,16 @@
 package com.epam.esm.repository.impl;
 
 import com.epam.esm.entity.User;
-import com.epam.esm.repository.UserRepository;
+import com.epam.esm.repository.UserRepositoryCustom;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Repository;
+import org.springframework.stereotype.Component;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.CriteriaUpdate;
-import javax.persistence.criteria.Root;
-import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.LinkedHashSet;
-import java.util.Optional;
 import java.util.Set;
-
-import static com.epam.esm.repository.ColumnName.*;
 
 /**
  * The type User repository.
@@ -26,56 +18,13 @@ import static com.epam.esm.repository.ColumnName.*;
  * @author YanaV
  * @project GiftCertificate
  */
-@Repository
-public class UserRepositoryImpl implements UserRepository {
+@Component
+public class UserRepositoryImpl implements UserRepositoryCustom {
     @Value("${max.result.amount}")
     private int maxResultAmount;
     private int lastPage;
     @PersistenceContext
     private EntityManager entityManager;
-
-    @Override
-    public long create(User user) {
-        entityManager.persist(user);
-        return user.getId();
-    }
-
-    @Override
-    public void delete(User user) {
-        entityManager.remove(user);
-    }
-
-    @Override
-    public Set<User> findAll(int firstElementNumber) {
-        CriteriaBuilder builder = entityManager.getCriteriaBuilder();
-        CriteriaQuery<User> query = builder.createQuery(User.class);
-        CriteriaQuery<Long> pageQuery = builder.createQuery(Long.class);
-
-        query.select(query.from(User.class));
-        pageQuery.select(builder.count(pageQuery.from(User.class)));
-
-        long amount = entityManager.createQuery(pageQuery).getSingleResult();
-        lastPage = (int) Math.ceil((double) amount / maxResultAmount);
-        return new LinkedHashSet<>(entityManager.createQuery(query)
-                .getResultList());
-    }
-
-    @Override
-    public Optional<User> findById(long id) {
-        User user = entityManager.find(User.class, id);
-        return Optional.ofNullable(user);
-    }
-
-    @Override
-    public Optional<User> findUserByLogin(String login) {
-        CriteriaBuilder builder = entityManager.getCriteriaBuilder();
-        CriteriaQuery<User> query = builder.createQuery(User.class);
-        Root<User> root = query.from(User.class);
-        query.select(root)
-                .where(builder.equal(root.get(LOGIN), login));
-        return Optional.ofNullable(entityManager.createQuery(query)
-                .getSingleResult());
-    }
 
     @Override
     public Set<User> findWithHighestOrderCost(int firstElementNumber) {
@@ -128,17 +77,6 @@ public class UserRepositoryImpl implements UserRepository {
                 .setFirstResult(firstElementNumber)
                 .setMaxResults(maxResultAmount)
                 .getResultList());
-    }
-
-    @Override
-    public void updateBalance(long userId, BigDecimal newBalance) {
-        CriteriaBuilder builder = entityManager.getCriteriaBuilder();
-        CriteriaUpdate<User> query = builder.createCriteriaUpdate(User.class);
-        Root<User> root = query.from(User.class);
-        query.set(root.get(BALANCE), newBalance)
-                .where(builder.equal(root.get(ID), userId));
-        entityManager.createQuery(query)
-                .executeUpdate();
     }
 
     @Override

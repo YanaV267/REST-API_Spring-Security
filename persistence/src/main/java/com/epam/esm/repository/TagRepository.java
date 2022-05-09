@@ -1,9 +1,9 @@
 package com.epam.esm.repository;
 
 import com.epam.esm.entity.Tag;
+import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
-import java.util.Set;
 
 /**
  * The interface Tag repository.
@@ -11,15 +11,7 @@ import java.util.Set;
  * @author YanaV
  * @project GiftCertificate
  */
-public interface TagRepository extends BaseRepository<Tag> {
-    /**
-     * Create long.
-     *
-     * @param tag the tag
-     * @return the long
-     */
-    long create(Tag tag);
-
+public interface TagRepository extends JpaRepository<Tag, Long>, TagRepositoryCustom {
     /**
      * Find by name optional.
      *
@@ -27,12 +19,4 @@ public interface TagRepository extends BaseRepository<Tag> {
      * @return the optional
      */
     Optional<Tag> findByName(String name);
-
-    /**
-     * Find most used tag set.
-     *
-     * @param firstElementNumber the first element number
-     * @return the set
-     */
-    Set<Tag> findMostUsedTag(int firstElementNumber);
 }

@@ -1,23 +1,16 @@
 package com.epam.esm.repository.impl;
 
 import com.epam.esm.entity.Tag;
-import com.epam.esm.repository.TagRepository;
+import com.epam.esm.repository.TagRepositoryCustom;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
-import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Root;
 import java.math.BigInteger;
 import java.util.LinkedHashSet;
-import java.util.Optional;
 import java.util.Set;
-
-import static com.epam.esm.repository.ColumnName.NAME;
 
 /**
  * The type Tag repository.
@@ -26,62 +19,12 @@ import static com.epam.esm.repository.ColumnName.NAME;
  * @project GiftCertificate
  */
 @Repository
-public class TagRepositoryImpl implements TagRepository {
+public class TagRepositoryImpl implements TagRepositoryCustom {
     @Value("${max.result.amount}")
     private int maxResultAmount;
     private int lastPage;
     @PersistenceContext
     private EntityManager entityManager;
-
-    @Override
-    public long create(Tag tag) {
-        entityManager.persist(tag);
-        return tag.getId();
-    }
-
-    @Override
-    public void delete(Tag tag) {
-        entityManager.remove(tag);
-    }
-
-    @Override
-    public Set<Tag> findAll(int firstElementNumber) {
-        CriteriaBuilder builder = entityManager.getCriteriaBuilder();
-        CriteriaQuery<Tag> query = builder.createQuery(Tag.class);
-        CriteriaQuery<Long> pageQuery = builder.createQuery(Long.class);
-
-        query.select(query.from(Tag.class));
-        pageQuery.select(builder.count(pageQuery.from(Tag.class)));
-
-        long amount = entityManager.createQuery(pageQuery).getSingleResult();
-        lastPage = (int) Math.ceil((double) amount / maxResultAmount);
-        return new LinkedHashSet<>(entityManager.createQuery(query)
-                .setFirstResult(firstElementNumber)
-                .setMaxResults(maxResultAmount)
-                .getResultList());
-    }
-
-    @Override
-    public Optional<Tag> findById(long id) {
-        Tag tag = entityManager.find(Tag.class, id);
-        return Optional.ofNullable(tag);
-    }
-
-    @Override
-    public Optional<Tag> findByName(String name) {
-        CriteriaBuilder builder = entityManager.getCriteriaBuilder();
-        CriteriaQuery<Tag> query = entityManager.getCriteriaBuilder()
-                .createQuery(Tag.class);
-        Root<Tag> root = query.from(Tag.class);
-        try {
-            query.select(root)
-                    .where(builder.equal(root.get(NAME), name));
-            return Optional.of(entityManager.createQuery(query)
-                    .getSingleResult());
-        } catch (NoResultException exception) {
-            return Optional.empty();
-        }
-    }
 
     @Override
     public Set<Tag> findMostUsedTag(int firstElementNumber) {

@@ -23,6 +23,9 @@ public final class ColumnName {
      * The constant ID.
      */
     public static final String ID = "id";
+    /**
+     * The constant LOGIN.
+     */
     public static final String LOGIN = "login";
     /**
      * The constant NAME.

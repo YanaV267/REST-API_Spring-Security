@@ -3,14 +3,17 @@ package com.epam.esm.repository.impl;
 import com.epam.esm.builder.GiftCertificatePredicateBuilder;
 import com.epam.esm.builder.GiftCertificateUpdateBuilder;
 import com.epam.esm.entity.GiftCertificate;
-import com.epam.esm.repository.GiftCertificateRepository;
+import com.epam.esm.repository.GiftCertificateRepositoryCustom;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.criteria.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
 
 import static com.epam.esm.repository.ColumnName.ID;
 
@@ -21,7 +24,7 @@ import static com.epam.esm.repository.ColumnName.ID;
  * @project GiftCertificate
  */
 @Repository
-public class GiftCertificateRepositoryImpl implements GiftCertificateRepository {
+public class GiftCertificateRepositoryImpl implements GiftCertificateRepositoryCustom {
     @Value("${max.result.amount}")
     private int maxResultAmount;
     private int lastPage;
@@ -30,12 +33,6 @@ public class GiftCertificateRepositoryImpl implements GiftCertificateRepository 
 
     @PersistenceContext
     private EntityManager entityManager;
-
-    @Override
-    public long create(GiftCertificate certificate) {
-        entityManager.merge(certificate);
-        return certificate.getId();
-    }
 
     @Override
     public void update(GiftCertificate certificate) {
@@ -52,34 +49,6 @@ public class GiftCertificateRepositoryImpl implements GiftCertificateRepository 
         query.where(builder.equal(root.get(ID), certificate.getId()));
         entityManager.createQuery(query)
                 .executeUpdate();
-    }
-
-    @Override
-    public void delete(GiftCertificate certificate) {
-        entityManager.remove(certificate);
-    }
-
-    @Override
-    public Set<GiftCertificate> findAll(int firstElementNumber) {
-        CriteriaBuilder builder = entityManager.getCriteriaBuilder();
-        CriteriaQuery<GiftCertificate> query = builder.createQuery(GiftCertificate.class);
-        CriteriaQuery<Long> pageQuery = builder.createQuery(Long.class);
-
-        query.select(query.from(GiftCertificate.class));
-        pageQuery.select(builder.count(pageQuery.from(GiftCertificate.class)));
-
-        long amount = entityManager.createQuery(pageQuery).getSingleResult();
-        lastPage = (int) Math.ceil((double) amount / maxResultAmount);
-        return new LinkedHashSet<>(entityManager.createQuery(query)
-                .setFirstResult(firstElementNumber)
-                .setMaxResults(maxResultAmount)
-                .getResultList());
-    }
-
-    @Override
-    public Optional<GiftCertificate> findById(long id) {
-        GiftCertificate certificate = entityManager.find(GiftCertificate.class, id);
-        return Optional.ofNullable(certificate);
     }
 
     @Override

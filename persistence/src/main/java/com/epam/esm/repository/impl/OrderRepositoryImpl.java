@@ -3,7 +3,7 @@ package com.epam.esm.repository.impl;
 import com.epam.esm.builder.OrderPredicateBuilder;
 import com.epam.esm.builder.OrderUpdateBuilder;
 import com.epam.esm.entity.Order;
-import com.epam.esm.repository.OrderRepository;
+import com.epam.esm.repository.OrderRepositoryCustom;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
 
@@ -12,7 +12,6 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.criteria.*;
 import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 
 import static com.epam.esm.repository.ColumnName.ID;
@@ -25,18 +24,12 @@ import static com.epam.esm.repository.ColumnName.USER;
  * @project GiftCertificate
  */
 @Repository
-public class OrderRepositoryImpl implements OrderRepository {
+public class OrderRepositoryImpl implements OrderRepositoryCustom {
     @Value("${max.result.amount}")
     private int maxResultAmount;
     private int lastPage;
     @PersistenceContext
     private EntityManager entityManager;
-
-    @Override
-    public long create(Order order) {
-        entityManager.persist(order);
-        return order.getId();
-    }
 
     @Override
     public void update(Order order) {
@@ -52,34 +45,6 @@ public class OrderRepositoryImpl implements OrderRepository {
         query.where(builder.equal(root.get(ID), order.getId()));
         entityManager.createQuery(query)
                 .executeUpdate();
-    }
-
-    @Override
-    public void delete(Order order) {
-        entityManager.remove(order);
-    }
-
-    @Override
-    public Set<Order> findAll(int firstElementNumber) {
-        CriteriaBuilder builder = entityManager.getCriteriaBuilder();
-        CriteriaQuery<Order> query = builder.createQuery(Order.class);
-        CriteriaQuery<Long> pageQuery = builder.createQuery(Long.class);
-
-        query.select(query.from(Order.class));
-        pageQuery.select(builder.count(pageQuery.from(Order.class)));
-
-        long amount = entityManager.createQuery(pageQuery).getSingleResult();
-        lastPage = (int) Math.ceil((double) amount / maxResultAmount);
-        return new LinkedHashSet<>(entityManager.createQuery(query)
-                .setFirstResult(firstElementNumber)
-                .setMaxResults(maxResultAmount)
-                .getResultList());
-    }
-
-    @Override
-    public Optional<Order> findById(long id) {
-        Order order = entityManager.find(Order.class, id);
-        return Optional.ofNullable(order);
     }
 
     @Override

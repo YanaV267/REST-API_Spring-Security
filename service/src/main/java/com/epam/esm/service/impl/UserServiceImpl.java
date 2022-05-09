@@ -9,6 +9,8 @@ import com.epam.esm.util.CustomUserDetails;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -38,7 +40,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        Optional<User> user = repository.findUserByLogin(username);
+        Optional<User> user = repository.findByLogin(username);
         if (user.isPresent()) {
             return new CustomUserDetails(user.get());
         }
@@ -49,16 +51,16 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     @Transactional
     public boolean create(UserDto userDto) {
         User user = mapper.mapToEntity(userDto);
-        repository.create(user);
+        repository.save(user);
         return true;
     }
 
     @Override
     @Transactional
     public boolean delete(long id) {
-        Optional<User> user = repository.findById(id);
-        if (user.isPresent()) {
-            repository.delete(user.get());
+        boolean exists = repository.existsById(id);
+        if (exists) {
+            repository.deleteById(id);
             return true;
         } else {
             return false;
@@ -67,9 +69,9 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
     @Override
     public Set<UserDto> findAll(int page) {
-        int firstElementNumber = getFirstElementNumber(page, maxResultAmount);
-        Set<User> users = repository.findAll(firstElementNumber);
-        lastPage = repository.getLastPage();
+        Pageable pageable = PageRequest.of(page, maxResultAmount);
+        Set<User> users = repository.findAll(pageable).toSet();
+        lastPage = repository.findAll(pageable).getTotalPages();
         return users.stream()
                 .map(mapper::mapToDto)
                 .collect(Collectors.toSet());
@@ -77,8 +79,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
     @Override
     public Set<UserDto> findAllWithOrders(int page) {
-        int firstElementNumber = getFirstElementNumber(page, maxResultAmount);
-        Set<UserDto> users = findAll(firstElementNumber);
+        Set<UserDto> users = findAll(page);
         return users.stream()
                 .filter(u -> !u.getOrders().isEmpty())
                 .collect(Collectors.toSet());

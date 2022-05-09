@@ -10,6 +10,8 @@ import com.epam.esm.service.GiftCertificateService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -57,7 +59,7 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
             Optional<Tag> tag = tagRepository.findByName(t.getName());
             tag.ifPresent(value -> t.setId(value.getId()));
         });
-        repository.create(certificate);
+        repository.save(certificate);
         return true;
     }
 
@@ -76,9 +78,9 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
     @Override
     @Transactional
     public boolean delete(long id) {
-        Optional<GiftCertificate> certificate = repository.findById(id);
-        if (certificate.isPresent()) {
-            repository.delete(certificate.get());
+        boolean exists = repository.existsById(id);
+        if (exists) {
+            repository.deleteById(id);
             return true;
         } else {
             return false;
@@ -87,9 +89,9 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
 
     @Override
     public Set<GiftCertificateDto> findAll(int page) {
-        int firstElementNumber = getFirstElementNumber(page, maxResultAmount);
-        Set<GiftCertificate> certificates = repository.findAll(firstElementNumber);
-        lastPage = repository.getLastPage();
+        Pageable pageable = PageRequest.of(page, maxResultAmount);
+        Set<GiftCertificate> certificates = repository.findAll(pageable).toSet();
+        lastPage = repository.findAll(pageable).getTotalPages();
         return certificates.stream()
                 .map(mapper::mapToDto)
                 .collect(Collectors.toSet());

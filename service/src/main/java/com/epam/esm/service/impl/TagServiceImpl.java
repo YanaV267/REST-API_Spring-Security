@@ -8,9 +8,11 @@ import com.epam.esm.service.TagService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-
 import org.springframework.transaction.annotation.Transactional;
+
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -48,7 +50,7 @@ public class TagServiceImpl implements TagService {
         if (!findByName(name).isPresent()) {
             Tag tag = new Tag();
             tag.setName(name);
-            repository.create(tag);
+            repository.save(tag);
             return true;
         }
         return false;
@@ -57,9 +59,9 @@ public class TagServiceImpl implements TagService {
     @Override
     @Transactional
     public boolean delete(long id) {
-        Optional<Tag> tag = repository.findById(id);
-        if (tag.isPresent()) {
-            repository.delete(tag.get());
+        boolean exists = repository.existsById(id);
+        if (exists) {
+            repository.deleteById(id);
             return true;
         } else {
             return false;
@@ -68,9 +70,9 @@ public class TagServiceImpl implements TagService {
 
     @Override
     public Set<TagDto> findAll(int page) {
-        int firstElementNumber = getFirstElementNumber(page, maxResultAmount);
-        Set<Tag> tags = repository.findAll(firstElementNumber);
-        lastPage = repository.getLastPage();
+        Pageable pageable = PageRequest.of(page, maxResultAmount);
+        Set<Tag> tags = repository.findAll(pageable).toSet();
+        lastPage = repository.findAll(pageable).getTotalPages();
         return tags.stream()
                 .map(mapper::mapToDto)
                 .collect(Collectors.toSet());

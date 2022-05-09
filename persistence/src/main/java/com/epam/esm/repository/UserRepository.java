@@ -1,10 +1,14 @@
 package com.epam.esm.repository;
 
 import com.epam.esm.entity.User;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
 import java.util.Optional;
-import java.util.Set;
 
 /**
  * The interface User repository.
@@ -12,38 +16,23 @@ import java.util.Set;
  * @author YanaV
  * @project GiftCertificate
  */
-public interface UserRepository extends BaseRepository<User> {
-    /**
-     * Create boolean.
-     *
-     * @param user the user
-     * @return the long
-     */
-    long create(User user);
-
+@Repository
+public interface UserRepository extends JpaRepository<User, Long>, UserRepositoryCustom {
     /**
      * Update balance.
      *
-     * @param userId     the user id
-     * @param newBalance the new balance
+     * @param balance the new balance
+     * @param id      the user id
      */
-    void updateBalance(long userId, BigDecimal newBalance);
+    @Modifying
+    @Query(value = "UPDATE User u SET u.balance = :balance WHERE u.id = :id")
+    void updateBalance(@Param(value = "balance") BigDecimal balance, @Param(value = "id") long id);
 
     /**
-     * Find with highest order cost set.
+     * Find by login optional.
      *
-     * @param firstElementNumber the first element number
-     * @return the set
+     * @param login the login
+     * @return the optional
      */
-    Set<User> findWithHighestOrderCost(int firstElementNumber);
-
-    /**
-     * Find with highest order cost most used tag set.
-     *
-     * @param firstElementNumber the first element number
-     * @return the set
-     */
-    Set<User> findWithHighestOrderCostMostUsedTag(int firstElementNumber);
-
-    Optional<User> findUserByLogin(String login);
+    Optional<User> findByLogin(String login);
 }

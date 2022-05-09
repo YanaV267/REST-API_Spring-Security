@@ -13,6 +13,8 @@ import com.epam.esm.service.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -85,8 +87,8 @@ public class OrderServiceImpl implements OrderService {
                         .build();
                 order.getCertificates().forEach(c -> c.setOrder(order));
                 BigDecimal newBalance = user.get().getBalance().subtract(orderCost);
-                userRepository.updateBalance(user.get().getId(), newBalance);
-                repository.create(order);
+                userRepository.updateBalance(newBalance, user.get().getId());
+                repository.save(order);
                 return true;
             }
         }
@@ -104,9 +106,9 @@ public class OrderServiceImpl implements OrderService {
     @Override
     @Transactional
     public boolean delete(long id) {
-        Optional<Order> order = repository.findById(id);
-        if (order.isPresent()) {
-            repository.delete(order.get());
+        boolean exists = repository.existsById(id);
+        if (exists) {
+            repository.deleteById(id);
             return true;
         } else {
             return false;
@@ -115,9 +117,9 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public Set<OrderDto> findAll(int page) {
-        int firstElementNumber = getFirstElementNumber(page, maxResultAmount);
-        Set<Order> foundOrders = repository.findAll(firstElementNumber);
-        lastPage = repository.getLastPage();
+        Pageable pageable = PageRequest.of(page, maxResultAmount);
+        Set<Order> foundOrders = repository.findAll(pageable).toSet();
+        lastPage = repository.findAll(pageable).getTotalPages();
         Set<OrderDto> orders = foundOrders.stream()
                 .map(mapper::mapToDto)
                 .collect(Collectors.toSet());
