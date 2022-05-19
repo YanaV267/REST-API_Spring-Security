@@ -1,7 +1,7 @@
 package com.epam.esm.config;
 
-import com.epam.esm.service.impl.UserServiceImpl;
 import com.epam.esm.jwt.JwtAuthenticationFilter;
+import com.epam.esm.service.impl.UserServiceImpl;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -18,6 +18,8 @@ import static org.springframework.http.HttpMethod.GET;
 import static org.springframework.http.HttpMethod.POST;
 
 /**
+ * The type Web security config.
+ *
  * @author YanaV
  * @project GiftCertificate
  */
@@ -27,11 +29,21 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     private static final String ADMIN_ROLE = "ADMIN";
     private static final String USER_ROLE = "USER";
 
+    /**
+     * User service user details service.
+     *
+     * @return the user details service
+     */
     @Bean
     public UserDetailsService userService() {
         return new UserServiceImpl();
     }
 
+    /**
+     * Password encoder b crypt password encoder.
+     *
+     * @return the b crypt password encoder
+     */
     @Bean
     public BCryptPasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
@@ -43,6 +55,11 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         return super.authenticationManagerBean();
     }
 
+    /**
+     * Jwt authentication filter jwt authentication filter.
+     *
+     * @return the jwt authentication filter
+     */
     @Bean
     public JwtAuthenticationFilter jwtAuthenticationFilter() {
         return new JwtAuthenticationFilter();
@@ -59,6 +76,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         http.httpBasic()
                 .and()
                 .authorizeRequests()
+                .antMatchers("/oauth/**").anonymous()
                 .antMatchers(POST, "/users/**").anonymous()
                 .antMatchers(GET, "/certificates/**").permitAll()
                 .antMatchers(GET).hasAnyRole(USER_ROLE, ADMIN_ROLE)

@@ -11,8 +11,11 @@ repositories {
 }
 
 dependencies {
-    implementation 'com.fasterxml.jackson.core:jackson-databind:2.13.2.2'
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.13.3'
     implementation 'org.springframework.boot:spring-boot-starter-oauth2-client:2.6.7'
+    implementation 'org.springframework.boot:spring-boot-starter-oauth2-resource-server:2.6.7'
+    implementation 'org.springframework.security.oauth:spring-security-oauth2:2.5.2.RELEASE'
+    implementation 'org.springframework.security:spring-security-jwt:1.1.1.RELEASE'
     implementation 'io.jsonwebtoken:jjwt:0.9.1'
     implementation project(':service')
 }
