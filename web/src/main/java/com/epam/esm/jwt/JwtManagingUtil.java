@@ -13,6 +13,8 @@ import java.security.Key;
 import java.util.Date;
 
 /**
+ * The type Jwt managing util.
+ *
  * @author YanaV
  * @project GiftCertificate
  */
@@ -23,6 +25,12 @@ public class JwtManagingUtil {
     @Value("${jwt.expiration.millis}")
     private long expirationMillis;
 
+    /**
+     * Create token string.
+     *
+     * @param subject the subject
+     * @return the string
+     */
     public String createToken(String subject) {
         SignatureAlgorithm signatureAlgorithm = SignatureAlgorithm.HS256;
         Date currentDate = new Date(System.currentTimeMillis());
@@ -37,6 +45,12 @@ public class JwtManagingUtil {
                 .compact();
     }
 
+    /**
+     * Decode token claims.
+     *
+     * @param token the token
+     * @return the claims
+     */
     public Claims decodeToken(String token) {
         return Jwts.parser()
                 .setSigningKey(DatatypeConverter.parseBase64Binary(secretKey))
@@ -44,6 +58,13 @@ public class JwtManagingUtil {
                 .getBody();
     }
 
+    /**
+     * Validate token boolean.
+     *
+     * @param token       the token
+     * @param userDetails the user details
+     * @return the boolean
+     */
     public Boolean validateToken(String token, UserDetails userDetails) {
         String username = getUsernameFromToken(token);
         boolean isTokenExpired = decodeToken(token)
@@ -52,6 +73,12 @@ public class JwtManagingUtil {
         return (username.equals(userDetails.getUsername()) && !isTokenExpired);
     }
 
+    /**
+     * Gets username from token.
+     *
+     * @param token the token
+     * @return the username from token
+     */
     public String getUsernameFromToken(String token) {
         return Jwts.parser().setSigningKey(secretKey)
                 .parseClaimsJws(token)

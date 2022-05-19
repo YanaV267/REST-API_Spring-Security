@@ -165,7 +165,7 @@ public class OrderController extends AbstractController<OrderDto> {
      *
      * @param page           the page
      * @param orderDto       the certificate dto
-     * @param userIds        the user ids
+     * @param userId         the user id
      * @param certificateIds the certificate ids
      * @return the set
      */
@@ -177,15 +177,15 @@ public class OrderController extends AbstractController<OrderDto> {
             @RequestParam @Min(1) int page,
             @Valid OrderDto orderDto,
             @RequestParam(value = "user_id", required = false)
-                    List<@Min(1) Integer> userIds,
+            @Min(1) Long userId,
             @RequestParam(value = "certificate", required = false)
                     List<@Min(1) Integer> certificateIds) {
-        Set<OrderDto> orders = orderService.findBySeveralParameters(page, orderDto, userIds, certificateIds);
+        Set<OrderDto> orders = orderService.findBySeveralParameters(page, orderDto, userId, certificateIds);
         int lastPage = orderService.getLastPage();
         if (!orders.isEmpty()) {
             addLinksToOrders(orders);
             CollectionModel<OrderDto> method = methodOn(OrderController.class)
-                    .retrieveBySeveralParameters(page, orderDto, userIds, certificateIds);
+                    .retrieveBySeveralParameters(page, orderDto, userId, certificateIds);
             List<Link> links = addPagesLinks(method, page, lastPage);
             return CollectionModel.of(orders, links);
         } else {

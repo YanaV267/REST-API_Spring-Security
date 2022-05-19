@@ -1,12 +1,14 @@
 com.epam.esm
+com.epam.esm.config
 com.epam.esm.controller
 com.epam.esm.dto
 com.epam.esm.entity
+com.epam.esm.entity.converter
 com.epam.esm.exception
+com.epam.esm.jwt
 com.epam.esm.mapper
 com.epam.esm.mapper.impl
 com.epam.esm.repository
-com.epam.esm.repository.impl
 com.epam.esm.service
 com.epam.esm.service.impl
 com.epam.esm.util

@@ -17,6 +17,8 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 /**
+ * The type Jwt authentication filter.
+ *
  * @author YanaV
  * @project GiftCertificate
  */

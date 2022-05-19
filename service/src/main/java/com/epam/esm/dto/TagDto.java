@@ -3,7 +3,7 @@ package com.epam.esm.dto;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.experimental.Tolerate;
 import org.springframework.hateoas.RepresentationModel;
 import org.springframework.hateoas.server.core.Relation;
 
@@ -19,10 +19,17 @@ import javax.validation.constraints.Pattern;
 @Builder
 @Relation(collectionRelation = "tags")
 @EqualsAndHashCode(callSuper = false)
-@NoArgsConstructor
 public class TagDto extends RepresentationModel<TagDto> {
     private long id;
 
     @Pattern(regexp = "[а-я\\p{Lower}_]{1,50}")
     private String name;
+
+    /**
+     * Instantiates a new Tag dto.
+     */
+    @Tolerate
+    public TagDto() {
+
+    }
 }

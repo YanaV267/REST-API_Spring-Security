@@ -98,6 +98,12 @@ public class BaseExceptionHandler {
                 MISSING_REQUEST_PARAMETERS_MESSAGE, exception.getMessage()), BAD_REQUEST);
     }
 
+    /**
+     * Request unauthorized response entity.
+     *
+     * @param exception the exception
+     * @return the response entity
+     */
     @ExceptionHandler({HttpClientErrorException.Unauthorized.class, AuthenticationException.class,
             SessionAuthenticationException.class})
     public ResponseEntity<ResponseErrorEntity> requestUnauthorized(Exception exception) {
@@ -106,6 +112,12 @@ public class BaseExceptionHandler {
                 exception.getMessage()), UNAUTHORIZED);
     }
 
+    /**
+     * Request access forbidden response entity.
+     *
+     * @param exception the exception
+     * @return the response entity
+     */
     @ExceptionHandler({HttpClientErrorException.Forbidden.class, AccessDeniedException.class})
     public ResponseEntity<ResponseErrorEntity> requestAccessForbidden(Exception exception) {
         return new ResponseEntity<>(new ResponseErrorEntity(FORBIDDEN.value(),

@@ -9,6 +9,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.experimental.Tolerate;
 import org.springframework.hateoas.RepresentationModel;
 
 import javax.validation.Valid;
@@ -62,6 +63,7 @@ public class GiftCertificateDto extends RepresentationModel<GiftCertificateDto> 
     /**
      * Instantiates a new Gift certificate dto.
      */
+    @Tolerate
     public GiftCertificateDto() {
         tags = new LinkedHashSet<>();
     }

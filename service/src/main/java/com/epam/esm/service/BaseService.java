@@ -38,7 +38,8 @@ public interface BaseService<T> {
     /**
      * Gets first element number.
      *
-     * @param page the page
+     * @param page            the page
+     * @param maxResultAmount the max result amount
      * @return the first element number
      */
     default int getFirstElementNumber(int page, int maxResultAmount) {

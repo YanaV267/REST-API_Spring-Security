@@ -49,7 +49,9 @@ public class UserController extends AbstractController<UserDto> {
     /**
      * Instantiates a new User controller.
      *
-     * @param userService the user service
+     * @param userService           the user service
+     * @param authenticationManager the authentication manager
+     * @param jwtManagingUtil       the jwt managing util
      */
     @Autowired
     public UserController(UserServiceImpl userService, AuthenticationManager authenticationManager,
@@ -59,6 +61,12 @@ public class UserController extends AbstractController<UserDto> {
         this.jwtManagingUtil = jwtManagingUtil;
     }
 
+    /**
+     * Sign in jwt response model.
+     *
+     * @param user the user
+     * @return the jwt response model
+     */
     @Validated(OnUpdateGroup.class)
     @PostMapping("/signin")
     @ResponseStatus(OK)
@@ -71,6 +79,11 @@ public class UserController extends AbstractController<UserDto> {
         return new JwtResponseModel(token);
     }
 
+    /**
+     * Sign up.
+     *
+     * @param user the user
+     */
     @Validated(OnCreateGroup.class)
     @PostMapping("/signup")
     @ResponseStatus(OK)

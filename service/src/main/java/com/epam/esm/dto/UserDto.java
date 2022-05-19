@@ -7,12 +7,13 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.experimental.Tolerate;
 import org.springframework.hateoas.RepresentationModel;
 
 import javax.validation.Valid;
 import javax.validation.constraints.*;
 import java.math.BigDecimal;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 /**
@@ -24,7 +25,6 @@ import java.util.Set;
 @Data
 @Builder
 @EqualsAndHashCode(callSuper = false)
-@NoArgsConstructor
 public class UserDto extends RepresentationModel<UserDto> {
     @Min(value = 1, groups = OnAggregationCreateGroup.class)
     private long id;
@@ -51,4 +51,12 @@ public class UserDto extends RepresentationModel<UserDto> {
     @Null
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private Set<@Valid OrderDto> orders;
+
+    /**
+     * Instantiates a new User dto.
+     */
+    @Tolerate
+    public UserDto() {
+        orders = new LinkedHashSet<>();
+    }
 }

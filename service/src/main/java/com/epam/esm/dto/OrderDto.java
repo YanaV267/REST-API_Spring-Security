@@ -7,6 +7,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.experimental.Tolerate;
 import org.springframework.hateoas.RepresentationModel;
 
 import javax.validation.Valid;
@@ -52,6 +53,7 @@ public class OrderDto extends RepresentationModel<OrderDto> {
     /**
      * Instantiates a new Order dto.
      */
+    @Tolerate
     public OrderDto() {
         certificates = new LinkedHashSet<>();
     }
