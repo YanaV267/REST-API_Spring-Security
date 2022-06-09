@@ -137,7 +137,7 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
             for (String sortType : sortTypes) {
                 String type = sortType.substring(sortType.indexOf(UNDERSCORE));
                 String column = sortType.substring(0, sortType.indexOf(UNDERSCORE));
-                if (type.equals(DESC)) {
+                if (DESC.equals(type)) {
                     orders.add(Sort.Order.desc(column));
                 } else {
                     orders.add(Sort.Order.asc(column));

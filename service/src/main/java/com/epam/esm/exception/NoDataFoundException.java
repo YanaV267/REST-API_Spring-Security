@@ -27,10 +27,10 @@ public class NoDataFoundException extends RuntimeException {
      */
     public NoDataFoundException(String parameters, Class<?> resourceClass) {
         super();
-        if (parameters.equals(CERTIFICATES) || parameters.equals(TAGS)
-                || parameters.equals(ORDERS) || parameters.equals(USERS)) {
+        if (CERTIFICATES.equals(parameters) || TAGS.equals(parameters)
+                || ORDERS.equals(parameters) || USERS.equals(parameters)) {
             this.parameters = parameters + DELIMITER + ALL_DATA_VALUE;
-        } else if (parameters.equals(MOST_USED_TAG) || parameters.equals(HIGHEST_ORDER_COST)) {
+        } else if (MOST_USED_TAG.equals(parameters) || HIGHEST_ORDER_COST.equals(parameters)) {
             this.parameters = parameters;
         } else {
             this.parameters = parameters.replaceAll(DELIMITER.trim(), DELIMITER);
