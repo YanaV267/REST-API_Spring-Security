@@ -1,16 +1,38 @@
-subprojects {
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '2.6.7'
+    id 'io.spring.dependency-management' version '1.0.11.RELEASE'
+}
+
+allprojects {
     apply plugin: 'java'
+    apply plugin: 'org.springframework.boot'
+    apply plugin: 'io.spring.dependency-management'
+}
 
+repositories {
+    mavenCentral()
+}
+
+subprojects {
     group 'com.epam.esm'
-    version '1.0-SNAPSHOT'
+    version '0.0.1-SNAPSHOT'
 
-    sourceCompatibility = '8'
-    targetCompatibility = '8'
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
 
     repositories {
         mavenCentral()
     }
 
     dependencies {
+        implementation 'org.springframework.boot:spring-boot-starter-parent:2.6.7'
+        implementation 'org.springframework.boot:spring-boot-starter-web:2.6.7'
+        implementation 'org.springframework.boot:spring-boot-starter-data-jpa:2.6.7'
+        implementation 'org.springframework.boot:spring-boot-starter-validation:2.6.7'
+        implementation 'org.springframework.boot:spring-boot-starter-hateoas:2.6.7'
+        implementation 'org.springframework.boot:spring-boot-starter-security:2.6.7'
+        implementation 'javax.validation:validation-api:2.0.1.Final'
+        testImplementation 'org.springframework.boot:spring-boot-starter-test'
     }
 }
