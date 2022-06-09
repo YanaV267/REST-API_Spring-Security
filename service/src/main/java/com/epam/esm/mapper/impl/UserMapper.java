@@ -6,6 +6,7 @@ import com.epam.esm.entity.User;
 import com.epam.esm.mapper.Mapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Set;
@@ -20,15 +21,19 @@ import java.util.stream.Collectors;
 @Service("userServiceMapper")
 public class UserMapper implements Mapper<User, UserDto> {
     private final OrderMapper orderMapper;
+    private final BCryptPasswordEncoder passwordEncoder;
 
     /**
      * Instantiates a new User mapper.
      *
-     * @param orderMapper the order mapper
+     * @param orderMapper     the order mapper
+     * @param passwordEncoder the password encoder
      */
     @Autowired
-    public UserMapper(@Qualifier("orderServiceMapper") OrderMapper orderMapper) {
+    public UserMapper(@Qualifier("orderServiceMapper") OrderMapper orderMapper,
+                      @Qualifier("passwordEncoder") BCryptPasswordEncoder passwordEncoder) {
         this.orderMapper = orderMapper;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
@@ -51,6 +56,7 @@ public class UserMapper implements Mapper<User, UserDto> {
         User user = new User();
         user.setId(userDto.getId());
         user.setLogin(userDto.getLogin());
+        user.setPassword(passwordEncoder.encode(userDto.getPassword()));
         user.setSurname(userDto.getSurname());
         user.setName(userDto.getName());
         user.setBalance(userDto.getBalance());

@@ -5,7 +5,15 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
-import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.Table;
+import javax.persistence.Id;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.EntityListeners;
+import javax.persistence.Convert;
+import javax.persistence.OneToMany;
+import javax.persistence.FetchType;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.LinkedHashSet;

@@ -1,6 +1,11 @@
 package com.epam.esm.exception;
 
-import static com.epam.esm.util.ParameterName.*;
+import static com.epam.esm.util.ParameterName.CERTIFICATES;
+import static com.epam.esm.util.ParameterName.USERS;
+import static com.epam.esm.util.ParameterName.MOST_USED_TAG;
+import static com.epam.esm.util.ParameterName.HIGHEST_ORDER_COST;
+import static com.epam.esm.util.ParameterName.TAGS;
+import static com.epam.esm.util.ParameterName.ORDERS;
 
 /**
  * The type No data found exception.

@@ -4,14 +4,29 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.experimental.Tolerate;
 
-import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.Table;
+import javax.persistence.Id;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Column;
+import javax.persistence.ManyToMany;
+import javax.persistence.JoinTable;
+import javax.persistence.JoinColumn;
+import javax.persistence.PrePersist;
+import javax.persistence.PreUpdate;
+import javax.persistence.PreRemove;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import static com.epam.esm.entity.AuditListener.*;
+import static com.epam.esm.entity.AuditListener.audit;
+import static com.epam.esm.entity.AuditListener.auditDateTime;
+import static com.epam.esm.entity.AuditListener.INSERT_OPERATION;
+import static com.epam.esm.entity.AuditListener.UPDATE_OPERATION;
+import static com.epam.esm.entity.AuditListener.DELETE_OPERATION;
 import static javax.persistence.CascadeType.MERGE;
 import static javax.persistence.CascadeType.PERSIST;
 

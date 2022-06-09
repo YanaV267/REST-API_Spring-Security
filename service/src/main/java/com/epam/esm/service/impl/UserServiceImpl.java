@@ -51,8 +51,12 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     @Transactional
     public boolean create(UserDto userDto) {
         User user = mapper.mapToEntity(userDto);
-        repository.save(user);
-        return true;
+        Optional<User> foundUser = repository.findByLogin(userDto.getLogin());
+        if (!foundUser.isPresent()) {
+            repository.save(user);
+            return true;
+        }
+        return false;
     }
 
     @Override
