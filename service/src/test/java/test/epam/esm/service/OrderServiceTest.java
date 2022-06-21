@@ -1,14 +1,17 @@
 package test.epam.esm.service;
 
+import com.epam.esm.dto.GiftCertificateDto;
+import com.epam.esm.dto.GiftCertificatePurchaseDto;
 import com.epam.esm.dto.OrderDto;
 import com.epam.esm.dto.UserDto;
 import com.epam.esm.entity.Order;
 import com.epam.esm.entity.User;
 import com.epam.esm.mapper.impl.OrderMapper;
+import com.epam.esm.mapper.impl.UserMapper;
 import com.epam.esm.repository.GiftCertificateRepository;
 import com.epam.esm.repository.OrderRepository;
 import com.epam.esm.repository.UserRepository;
-import com.epam.esm.service.OrderService;
+import com.epam.esm.service.impl.OrderServiceImpl;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -17,17 +20,20 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Example;
-import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.test.util.ReflectionTestUtils;
 
-import java.util.Optional;
-import java.util.List;
+import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Set;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -44,19 +50,24 @@ class OrderServiceTest {
     private UserRepository userRepository;
     @Mock
     private OrderMapper mapper;
+    @Mock
+    private UserMapper userMapper;
     @InjectMocks
-    private OrderService service;
+    private OrderServiceImpl service;
 
     @BeforeEach
     void init() {
-        MockitoAnnotations.openMocks(this);
+        ReflectionTestUtils.setField(service, "maxResultAmount", 15);
     }
 
     @ParameterizedTest
     @MethodSource("provideOrderData")
     void create(OrderDto order) {
+        User user = new User(7);
+        user.setBalance(BigDecimal.valueOf(100));
         when(certificateRepository.findById(anyLong())).thenReturn(Optional.empty());
-        when(userRepository.findById(anyLong())).thenReturn(Optional.of(new User(7)));
+        when(userRepository.findById(anyLong())).thenReturn(Optional.of(user));
+        doNothing().when(userRepository).updateBalance(any(BigDecimal.class), anyLong());
         when(repository.save(any(Order.class))).thenReturn(new Order());
 
         boolean actual = service.create(order);
@@ -66,7 +77,8 @@ class OrderServiceTest {
     @ParameterizedTest
     @MethodSource("provideOrderData")
     void update(OrderDto order) {
-        doNothing().when(repository).save(any(Order.class));
+        when(mapper.mapToEntity(any(OrderDto.class))).thenReturn(new Order());
+        when(repository.save(any(Order.class))).thenReturn(new Order());
 
         boolean actual = service.update(order);
         Assertions.assertTrue(actual);
@@ -75,21 +87,23 @@ class OrderServiceTest {
     @ParameterizedTest
     @ValueSource(longs = {1, 4, 14, 5})
     void delete(long id) {
-        when(repository.findById(anyLong())).thenReturn(Optional.empty());
-        doNothing().when(repository).delete(any(Order.class));
+        when(repository.existsById(anyLong())).thenReturn(true);
+        doNothing().when(repository).deleteById(anyLong());
 
         boolean actual = service.delete(id);
-        Assertions.assertFalse(actual);
+        Assertions.assertTrue(actual);
     }
 
     @ParameterizedTest
     @ValueSource(ints = {7, 30})
-    void findAll(int startElementNumber) {
-        when(repository.findAll(any(Pageable.class))).thenReturn(Page.empty());
+    void findAll(int page) {
+        when(repository.findAll(any(Pageable.class)))
+                .thenReturn(new PageImpl<>(Collections.nCopies(3, new Order())));
         when(mapper.mapToDto(any(Order.class))).thenReturn(new OrderDto());
+        when(userMapper.mapToDto(any(User.class))).thenReturn(new UserDto());
 
-        int expected = 9;
-        Set<OrderDto> tags = service.findAll(startElementNumber);
+        int expected = 1;
+        Set<OrderDto> tags = service.findAll(page);
         int actual = tags.size();
         Assertions.assertEquals(expected, actual);
     }
@@ -101,39 +115,48 @@ class OrderServiceTest {
         when(mapper.mapToDto(any(Order.class))).thenReturn(new OrderDto());
 
         Optional<OrderDto> tag = service.findById(id);
-        Assertions.assertFalse(tag.isPresent());
+        Assertions.assertTrue(tag.isPresent());
     }
 
     @ParameterizedTest
     @ValueSource(longs = {8, 25, 14})
     void findAllByUser(long userId) {
-        when(repository.findByUser_Id(anyLong(), any(Pageable.class))).thenReturn(Page.empty());
+        when(repository.findByUser_Id(anyLong(), any(Pageable.class)))
+                .thenReturn(new PageImpl<>(Collections.nCopies(3, new Order())));
         when(mapper.mapToDto(any(Order.class))).thenReturn(new OrderDto());
+        when(userMapper.mapToDto(any(User.class))).thenReturn(new UserDto());
 
-        int expected = 9;
-        int startElementNumber = 15;
-        Set<OrderDto> tags = service.findAllByUser(startElementNumber, userId);
+        int expected = 1;
+        int page = 15;
+        Set<OrderDto> tags = service.findAllByUser(page, userId);
         int actual = tags.size();
         Assertions.assertEquals(expected, actual);
     }
 
     @ParameterizedTest
     @MethodSource("provideSearchParameters")
-    void findBySeveralParameters(int startElementNumber, OrderDto order, long userId, List<Integer> certificateIds) {
-        when(repository.findAll(any(Example.class), any(Pageable.class))).thenReturn(Page.empty());
+    void findBySeveralParameters(int page, OrderDto order, long userId, List<Integer> certificateIds) {
+        when(repository.findAll(any(Example.class), any(Pageable.class)))
+                .thenReturn(new PageImpl<>(Collections.nCopies(3, new Order())));
+        when(mapper.mapToEntity(any(OrderDto.class))).thenReturn(new Order());
         when(mapper.mapToDto(any(Order.class))).thenReturn(new OrderDto());
+        when(userMapper.mapToDto(any(User.class))).thenReturn(new UserDto());
 
         int expected = 1;
-        Set<OrderDto> orders = service.findBySeveralParameters(startElementNumber, order, userId, certificateIds);
+        Set<OrderDto> orders = service.findBySeveralParameters(page, order, userId, certificateIds);
         int actual = orders.size();
         Assertions.assertEquals(expected, actual);
     }
 
     private static Object[][] provideOrderData() {
         return new Object[][]{
-                {Order.builder()
-                        .user(new User(8))
-                        .certificates(new LinkedHashSet<>(2))
+                {OrderDto.builder()
+                        .user(UserDto.builder()
+                                .id(8)
+                                .balance(BigDecimal.valueOf(900))
+                                .build())
+                        .certificates(new HashSet<>(Collections.nCopies(5,
+                                new GiftCertificatePurchaseDto(new GiftCertificateDto(), 7))))
                         .build()}
         };
     }
@@ -145,11 +168,7 @@ class OrderServiceTest {
                                 .id(8)
                                 .build())
                         .certificates(new LinkedHashSet<>(2))
-                        .build(), new ArrayList<Integer>() {
-                    {
-                        add(1);
-                    }
-                }, new ArrayList<Integer>() {
+                        .build(), 1, new ArrayList<Integer>() {
                     {
                         add(10);
                     }
@@ -158,11 +177,11 @@ class OrderServiceTest {
                         .user(UserDto.builder()
                                 .id(14)
                                 .build())
-                        .build(), new ArrayList<Integer>() {
+                        .build(), 17, new ArrayList<Integer>() {
                     {
                         add(5);
                     }
-                }, new ArrayList<Integer>()},
+                }},
         };
     }
 }

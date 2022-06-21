@@ -4,7 +4,7 @@ import com.epam.esm.dto.UserDto;
 import com.epam.esm.entity.User;
 import com.epam.esm.mapper.impl.UserMapper;
 import com.epam.esm.repository.UserRepository;
-import com.epam.esm.service.UserService;
+import com.epam.esm.service.impl.UserServiceImpl;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -13,16 +13,21 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.test.util.ReflectionTestUtils;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 
@@ -33,16 +38,18 @@ class UserServiceTest {
     @Mock
     private UserMapper mapper;
     @InjectMocks
-    private UserService service;
+    private UserServiceImpl service;
 
     @BeforeEach
     void init() {
-        MockitoAnnotations.openMocks(this);
+        ReflectionTestUtils.setField(service, "maxResultAmount", 15);
     }
 
     @ParameterizedTest
     @MethodSource("provideUserData")
     void create(UserDto user) {
+        when(mapper.mapToEntity(any(UserDto.class))).thenReturn(new User());
+        when(repository.findByLogin(anyString())).thenReturn(Optional.empty());
         when(repository.save(any(User.class))).thenReturn(new User());
 
         boolean actual = service.create(user);
@@ -52,8 +59,8 @@ class UserServiceTest {
     @ParameterizedTest
     @ValueSource(longs = {3, 7, 2})
     void delete(long id) {
-        when(repository.findById(anyLong())).thenReturn(Optional.empty());
-        doNothing().when(repository).delete(any(User.class));
+        when(repository.existsById(anyLong())).thenReturn(true);
+        doNothing().when(repository).deleteById(anyLong());
 
         boolean actual = service.delete(id);
         Assertions.assertTrue(actual);
@@ -62,10 +69,11 @@ class UserServiceTest {
     @ParameterizedTest
     @ValueSource(ints = {4, 45})
     void findAll(int page) {
-        when(repository.findAll(any(Pageable.class))).thenReturn(Page.empty());
+        when(repository.findAll(any(Pageable.class)))
+                .thenReturn(new PageImpl<>(Collections.nCopies(8, new User())));
         when(mapper.mapToDto(any(User.class))).thenReturn(new UserDto());
 
-        int expected = 4;
+        int expected = 1;
         Set<UserDto> users = service.findAll(page);
         int actual = users.size();
         Assertions.assertEquals(expected, actual);
@@ -78,16 +86,17 @@ class UserServiceTest {
         when(mapper.mapToDto(any(User.class))).thenReturn(new UserDto());
 
         Optional<UserDto> user = service.findById(id);
-        Assertions.assertFalse(user.isPresent());
+        Assertions.assertTrue(user.isPresent());
     }
 
     @ParameterizedTest
     @ValueSource(ints = {1})
     void findAllWithOrders(int page) {
-        when(repository.findAll(any(Pageable.class))).thenReturn(Page.empty());
+        when(repository.findAll(any(Pageable.class)))
+                .thenReturn(new PageImpl<>(getUserList(11)));
         when(mapper.mapToDto(any(User.class))).thenReturn(new UserDto());
 
-        int expected = 4;
+        int expected = 1;
         Set<UserDto> users = service.findAll(page);
         int actual = users.size();
         Assertions.assertEquals(expected, actual);
@@ -96,11 +105,12 @@ class UserServiceTest {
     @ParameterizedTest
     @ValueSource(ints = {4})
     void findWithHighestOrderCost(int page) {
-        when(repository.findByHighestOrderCost(any(Pageable.class))).thenReturn(Page.empty());
+        when(repository.findByHighestOrderCost(any(Pageable.class)))
+                .thenReturn(new PageImpl<>(getUserList(5)));
         when(mapper.mapToDto(any(User.class))).thenReturn(new UserDto());
 
-        int expected = 4;
-        Set<UserDto> users = service.findAll(page);
+        int expected = 1;
+        Set<UserDto> users = service.findWithHighestOrderCost(page);
         int actual = users.size();
         Assertions.assertEquals(expected, actual);
     }
@@ -108,13 +118,20 @@ class UserServiceTest {
     @ParameterizedTest
     @ValueSource(ints = {6, 19})
     void findWithHighestOrderCostMostUsedTag(int page) {
-        when(repository.findByHighestOrderCostMostUsedTag(any(Pageable.class))).thenReturn(Page.empty());
+        when(repository.findByHighestOrderCostMostUsedTag(any(Pageable.class)))
+                .thenReturn(new PageImpl<>(getUserList(18)));
         when(mapper.mapToDto(any(User.class))).thenReturn(new UserDto());
 
-        int expected = 4;
-        Set<UserDto> users = service.findAll(page);
+        int expected = 1;
+        Set<UserDto> users = service.findWithHighestOrderCostMostUsedTag(page);
         int actual = users.size();
         Assertions.assertEquals(expected, actual);
+    }
+
+    private List<User> getUserList(int amount) {
+        return IntStream.range(0, amount)
+                .mapToObj(User::new)
+                .collect(Collectors.toList());
     }
 
     private static Object[][] provideUserData() {
