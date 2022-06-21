@@ -13,11 +13,12 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.test.util.ReflectionTestUtils;
 
+import java.util.Collections;
 import java.util.Optional;
 import java.util.Set;
 
@@ -38,23 +39,25 @@ class TagServiceTest {
 
     @BeforeEach
     void init() {
-        MockitoAnnotations.openMocks(this);
+        ReflectionTestUtils.setField(service, "maxResultAmount", 15);
     }
 
     @ParameterizedTest
     @MethodSource("provideTagData")
     void create(TagDto tag) {
+        when(repository.findByName(anyString())).thenReturn(Optional.empty());
+        when(mapper.mapToDto(any(Tag.class))).thenReturn(new TagDto());
         when(repository.save(any(Tag.class))).thenReturn(new Tag());
 
         boolean actual = service.create(tag);
-        Assertions.assertTrue(actual);
+        Assertions.assertFalse(actual);
     }
 
     @ParameterizedTest
     @ValueSource(longs = {3, 7, 2})
     void delete(long id) {
-        when(repository.findById(anyLong())).thenReturn(Optional.empty());
-        doNothing().when(repository).delete(any(Tag.class));
+        when(repository.existsById(anyLong())).thenReturn(true);
+        doNothing().when(repository).deleteById(anyLong());
 
         boolean actual = service.delete(id);
         Assertions.assertTrue(actual);
@@ -63,10 +66,11 @@ class TagServiceTest {
     @ParameterizedTest
     @ValueSource(ints = {4, 45})
     void findAll(int page) {
-        when(repository.findAll(any(Pageable.class))).thenReturn(Page.empty());
+        when(repository.findAll(any(Pageable.class)))
+                .thenReturn(new PageImpl<>(Collections.nCopies(3, new Tag())));
         when(mapper.mapToDto(any(Tag.class))).thenReturn(new TagDto());
 
-        int expected = 4;
+        int expected = 1;
         Set<TagDto> tags = service.findAll(page);
         int actual = tags.size();
         Assertions.assertEquals(expected, actual);
@@ -79,7 +83,7 @@ class TagServiceTest {
         when(mapper.mapToDto(any(Tag.class))).thenReturn(new TagDto());
 
         Optional<TagDto> tag = service.findById(id);
-        Assertions.assertFalse(tag.isPresent());
+        Assertions.assertTrue(tag.isPresent());
     }
 
     @ParameterizedTest
@@ -89,7 +93,7 @@ class TagServiceTest {
         when(mapper.mapToDto(any(Tag.class))).thenReturn(new TagDto());
 
         Optional<TagDto> tag = service.findByName(name);
-        Assertions.assertFalse(tag.isPresent());
+        Assertions.assertTrue(tag.isPresent());
     }
 
     private static Object[][] provideTagData() {
