@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.Link;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -45,6 +46,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
  * @project GiftCertificate
  */
 @RestController
+@CrossOrigin(origins = "http://localhost:3000")
 @Validated
 @RequestMapping("/tags")
 public class TagController extends AbstractController<TagDto> {

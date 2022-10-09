@@ -4,6 +4,7 @@ import com.epam.esm.validation.OnAggregationCreateGroup;
 import com.epam.esm.validation.OnCreateGroup;
 import com.epam.esm.validation.OnUpdateGroup;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -11,11 +12,11 @@ import lombok.experimental.Tolerate;
 import org.springframework.hateoas.RepresentationModel;
 
 import javax.validation.Valid;
-import javax.validation.constraints.Min;
-import javax.validation.constraints.Pattern;
-import javax.validation.constraints.NotNull;
 import javax.validation.constraints.DecimalMin;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Null;
+import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 import java.math.BigDecimal;
 import java.util.LinkedHashSet;
@@ -38,6 +39,7 @@ public class UserDto extends RepresentationModel<UserDto> {
     private String login;
 
     @Pattern(regexp = "[\\p{Alnum}_]{1,60}", groups = {OnCreateGroup.class, OnUpdateGroup.class})
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
 
     @NotNull(groups = OnCreateGroup.class)

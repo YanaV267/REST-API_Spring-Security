@@ -14,9 +14,6 @@ import java.util.Date;
 
 /**
  * The type Jwt managing util.
- *
- * @author YanaV
- * @project GiftCertificate
  */
 @Component
 public class JwtManagingUtil {

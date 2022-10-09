@@ -2,8 +2,6 @@ package com.epam.esm;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.security.oauth2.config.annotation.web.configuration.EnableAuthorizationServer;
-import org.springframework.security.oauth2.config.annotation.web.configuration.EnableResourceServer;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 /**
@@ -14,8 +12,6 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
  */
 @SpringBootApplication
 @EnableWebMvc
-@EnableResourceServer
-@EnableAuthorizationServer
 public class GiftCertificateApplication {
     /**
      * The entry point of application.
@@ -25,5 +21,4 @@ public class GiftCertificateApplication {
     public static void main(String[] args) {
         SpringApplication.run(GiftCertificateApplication.class, args);
     }
-
 }

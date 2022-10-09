@@ -12,6 +12,7 @@ import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.Link;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -46,6 +47,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
  * @project GiftCertificate
  */
 @RestController
+@CrossOrigin(origins = "http://localhost:3000")
 @Validated
 @RequestMapping("/certificates")
 public class GiftCertificateController extends AbstractController<GiftCertificateDto> {
@@ -130,6 +132,22 @@ public class GiftCertificateController extends AbstractController<GiftCertificat
     }
 
     /**
+     * Retrieve all set.
+     *
+     * @return the set
+     */
+    @GetMapping(produces = APPLICATION_JSON_VALUE)
+    @ResponseStatus(FOUND)
+    public CollectionModel<GiftCertificateDto> retrieveAll() {
+        Set<GiftCertificateDto> certificates = certificateService.findAll();
+        if (!certificates.isEmpty()) {
+            return CollectionModel.of(certificates);
+        } else {
+            throw new NoDataFoundException(CERTIFICATES, GiftCertificateDto.class);
+        }
+    }
+
+    /**
      * Retrieve by id gift certificate dto.
      *
      * @param id the id
@@ -158,7 +176,7 @@ public class GiftCertificateController extends AbstractController<GiftCertificat
      * @return the set
      */
     @Validated(OnSearchGroup.class)
-    @GetMapping(produces = APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/search", produces = APPLICATION_JSON_VALUE)
     @ResponseStatus(FOUND)
     public CollectionModel<GiftCertificateDto> retrieveBySeveralParameters(
             @RequestParam(value = "page") @Min(1) int page,

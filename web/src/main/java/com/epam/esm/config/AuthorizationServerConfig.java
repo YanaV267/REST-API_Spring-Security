@@ -10,6 +10,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.oauth2.config.annotation.configurers.ClientDetailsServiceConfigurer;
 import org.springframework.security.oauth2.config.annotation.web.configuration.AuthorizationServerConfigurerAdapter;
+import org.springframework.security.oauth2.config.annotation.web.configuration.EnableAuthorizationServer;
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerEndpointsConfigurer;
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerSecurityConfigurer;
 import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenConverter;
@@ -21,9 +22,10 @@ import org.springframework.security.oauth2.provider.token.store.JwtTokenStore;
  * @author YanaV
  * @project GiftCertificate
  */
-@Configuration
 @Order(3)
-public class OauthConfig extends AuthorizationServerConfigurerAdapter {
+@Configuration
+@EnableAuthorizationServer
+public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdapter {
     @Value("${spring.security.oauth2.client.client-id}")
     private String clientId;
     @Value("${spring.security.oauth2.client.client-secret}")
@@ -47,14 +49,14 @@ public class OauthConfig extends AuthorizationServerConfigurerAdapter {
     private final BCryptPasswordEncoder passwordEncoder;
 
     /**
-     * Instantiates a new Oauth config.
+     * Instantiates a new Authorization server config.
      *
      * @param authenticationManager the authentication manager
      * @param passwordEncoder       the password encoder
      */
     @Autowired
-    public OauthConfig(@Qualifier("authenticationManagerBean") AuthenticationManager authenticationManager,
-                       @Qualifier("passwordEncoder") BCryptPasswordEncoder passwordEncoder) {
+    public AuthorizationServerConfig(@Qualifier("authenticationManagerBean") AuthenticationManager authenticationManager,
+                                     @Qualifier("passwordEncoder") BCryptPasswordEncoder passwordEncoder) {
         this.authenticationManager = authenticationManager;
         this.passwordEncoder = passwordEncoder;
     }
@@ -104,6 +106,5 @@ public class OauthConfig extends AuthorizationServerConfigurerAdapter {
                 .authorizedGrantTypes(grantTypes)
                 .accessTokenValiditySeconds(expirationSeconds)
                 .refreshTokenValiditySeconds(expirationSeconds);
-
     }
 }

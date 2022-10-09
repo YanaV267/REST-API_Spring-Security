@@ -4,9 +4,6 @@ import java.io.Serializable;
 
 /**
  * The type Jwt response model.
- *
- * @author YanaV
- * @project GiftCertificate
  */
 public class JwtResponseModel implements Serializable {
     private final String token;

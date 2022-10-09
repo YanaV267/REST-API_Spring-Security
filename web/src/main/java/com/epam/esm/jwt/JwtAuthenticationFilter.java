@@ -18,9 +18,6 @@ import java.io.IOException;
 
 /**
  * The type Jwt authentication filter.
- *
- * @author YanaV
- * @project GiftCertificate
  */
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private static final String HEADER_KEY = "Authorization";

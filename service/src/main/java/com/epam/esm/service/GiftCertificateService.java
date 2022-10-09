@@ -12,6 +12,12 @@ import java.util.Set;
  * @project GiftCertificate
  */
 public interface GiftCertificateService extends CompleteBaseService<GiftCertificateDto> {
+    /**
+     * Find all set.
+     *
+     * @return the set
+     */
+    Set<GiftCertificateDto> findAll();
 
     /**
      * Find by several parameters set.

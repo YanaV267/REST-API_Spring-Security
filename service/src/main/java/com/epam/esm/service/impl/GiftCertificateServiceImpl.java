@@ -17,6 +17,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.Optional;
 import java.util.List;
 import java.util.ArrayList;
@@ -60,10 +62,8 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
     @Transactional
     public boolean create(GiftCertificateDto giftCertificateDto) {
         GiftCertificate certificate = mapper.mapToEntity(giftCertificateDto);
-        certificate.getTags().forEach(t -> {
-            Optional<Tag> tag = tagRepository.findByName(t.getName());
-            tag.ifPresent(value -> t.setId(value.getId()));
-        });
+        Set<Tag> tags = saveTags(new ArrayList<>(certificate.getTags()));
+        certificate.setTags(tags);
         repository.save(certificate);
         return true;
     }
@@ -73,12 +73,51 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
     public boolean update(GiftCertificateDto giftCertificateDto) {
         Optional<GiftCertificate> foundCertificate = repository.findById(giftCertificateDto.getId());
         if (foundCertificate.isPresent()) {
-            GiftCertificate certificate = mapper.mapToEntity(giftCertificateDto);
+            GiftCertificate certificate = mapEntityForUpdate(giftCertificateDto, foundCertificate.get());
+            certificate.setLastUpdateDate(LocalDateTime.now());
+            Set<Tag> tags = saveTags(new ArrayList<>(certificate.getTags()));
+            certificate.setTags(tags);
             repository.save(certificate);
             return true;
         }
         return false;
     }
+
+    private Set<Tag> saveTags(List<Tag> tags) {
+        for (int i = 0; i < tags.size(); i++) {
+            Optional<Tag> foundTag = tagRepository.findByName(tags.get(i).getName());
+            if (foundTag.isPresent()) {
+                tags.set(i, foundTag.get());
+            } else {
+                tags.set(i, tagRepository.save(tags.get(i)));
+            }
+        }
+        return new HashSet<>(tags);
+    }
+
+    private GiftCertificate mapEntityForUpdate(GiftCertificateDto giftCertificateDto, GiftCertificate foundCertificate) {
+        GiftCertificate certificate = mapper.mapToEntity(giftCertificateDto);
+        if (certificate.getName() == null) {
+            certificate.setName(foundCertificate.getName());
+        }
+        if (certificate.getDescription() == null) {
+            certificate.setDescription(foundCertificate.getDescription());
+        }
+        if (certificate.getPrice() == null) {
+            certificate.setPrice(foundCertificate.getPrice());
+        }
+        if (certificate.getDuration() == 0) {
+            certificate.setDuration(foundCertificate.getDuration());
+        }
+        if (certificate.getCreateDate() == null) {
+            certificate.setCreateDate(foundCertificate.getCreateDate());
+        }
+        if (certificate.getTags() == null || certificate.getTags().isEmpty()) {
+            certificate.setTags(foundCertificate.getTags());
+        }
+        return certificate;
+    }
+
 
     @Override
     @Transactional
@@ -97,6 +136,14 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
         Pageable pageable = PageRequest.of(page, maxResultAmount);
         Set<GiftCertificate> certificates = repository.findAll(pageable).toSet();
         lastPage = repository.findAll(pageable).getTotalPages();
+        return certificates.stream()
+                .map(mapper::mapToDto)
+                .collect(Collectors.toSet());
+    }
+
+    @Override
+    public Set<GiftCertificateDto> findAll() {
+        Set<GiftCertificate> certificates = new HashSet<>(repository.findAll());
         return certificates.stream()
                 .map(mapper::mapToDto)
                 .collect(Collectors.toSet());
